@@ -1,78 +1,76 @@
-%
-% Parameters describing experimental setup 
-%
+#
+# Parameters describing experimental setup 
+#
 
-% Experimental setup
-wavelength = 0.5092836 % in angstrom
-distance = 95.00			% sample-detector distance (mm)
-% Frelon2K non-binned specs below
-dety_center = 511.5				% beamcenter, y in pixel coordinatees
-detz_center = 511.5				% beamcenter, z in pixel coordinatees
-y_size = 0.0936   % Pixel size y (mm)
-z_size = 0.0962   % Pixel size z (mm)
-dety_size = 1024.0     % detector y size (pixels)
-detz_size = 1024.0     % detector z size (pixels)
-tilt_x   = 0.0        % detector tilt counterclockwise around lab x axis in rad 
-tilt_y   = 0.0        % detector tilt counterclockwise around lab y axis in rad 
-tilt_z   = 0.0        % detector tilt counterclockwise around lab z axis in rad 
-omega_start = -90.0   % Minimum Omega in range of interest (in deg)
-omega_end = 90.0      % Maximum Omega in range of interest (in deg)
-omega_step = 0.5      % Omega step size (in deg)
-omega_sign = 1        % Sign of omega rotation
-beampol_factor = 1    % Polarisation factor
-beampol_direct = 0    % Polarisation direction
-%theta_max = 16.0     % Maximum theta angle for harvesting reflections
-o11 = -1              % Orientation matrix of detector 
-o12 =  0              % [[o11,o12]
-o21 =  0              %  [o21,o22]]
-o22 = -1              % 
+# Experimental setup
+wavelength  0.5092836 # in angstrom
+distance  95.00			# sample-detector distance (mm)
+# Frelon2K non-binned specs below
+dety_center  511.5				# beamcenter, y in pixel coordinatees
+detz_center  511.5				# beamcenter, z in pixel coordinatees
+y_size  0.0936   # Pixel size y (mm)
+z_size  0.0962   # Pixel size z (mm)
+dety_size  1024.0     # detector y size (pixels)
+detz_size  1024.0     # detector z size (pixels)
+tilt_x    0.0        # detector tilt counterclockwise around lab x axis in rad 
+tilt_y    0.0        # detector tilt counterclockwise around lab y axis in rad 
+tilt_z    0.0        # detector tilt counterclockwise around lab z axis in rad 
+omega_start  -90.0   # Minimum Omega in range of interest (in deg)
+omega_end  90.0      # Maximum Omega in range of interest (in deg)
+omega_step  0.5      # Omega step size (in deg)
+omega_sign  1        # Sign of omega rotation
+beampol_factor  1    # Polarisation factor
+beampol_direct  0    # Polarisation direction
+theta_min  0                # Minimum theta angle for reflection generation
+theta_max  15               # Maximum theta angle for reflection generation
+o11  -1              # Orientation matrix of detector 
+o12   0              # [[o11,o12]
+o21   0              #  [o21,o22]]
+o22  -1              # 
+
 
 ### File spec
-direc = '/usr/scratch/simulate_data/FableTest1/pyfabric_out'
-imagefile = '/usr/scratch/simulate_data/FableTest1/FableTest1_25gr0001.tif.gz'
-#direc = '../../../../FableTest1/pyfabric_out'
-#imagefile = '../../../../FableTest1/FableTest1_25gr0001.tif.gz'
+direc  '/usr/scratch/simulate_data/FableTest1/pyfabric_out'
+imagefile  '/usr/scratch/simulate_data/FableTest1/FableTest1_25gr0001.tif.gz'
+#direc  '../../../../FableTest1/pyfabric_out'
+#imagefile  '../../../../FableTest1/FableTest1_25gr0001.tif.gz'
     
 ### Cell and space group
-unit_cell = [8.531200, 4.832100, 10.125000, 90.000000, 92.031000, 90.000000]
-sgno = 4
-sysconditions = 23*[0]
-
-theta_min = 0                # Minimum theta angle for reflection generation
-theta_max = 15               # Maximum theta angle for reflection generation
+unit_cell  8.531200 4.832100 10.125000 90.000000 92.031000 90.000000
+sgno  4
+sysconditions  23*[0]
 
 
-### Shoebox size
-sbox_y = 17            # Pixels
-sbox_z = 17            # Pixels
-sbox_omega = 5             # Number of frames
-bordersize = 2       # pixels used to fit background for bg substraction
 
-#no_grains = 25
-no_grains = 2
+#no_grains  25
+no_grains  2
 
-U_grains = [-0.888246, 0.411253, -0.204671, -0.201101, -0.748709, -0.631659, -0.413011, -0.519909, 0.747741]
-U_grains = [-0.158282, -0.986955, 0.029458, -0.929214, 0.158978, 0.333597, -0.333929, 0.025430, -0.942255]
-# U_grains = [-0.174660, -0.984504, 0.015694, 0.983236, -0.173543, 0.055938, -0.052348, 0.025201, 0.998311]
-# U_grains = [-0.361515, -0.876335, 0.318346, -0.233352, 0.415615, 0.879097, -0.902693, 0.243520, -0.354745]
-# U_grains = [0.106886, -0.932239, -0.345697, -0.747534, 0.153899, -0.646148, 0.655567, 0.327485, -0.680431]
-# U_grains = [-0.991823, 0.060390, 0.112431, 0.078775, 0.982800, 0.167027, -0.100410, 0.174518, -0.979521]
-# U_grains = [-0.610325, 0.772524, 0.175242, 0.783513, 0.556130, 0.277177, 0.116668, 0.306473, -0.944703]
-# U_grains = [-0.559955, 0.700702, 0.442117, 0.827813, 0.451074, 0.333553, 0.034293, 0.552765, -0.832631]
-# U_grains = [-0.380594, -0.804698, 0.455641, 0.732695, -0.563019, -0.382319, 0.564185, 0.188338, 0.803880]
-# U_grains = [0.126565, 0.879903, -0.457986, -0.686587, 0.410938, 0.599774, 0.715947, 0.238537, 0.656140]
-# U_grains = [-0.914075, -0.399729, 0.068437, -0.325781, 0.623260, -0.710925, 0.241523, -0.672134, -0.699930]
-# U_grains = [-0.771692, -0.483598, -0.413067, 0.409783, 0.118624, -0.904437, 0.486383, -0.867215, 0.106629]
-# U_grains = [0.104542, -0.562480, -0.820175, -0.284089, 0.773442, -0.566640, 0.953082, 0.292241, -0.078937]
-# U_grains = [-0.561266, -0.707281, -0.429808, -0.825463, 0.515994, 0.228826, 0.059934, 0.483223, -0.873444]
-# U_grains = [-0.498085, -0.199400, -0.843890, -0.311777, -0.866937, 0.388864, -0.809139, 0.456793, 0.369640]
-# U_grains = [0.897031, 0.441746, -0.013982, 0.280146, -0.543839, 0.791048, 0.341838, -0.713512, -0.611594]
-# U_grains = [-0.847805, 0.044205, 0.528462, 0.066615, -0.979749, 0.188824, 0.526107, 0.195290, 0.827692]
-# U_grains = [0.262113, -0.617778, -0.741382, 0.941746, -0.004018, 0.336300, -0.210738, -0.786342, 0.580737]
-# U_grains = [-0.093786, -0.745172, 0.660245, -0.821472, -0.316752, -0.474185, 0.562483, -0.586845, -0.582431]
-# U_grains = [-0.147536, 0.928090, -0.341879, 0.957953, 0.048084, -0.282869, -0.246089, -0.369237, -0.896161]
-# U_grains = [-0.453461, -0.891251, 0.006708, -0.846526, 0.433036, 0.309634, -0.278866, 0.134728, -0.950832]
-# U_grains = [0.889180, -0.163271, -0.427436, -0.013625, -0.943202, 0.331939, -0.457355, -0.289330, -0.840901]
-# U_grains = [-0.135732, 0.737637, 0.661414, -0.735750, -0.522140, 0.431326, 0.663512, -0.428091, 0.613587]
-# U_grains = [0.226129, 0.960757, -0.160661, 0.673011, -0.034857, 0.738811, 0.704218, -0.275193, -0.654482]
-# U_grains = [-0.493401, -0.260091, -0.830005, 0.501570, 0.694534, -0.515800, 0.710622, -0.670802, -0.212230]
+U_grains_1 -0.888246 0.411253 -0.204671 -0.201101 -0.748709 -0.631659 -0.413011 -0.519909 0.747741
+U_grains_2 -0.158282 -0.986955 0.029458 -0.929214 0.158978 0.333597 -0.333929 0.025430 -0.942255
+# U_grains 3  -0.174660 -0.984504 0.015694 0.983236 -0.173543 0.055938 -0.052348 0.025201 0.998311
+# U_grains 4 -0.361515 -0.876335 0.318346 -0.233352 0.415615 0.879097 -0.902693 0.243520 -0.354745
+# U_grains 5 0.106886 -0.932239 -0.345697 -0.747534 0.153899 -0.646148 0.655567 0.327485 -0.680431
+# U_grains 6 -0.991823 0.060390 0.112431 0.078775 0.982800 0.167027 -0.100410 0.174518 -0.979521
+# U_grains 7 -0.610325 0.772524 0.175242 0.783513 0.556130 0.277177 0.116668 0.306473 -0.944703
+# U_grains 8 -0.559955 0.700702 0.442117 0.827813 0.451074 0.333553 0.034293 0.552765 -0.832631
+# U_grains 9 -0.380594 -0.804698 0.455641 0.732695 -0.563019 -0.382319 0.564185 0.188338 0.803880
+# U_grains 10 0.126565 0.879903 -0.457986 -0.686587 0.410938 0.599774 0.715947 0.238537 0.656140
+# U_grains 11 -0.914075 -0.399729 0.068437 -0.325781 0.623260 -0.710925 0.241523 -0.672134 -0.699930
+# U_grains 12 -0.771692 -0.483598 -0.413067 0.409783 0.118624 -0.904437 0.486383 -0.867215 0.106629
+# U_grains 13 0.104542 -0.562480 -0.820175 -0.284089 0.773442 -0.566640 0.953082 0.292241 -0.078937
+# U_grains 14 -0.561266 -0.707281 -0.429808 -0.825463 0.515994 0.228826 0.059934 0.483223 -0.873444
+# U_grains 15 -0.498085 -0.199400 -0.843890 -0.311777 -0.866937 0.388864 -0.809139 0.456793 0.369640
+# U_grains 16 0.897031 0.441746 -0.013982 0.280146 -0.543839 0.791048 0.341838 -0.713512 -0.611594
+# U_grains 17 -0.847805 0.044205 0.528462 0.066615 -0.979749 0.188824 0.526107 0.195290 0.827692
+# U_grains 18 0.262113 -0.617778 -0.741382 0.941746 -0.004018 0.336300 -0.210738 -0.786342 0.580737
+# U_grains 19 -0.093786 -0.745172 0.660245 -0.821472 -0.316752 -0.474185 0.562483 -0.586845 -0.582431
+# U_grains 20 -0.147536 0.928090 -0.341879 0.957953 0.048084 -0.282869 -0.246089 -0.369237 -0.896161
+# U_grains 21 -0.453461 -0.891251 0.006708 -0.846526 0.433036 0.309634 -0.278866 0.134728 -0.950832
+# U_grains 22 0.889180 -0.163271 -0.427436 -0.013625 -0.943202 0.331939 -0.457355 -0.289330 -0.840901
+# U_grains 23 -0.135732 0.737637 0.661414 -0.735750 -0.522140 0.431326 0.663512 -0.428091 0.613587
+# U_grains 24 0.226129 0.960757 -0.160661 0.673011 -0.034857 0.738811 0.704218 -0.275193 -0.654482
+# U_grains 25 -0.493401 -0.260091 -0.830005 0.501570 0.694534 -0.515800 0.710622 -0.670802 -0.212230
+
+pos_grains  1 0 0 0
+pos_grains  2 0.01 -0.05 0.2
+ 

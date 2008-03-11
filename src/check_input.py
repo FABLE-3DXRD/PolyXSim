@@ -69,25 +69,21 @@ class parse_input:
         f.close()
 
         for lines in self.input:
-            if lines[0] != '#' and lines[0] != '%':
-                if lines.find('=') > -1:
-                    line = split(lines,'=')
-                    if line[1].find('#') > -1:
-                        line[1] = split(line[1],'#')[0]
-                    if line[1].find('%') > -1:
-                        line[1] = split(line[1],'%')[0]
-
-                    key = line[0].strip()
-                    val = line[1].strip()
-                    if key == 'U_grains':
-                        key = 'U_grains_%i' %self.grainno
-                        self.grainno = self.grainno + 1
-                    if key == 'pos_grains':
-                        spos = self.entries[key]
-                        spos.append(eval(val))
-                        self.entries[key] = spos
+            if lines.find('#') != 0:
+                if lines.find('#') > 0:
+                    lines = split(lines,'#')[0]
+                line = split(lines)
+                if len(line) != 0:
+                    key = line[0]
+                    val = line[1:]
+                    valtmp = '['
+                    if len(val) > 1:
+                        for i in val:
+                            valtmp = valtmp + i +',' 
+                        val = valtmp + ']'
                     else:
-                        self.entries[key] = eval(val)
+                        val = val[0]
+                    self.entries[key] = eval(val)
                 
 
                 
