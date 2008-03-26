@@ -30,7 +30,7 @@ if options.filename == None:
 # Read and check input
 myinput = check_input.parse_input(input_file=options.filename)  # Make instance of parse_input class
 myinput.read()                                # read input file
-print myinput.entries
+#print myinput.entries
 myinput.check()                               # check validity of input
 if myinput.missing == True:                   # if problem exit
     logging.info('MISSING ITEMS')

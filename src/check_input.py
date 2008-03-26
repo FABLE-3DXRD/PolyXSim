@@ -19,7 +19,7 @@ class parse_input:
         self.filename = input_file
         self.entries = {}
         self.grainno = 0
-        self.entries['pos_grains'] = []
+#        self.entries['pos_grains'] = []
         self.no_pos = 0 # keeping track of no of grain position
         # Experimental setup
         self.needed_items = {
@@ -45,7 +45,7 @@ class parse_input:
                     }
         self.optional_items = {
             'sgno': 1,
-            'pos_grains' : [[0, 0, 0]],
+#            'pos_grains' : [[0, 0, 0]],
             'tilt_x'     : 0,
             'tilt_y'     : 0,
             'tilt_z'     : 0,
@@ -88,16 +88,69 @@ class parse_input:
 
                 
     def check(self):
-        self.missing = False
+		self.missing = False
 
-        for item in self.needed_items:
-            if item not in self.entries:
-                print self.needed_items[item]
-                self.missing = True
-        assert self.grainno == self.entries['no_grains']
-                
-#        for i in range(self.entries['no_grains'])
-#        
+		for item in self.needed_items:
+			if item not in self.entries:
+				print self.needed_items[item]
+				self.missing = True
+		
+		grain_list_U = []
+		grain_list_pos = []
+		grain_list_eps = []
+		no_grains = self.entries['no_grains']
+
+# read U, pos and eps for all grains		
+		for item in self.entries:
+			if '_grains_' in item:
+				if 'U' in item:
+					grain_list_U.append(eval(split(item,'_grains_')[1]))
+				elif 'pos' in item:
+					grain_list_pos.append(eval(split(item,'_grains_')[1]))
+				elif 'eps' in item:
+					grain_list_eps.append(eval(split(item,'_grains_')[1]))
+					
+# assert that input U, pos and eps are correct in format (same number of grains and same specifiers or else not input) 
+		grain_list_U.sort()
+		grain_list_pos.sort()
+		grain_list_eps.sort()
+		
+		if len(grain_list_U) != 0:
+			assert len(grain_list_U) == no_grains, 'Input number of grains does not agree with number of U_grains, check for multiple names'
+			self.entries['grain_list'] = grain_list_U
+			if len(grain_list_pos) != 0:
+				assert grain_list_U == grain_list_pos, 'Specified grain number for U_grains and pos_grains disagree'
+			if len(grain_list_eps) != 0:
+				assert grain_list_U == grain_list_eps, 'Specified grain number for U_grains and eps_grains disagree'
+		else:
+			if len(grain_list_pos) != 0:
+				assert len(grain_list_pos) == no_grains, 'Input number of grains does not agree with number of pos_grains, check for multiple names'
+				self.entries['grain_list'] = grain_list_pos
+				if len(grain_list_eps) != 0:
+					assert grain_list_pos == grain_list_eps, 'Specified grain number for pos_grains and eps_grains disagree'
+			elif len(grain_list_eps) != 0:
+				assert len(grain_list_eps) == no_grains, 'Input number of grains does not agree with number of eps_grains, check for multiple names'
+				self.entries['grain_list'] = grain_list_eps
+			else:
+				self.entries['grain_list'] = range(no_grains)
+							
+# If U, pos or eps are not input generate values
+		if len(grain_list_U) == 0: 
+			for i in self.entries['grain_list']:
+				self.entries['U_grains_%s' %(i)] = [1, 0, 0, 0, 1, 0, 0, 0, 1]
+				
+		if len(grain_list_pos) == 0: 
+			for i in self.entries['grain_list']:
+				self.entries['pos_grains_%s' %(i)] = [0, 0, 0]
+				
+		if len(grain_list_eps) == 0: 
+			for i in self.entries['grain_list']:
+				self.entries['eps_grains_%s' %(i)] = [0, 0, 0, 0, 0, 0]
+	
+#		for item in self.entries:
+#			print item, self.entries[item]
+
+			
     def initialize(self):
         fileinfo = deconstruct_filename(self.entries['imagefile'])
         self.entries['filetype'] = fileinfo.format

@@ -1,6 +1,7 @@
 #from numpy.oldnumeric import *
 import numpy as N
-from Cryst import *
+#from Cryst import *
+from xfab import tools
 #from math    import *
 import variables
 import sys
@@ -21,10 +22,10 @@ class find_refl:
         sintlmax = N.sin(self.param['theta_max']*N.pi/180)/self.param['wavelength']
         self.K = -2*N.pi/self.param['wavelength']
         self.S = N.array([[1, 0, 0],[0, 1, 0],[0, 0, 1]])
-        self.B = N.array(FormB(self.param['unit_cell']))
-        self.V = N.array(CellVolume(self.param['unit_cell']))
-        self.sbox_y_half = (self.param['sbox_y']-1)/2
-        self.sbox_z_half = (self.param['sbox_z']-1)/2
+        self.A0inv = N.array(tools.FormAinv(self.param['unit_cell']))
+        self.V = N.array(tools.CellVolume(self.param['unit_cell']))
+    #    self.sbox_y_half = (self.param['sbox_y']-1)/2
+    #    self.sbox_z_half = (self.param['sbox_z']-1)/2
         # Detector tilt correction matrix
         if self.param['tilt_x'] != 0 or self.param['tilt_y'] != 0 or self.param['tilt_z'] != 0:
              tilt_x = self.param['tilt_x']
@@ -51,7 +52,7 @@ class find_refl:
         
         # Generate Miller indices for reflections within a certain resolution
         print 'Generating reflections'
-        self.hkl  = genhkl(self.param['unit_cell'],self.param['sysconditions'],sintlmin,sintlmax)
+        self.hkl  = tools.genhkl(self.param['unit_cell'],self.param['sysconditions'],sintlmin,sintlmax)
         #print self.hkl
         print 'Finished generating reflections\n'
     
@@ -60,14 +61,18 @@ class find_refl:
         # Generate orientations of the grains and loop over all grains
         for grainno in range(self.param['no_grains']):
             A = []
-            U = N.array(self.param['U_grains_%s' %(grainno)])
+            U = N.array(self.param['U_grains_%s' %(self.param['grain_list'][grainno])])
             U.shape = (3,3)
             self.grain.append(variables.grain_cont(U))
-            gr_pos = N.array(self.param['pos_grains'][grainno])
-            print 'GRAIN POSITION of grain ',grainno,': ',gr_pos
-            print 'GRAIN NO: ',grainno
-            self.grain[grainno].pos = gr_pos
-            print self.grain[grainno].U
+            gr_pos = N.array(self.param['pos_grains_%s' %(self.param['grain_list'][grainno])])
+            gr_eps = N.array(self.param['eps_grains_%s' %(self.param['grain_list'][grainno])])
+            B = tools.epsilon2B(gr_eps,self.A0inv)  # Calculate the B-matrix based on the strain tensor for each grain
+            print 'GRAIN NO: ',self.param['grain_list'][grainno]
+            print 'GRAIN POSITION of grain ',self.param['grain_list'][grainno],': ',gr_pos
+            print 'STRAIN TENSOR COMPONENTS (e11 e12 e13 e22 e23 e33) of grain ',self.param['grain_list'][grainno],':\n',gr_eps
+            print 'U of grain ',self.param['grain_list'][grainno],':\n',U
+#            print self.grain[grainno].U
+#            self.grain[grainno].pos = gr_pos
             nrefl = 0
   
             # Calculate these values:
@@ -75,22 +80,22 @@ class find_refl:
             # For all reflections in Ahkl that fulfill omega_start < omega < omega_end.
             # All angles in Grain are in degrees
             for hkl in self.hkl:
-                Gtmp = N.dot(self.B,hkl)
+                Gtmp = N.dot(B,hkl)
                 Gtmp = N.dot(U,Gtmp)
                 Gw =   N.dot(self.S,Gtmp)
                 #Gw = self.S*U*self.B*hkl
                 #print G
-                Glen = N.sqrt(dot(Gw,Gw))
+                Glen = N.sqrt(N.dot(Gw,Gw))
                 theta = N.arcsin(Glen/(2*abs(self.K)))
                 costth = N.cos(2*theta)
 
-                Omega = find_omega(Gw,costth)
+                Omega = tools.find_omega(Gw,costth)
   
                 if len(Omega) > 0:
                     for omega in Omega:
                         if  (self.param['omega_start']*N.pi/180) < omega and omega < (self.param['omega_end']*N.pi/180):
-                            Om = array([[cos(omega), -sin(omega), 0],
-                                        [sin(omega),  cos(omega), 0],
+                            Om = N.array([[N.cos(omega), -N.sin(omega), 0],
+                                        [N.sin(omega),  N.cos(omega), 0],
                                         [  0       ,    0       , 1]])
                             Gt = N.dot(Om,Gw)
                             eta = N.arctan2(-Gt[1],Gt[2])
@@ -132,12 +137,12 @@ class find_refl:
                                 detyd = dety
                                 detzd = detz
                              #If shoebox extends outside detector exclude it
-                            if ( self.param['sbox_y'] > detyd) or (detyd > self.param['dety_size']-self.param['sbox_y']) or (self.param['sbox_z'] > detzd) or (detzd > self.param['detz_size']-self.param['sbox_z']):
-                                 continue
+ #                           if ( self.param['sbox_y'] > detyd) or (detyd > self.param['dety_size']-self.param['sbox_y']) or (self.param['sbox_z'] > detzd) or (detzd > self.param['detz_size']-self.param['sbox_z']):
+ #                                continue
                             
-                            frame_center = N.floor((omega*180/N.pi-self.param['omega_start'])/self.param['omega_step'])
-                            delta_sbox_omega =  int((self.param['sbox_omega']-1)/2)
-                            frame_limits = [frame_center - delta_sbox_omega, frame_center + delta_sbox_omega]
+ #                           frame_center = N.floor((omega*180/N.pi-self.param['omega_start'])/self.param['omega_step'])
+ #                           delta_sbox_omega =  int((self.param['sbox_omega']-1)/2)
+ #                           frame_limits = [frame_center - delta_sbox_omega, frame_center + delta_sbox_omega]
                             #Polarization factor (Kahn et al, J. Appl. Cryst. (1982) 15, 330-337.)
                             rho = N.pi/2.0 + eta + self.param['beampol_direct']*N.pi/180.0 
                             P = 0.5 * (1 + costth*costth +\
@@ -157,11 +162,11 @@ class find_refl:
                                       dety,detz,
                                       detyd,detzd,
                                       Gw[0],Gw[1],Gw[2],
-                                      L,P,
-                                      frame_limits[0],frame_limits[1],
-                                      overlaps])
-                            nrefl   += 1
-                            spot_id += 1
+                                      L,P])
+ #                                     frame_limits[0],frame_limits[1],
+  #                                    overlaps])
+                            nrefl = nrefl+1
+                            spot_id = spot_id+1
 
 #           print 'Length of Grain', len(self.grain[0].refl)
             A = N.array(A)
@@ -254,9 +259,12 @@ class find_refl:
                                A[i,A_id['gv3']],
                                A[i,A_id['L']],
                                A[i,A_id['P']],
-                               A[i,A_id['frame_start']],
-                               A[i,A_id['frame_end']],
-                               A[i,A_id['overlaps']]
+                               A[i,0],
+                               A[i,0],
+                               A[i,0]
+#                               A[i,A_id['frame_start']],
+#                               A[i,A_id['frame_end']],
+#                               A[i,A_id['overlaps']]
                            )
                 f.write(out)
             f.close()   
