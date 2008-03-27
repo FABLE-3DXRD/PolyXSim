@@ -8,6 +8,7 @@ from string import split
 import sys, os 
 from fabio import deconstruct_filename, jump_filename
 import variables
+from xfab import tools
 
 import numpy as N
 import logging
@@ -54,7 +55,12 @@ class parse_input:
             'spatial' : None,
             'flood' : None,
             'dark' : None,
-            'darkoffset' : None
+            'darkoffset' : None,
+#			'gen_U'   : 0,
+#			'gen_pos' : 0,
+#			'gen_eps' : [0,0],	
+#			'sample_xyz': [0,0,0],
+#			'sample_cyl': [0,0]
             }
 
         
@@ -114,43 +120,98 @@ class parse_input:
 		grain_list_U.sort()
 		grain_list_pos.sort()
 		grain_list_eps.sort()
-		
-		if len(grain_list_U) != 0:
+		if len(grain_list_U) != 0 and 'gen_U' not in self.entries:
 			assert len(grain_list_U) == no_grains, 'Input number of grains does not agree with number of U_grains, check for multiple names'
 			self.entries['grain_list'] = grain_list_U
-			if len(grain_list_pos) != 0:
+			if len(grain_list_pos) != 0 and 'gen_pos' not in self.entries:
 				assert grain_list_U == grain_list_pos, 'Specified grain number for U_grains and pos_grains disagree'
-			if len(grain_list_eps) != 0:
+			if len(grain_list_eps) != 0 and 'gen_eps' not in self.entries:
 				assert grain_list_U == grain_list_eps, 'Specified grain number for U_grains and eps_grains disagree'
 		else:
-			if len(grain_list_pos) != 0:
+			if len(grain_list_pos) != 0 and 'gen_pos' not in self.entries:
 				assert len(grain_list_pos) == no_grains, 'Input number of grains does not agree with number of pos_grains, check for multiple names'
 				self.entries['grain_list'] = grain_list_pos
-				if len(grain_list_eps) != 0:
+				if len(grain_list_eps) != 0 and 'gen_eps' not in self.entries:
 					assert grain_list_pos == grain_list_eps, 'Specified grain number for pos_grains and eps_grains disagree'
-			elif len(grain_list_eps) != 0:
+			elif len(grain_list_eps) != 0 and 'gen_eps' not in self.entries:
 				assert len(grain_list_eps) == no_grains, 'Input number of grains does not agree with number of eps_grains, check for multiple names'
 				self.entries['grain_list'] = grain_list_eps
 			else:
 				self.entries['grain_list'] = range(no_grains)
 							
-# If U, pos or eps are not input generate values
-		if len(grain_list_U) == 0: 
+# Generate U if gen_U exists or the values are not input
+		if len(grain_list_U) == 0 or 'gen_U' in self.entries: 
+			print 'Grain orientations will be randomly generated\n'
 			for i in self.entries['grain_list']:
-				self.entries['U_grains_%s' %(i)] = [1, 0, 0, 0, 1, 0, 0, 0, 1]
+				phi1 = N.random.rand()*2*N.pi
+				phi2 = N.random.rand()*2*N.pi
+				PHI = N.random.rand()*N.pi
+				self.entries['U_grains_%s' %(i)] = tools.euler2U(phi1,PHI,phi2)
 				
-		if len(grain_list_pos) == 0: 
+# Generate pos if gen_pos exists
+# If gen_pos != 0 use the sample shape and size if this is input, else default to (0,0,0)
+# Finally, if the positions are not input or gen_pos == 0, default to (0,0,0)	
+		if 'gen_pos' in self.entries:
+			if self.entries['gen_pos'] != 0:
+				if 'sample_xyz' in self.entries:
+					assert 'sample_cyl' not in self.entries, 'sample_xyz and sample_cyl are input simultaneously'
+					sample_x = self.entries['sample_xyz'][0]
+					sample_y = self.entries['sample_xyz'][1]
+					sample_z = self.entries['sample_xyz'][2]
+					print 'Grain positions will be randomly generated within a box of ', sample_x, sample_y, sample_z, 'mm\n'
+					for i in self.entries['grain_list']:
+						x = (N.random.rand()-0.5)*sample_x
+						y = (N.random.rand()-0.5)*sample_y
+						z = (N.random.rand()-0.5)*sample_z
+						self.entries['pos_grains_%s' %(i)] = [x, y, z]
+
+				elif 'sample_cyl'in self.entries:
+					sample_r = self.entries['sample_cyl'][0]
+					sample_z = self.entries['sample_cyl'][1]
+					print 'Grain positions will be randomly generated within a cylinder of radius ', sample_r, ' and length ', sample_z, 'mm\n'
+					for i in self.entries['grain_list']:
+						r = N.random.rand()*sample_r
+						w = N.random.rand()*2*N.pi
+						z = (N.random.rand()-0.5)*sample_z
+						self.entries['pos_grains_%s' %(i)] = [r*N.cos(w), r*N.sin(w), z]
+
+				else:
+					print 'Grain positions will be set to (0,0,0)\n'
+					for i in self.entries['grain_list']:
+						self.entries['pos_grains_%s' %(i)] = [0, 0, 0]
+
+			else:
+				print 'Grain positions will be set to (0,0,0)\n'
+				for i in self.entries['grain_list']:
+					self.entries['pos_grains_%s' %(i)] = [0, 0, 0]
+					
+		elif len(grain_list_pos) == 0:
+			print 'Grain positions will be set to (0,0,0)\n'
 			for i in self.entries['grain_list']:
 				self.entries['pos_grains_%s' %(i)] = [0, 0, 0]
+
+# Generate strain tensors if gen_eps exists
+# Use a normal distribution with the specified mean and spread for diagonal and off-diagonal elements
+# Finally, if the strain tensors are not input default to (0,0,0,0,0,0)	
+		if 'gen_eps' in self.entries: 
+			mean_diag = self.entries['gen_eps'][0]
+			spread_diag = self.entries['gen_eps'][1]
+			mean_offdiag = self.entries['gen_eps'][2]
+			spread_offdiag = self.entries['gen_eps'][3]
+			print 'Grain strain tensors will be randomly generated using a normal distribution'
+			print 'For diagonal elements, mean: ', mean_diag, ' and spread: ', spread_diag
+			print 'For off-diagonal elements, mean: ', mean_offdiag, ' and spread: ', spread_offdiag
+			
+			for i in self.entries['grain_list']:
+				eps = tools.geneps(mean_diag,spread_diag,mean_offdiag,spread_offdiag)
+				self.entries['eps_grains_%s' %(i)] = eps
 				
-		if len(grain_list_eps) == 0: 
+		elif len(grain_list_eps) == 0: 
+			print 'Grain strain tensors will be set to (0,0,0,0,0,0) - no strain'
 			for i in self.entries['grain_list']:
 				self.entries['eps_grains_%s' %(i)] = [0, 0, 0, 0, 0, 0]
 	
-#		for item in self.entries:
-#			print item, self.entries[item]
-
-			
+	
     def initialize(self):
         fileinfo = deconstruct_filename(self.entries['imagefile'])
         self.entries['filetype'] = fileinfo.format

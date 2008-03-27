@@ -41,12 +41,17 @@ sgno  4
 sysconditions  23*[0]
 
 
+gen_U 0        # generate grain orientations
+gen_pos 1      # generate grain positions
+gen_eps 0 0.001 0 0 # generate strain tensors [mean (diag) spread (diag) mean (off-diag) spread (off-diag)]
+sample_xyz 0.3 0.3 0.3  # sample size in mm
+#sample_cyl 0.2 0.3      # cylinder dimension, radius and length, of sample in mm
 
 #no_grains  25
 no_grains  2
 
-U_grains_1 -0.888246 0.411253 -0.204671 -0.201101 -0.748709 -0.631659 -0.413011 -0.519909 0.747741
-U_grains_2 -0.158282 -0.986955 0.029458 -0.929214 0.158978 0.333597 -0.333929 0.025430 -0.942255
+#U_grains_1 -0.888246 0.411253 -0.204671 -0.201101 -0.748709 -0.631659 -0.413011 -0.519909 0.747741
+#U_grains_2 -0.158282 -0.986955 0.029458 -0.929214 0.158978 0.333597 -0.333929 0.025430 -0.942255
 # U_grains_3  -0.174660 -0.984504 0.015694 0.983236 -0.173543 0.055938 -0.052348 0.025201 0.998311
 # U_grains_4 -0.361515 -0.876335 0.318346 -0.233352 0.415615 0.879097 -0.902693 0.243520 -0.354745
 # U_grains_5 0.106886 -0.932239 -0.345697 -0.747534 0.153899 -0.646148 0.655567 0.327485 -0.680431
