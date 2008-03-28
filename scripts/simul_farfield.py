@@ -4,6 +4,7 @@
 import sys
 from Simul_farfield import check_input
 from Simul_farfield import find_refl
+from Simul_farfield import generate_grains
 import logging
 logging.basicConfig(level=logging.INFO,format='\n%(levelname)s: %(message)s')
 
@@ -30,12 +31,15 @@ if options.filename == None:
 # Read and check input
 myinput = check_input.parse_input(input_file=options.filename)  # Make instance of parse_input class
 myinput.read()                                # read input file
-#print myinput.entries
 myinput.check()                               # check validity of input
 if myinput.missing == True:                   # if problem exit
     logging.info('MISSING ITEMS')
     sys.exit()
 myinput.initialize()                            # if ok initialize
+
+generate_grains.generate_grains(myinput.entries)
+#print myinput.entries
+
 
 # Determine the reflection parameters for grains
 graindata = find_refl.find_refl(myinput.entries)

@@ -20,8 +20,7 @@ class parse_input:
         self.filename = input_file
         self.entries = {}
         self.grainno = 0
-#        self.entries['pos_grains'] = []
-        self.no_pos = 0 # keeping track of no of grain position
+#        self.no_pos = 0 # keeping track of no of grain position
         # Experimental setup
         self.needed_items = {
                     'wavelength' : 'Missing input: wavelenght [wavelength in angstrom]',
@@ -35,10 +34,8 @@ class parse_input:
                     'omega_start'       : 'Missing input: omega_start [Omega start in degrees]',
                     'omega_end'       : 'Missing input: omega_end [Omega end in degrees]',
                     'omega_step'      : 'Missing input: omega_step [Omega step size in degrees]',
-                    #'sgno'       : 'Missing input: sgno [space group number has to be given when sysconditions are not]',
                     'unit_cell'  : 'Missing input: unit_cell [unit cell parameters: a,b,c,alpha,beta, gamma]',
                     'no_grains'  : 'Missing input: no_grains [number of grains]',
-                    #'U_grains'   : 'Missing input: U_grains [crystal orientations]',
                     'direc'      : 'Missing input: direc [directory to save output]',
                     'theta_min'   : 'Missing input: theta_min [Minimum theta angle for generation of reflections in degrees]',
                     'theta_max'   : 'Missing input: theta_max [Maximum theta angle for generation of reflections in degrees]',
@@ -46,7 +43,6 @@ class parse_input:
                     }
         self.optional_items = {
             'sgno': 1,
-#            'pos_grains' : [[0, 0, 0]],
             'tilt_x'     : 0,
             'tilt_y'     : 0,
             'tilt_z'     : 0,
@@ -56,11 +52,11 @@ class parse_input:
             'flood' : None,
             'dark' : None,
             'darkoffset' : None,
-#			'gen_U'   : 0,
-#			'gen_pos' : 0,
-#			'gen_eps' : [0,0],	
-#			'sample_xyz': [0,0,0],
-#			'sample_cyl': [0,0]
+			'gen_U'   : None,
+			'gen_pos' : None,
+			'gen_eps' : None,	
+			'sample_xyz': None,
+			'sample_cyl': None
             }
 
         
@@ -82,13 +78,31 @@ class parse_input:
                 if len(line) != 0:
                     key = line[0]
                     val = line[1:]
+
+# assert that the correct number of arguments are given
+                    if key == 'sample_cyl':
+                        assert len(val) == 2, 'Wrong number of arguments for %s' %key
+                    elif key == 'sample_xyz' or 'pos_grains' in key:
+                        assert len(val) == 3, 'Wrong number of arguments for %s' %key
+                    elif key == 'gen_eps':
+                        assert len(val) == 4, 'Wrong number of arguments for %s' %key
+                    elif key == 'unit_cell' or 'eps_grains' in key:
+                        assert len(val) == 6, 'Wrong number of arguments for %s' %key
+                    elif 'U_grains' in key:
+                        assert len(val) == 9, 'Wrong number of arguments for %s' %key
+                    else:
+                        assert len(val) == 1, 'Wrong number of arguments for %s' %key
+
+# evaluate and store 
                     valtmp = '['
                     if len(val) > 1:
                         for i in val:
-                            valtmp = valtmp + i +',' 
+                            valtmp = valtmp + i +','
+							
                         val = valtmp + ']'
                     else:
                         val = val[0]
+
                     self.entries[key] = eval(val)
                 
 
@@ -138,86 +152,20 @@ class parse_input:
 				self.entries['grain_list'] = grain_list_eps
 			else:
 				self.entries['grain_list'] = range(no_grains)
+				
+		if len(grain_list_U) == 0 and 'gen_U' not in self.entries:
+			self.entries['gen_U'] = 0
+		if len(grain_list_pos) == 0 and 'gen_pos' not in self.entries:
+			self.entries['gen_pos'] = 0
+		if len(grain_list_eps) == 0 and 'gen_eps' not in self.entries:
+			self.entries['gen_eps'] = [0,0,0,0]
 							
-# Generate U if gen_U exists or the values are not input
-		if len(grain_list_U) == 0 or 'gen_U' in self.entries: 
-			print 'Grain orientations will be randomly generated\n'
-			for i in self.entries['grain_list']:
-				phi1 = N.random.rand()*2*N.pi
-				phi2 = N.random.rand()*2*N.pi
-				PHI = N.random.rand()*N.pi
-				self.entries['U_grains_%s' %(i)] = tools.euler2U(phi1,PHI,phi2)
-				
-# Generate pos if gen_pos exists
-# If gen_pos != 0 use the sample shape and size if this is input, else default to (0,0,0)
-# Finally, if the positions are not input or gen_pos == 0, default to (0,0,0)	
-		if 'gen_pos' in self.entries:
-			if self.entries['gen_pos'] != 0:
-				if 'sample_xyz' in self.entries:
-					assert 'sample_cyl' not in self.entries, 'sample_xyz and sample_cyl are input simultaneously'
-					sample_x = self.entries['sample_xyz'][0]
-					sample_y = self.entries['sample_xyz'][1]
-					sample_z = self.entries['sample_xyz'][2]
-					print 'Grain positions will be randomly generated within a box of ', sample_x, sample_y, sample_z, 'mm\n'
-					for i in self.entries['grain_list']:
-						x = (N.random.rand()-0.5)*sample_x
-						y = (N.random.rand()-0.5)*sample_y
-						z = (N.random.rand()-0.5)*sample_z
-						self.entries['pos_grains_%s' %(i)] = [x, y, z]
-
-				elif 'sample_cyl'in self.entries:
-					sample_r = self.entries['sample_cyl'][0]
-					sample_z = self.entries['sample_cyl'][1]
-					print 'Grain positions will be randomly generated within a cylinder of radius ', sample_r, ' and length ', sample_z, 'mm\n'
-					for i in self.entries['grain_list']:
-						r = N.random.rand()*sample_r
-						w = N.random.rand()*2*N.pi
-						z = (N.random.rand()-0.5)*sample_z
-						self.entries['pos_grains_%s' %(i)] = [r*N.cos(w), r*N.sin(w), z]
-
-				else:
-					print 'Grain positions will be set to (0,0,0)\n'
-					for i in self.entries['grain_list']:
-						self.entries['pos_grains_%s' %(i)] = [0, 0, 0]
-
-			else:
-				print 'Grain positions will be set to (0,0,0)\n'
-				for i in self.entries['grain_list']:
-					self.entries['pos_grains_%s' %(i)] = [0, 0, 0]
-					
-		elif len(grain_list_pos) == 0:
-			print 'Grain positions will be set to (0,0,0)\n'
-			for i in self.entries['grain_list']:
-				self.entries['pos_grains_%s' %(i)] = [0, 0, 0]
-
-# Generate strain tensors if gen_eps exists
-# Use a normal distribution with the specified mean and spread for diagonal and off-diagonal elements
-# Finally, if the strain tensors are not input default to (0,0,0,0,0,0)	
-		if 'gen_eps' in self.entries: 
-			mean_diag = self.entries['gen_eps'][0]
-			spread_diag = self.entries['gen_eps'][1]
-			mean_offdiag = self.entries['gen_eps'][2]
-			spread_offdiag = self.entries['gen_eps'][3]
-			print 'Grain strain tensors will be randomly generated using a normal distribution'
-			print 'For diagonal elements, mean: ', mean_diag, ' and spread: ', spread_diag
-			print 'For off-diagonal elements, mean: ', mean_offdiag, ' and spread: ', spread_offdiag
-			
-			for i in self.entries['grain_list']:
-				eps = tools.geneps(mean_diag,spread_diag,mean_offdiag,spread_offdiag)
-				self.entries['eps_grains_%s' %(i)] = eps
-				
-		elif len(grain_list_eps) == 0: 
-			print 'Grain strain tensors will be set to (0,0,0,0,0,0) - no strain'
-			for i in self.entries['grain_list']:
-				self.entries['eps_grains_%s' %(i)] = [0, 0, 0, 0, 0, 0]
-	
 	
     def initialize(self):
         fileinfo = deconstruct_filename(self.entries['imagefile'])
         self.entries['filetype'] = fileinfo.format
         self.entries['stem'] = fileinfo.stem
-        if 'start_frame' not in self.entries:
-            
+        if 'start_frame' not in self.entries:            
             self.entries['start_frame'] = fileinfo.num
         self.entries['filetype'] = fileinfo.format
         for item in self.optional_items:

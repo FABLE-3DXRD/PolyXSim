@@ -1,8 +1,5 @@
-#from numpy.oldnumeric import *
 import numpy as N
-#from Cryst import *
 from xfab import tools
-#from math    import *
 import variables
 import sys
 from ImageD11 import blobcorrector
