@@ -16,7 +16,7 @@ tilt_x    0.0        # detector tilt counterclockwise around lab x axis in rad
 tilt_y    0.0        # detector tilt counterclockwise around lab y axis in rad 
 tilt_z    0.0        # detector tilt counterclockwise around lab z axis in rad 
 omega_start  -90.0   # Minimum Omega in range of interest (in deg)
-omega_end  90.0      # Maximum Omega in range of interest (in deg)
+omega_end  -80.0      # Maximum Omega in range of interest (in deg)
 omega_step  0.5      # Omega step size (in deg)
 omega_sign  1        # Sign of omega rotation
 beampol_factor  1    # Polarisation factor
@@ -43,12 +43,12 @@ sysconditions  23*[0]
 
 gen_U 0        # generate grain orientations
 gen_pos 1      # generate grain positions
-#gen_eps 0 0 0 0 # generate strain tensors [mean (diag) spread (diag) mean (off-diag) spread (off-diag)]
+gen_eps 0 0 0 0 # generate strain tensors [mean (diag) spread (diag) mean (off-diag) spread (off-diag)]
 sample_xyz 0.3 0.3 0.3  # sample size in mm
 #sample_cyl 0.2 0.3    # cylinder dimension, radius and length, of sample in mm
 
 #no_grains  25
-no_grains  2
+no_grains  25
 
 U_grains_1 -0.888246 0.411253 -0.204671 -0.201101 -0.748709 -0.631659 -0.413011 -0.519909 0.747741
 U_grains_2 -0.158282 -0.986955 0.029458 -0.929214 0.158978 0.333597 -0.333929 0.025430 -0.942255

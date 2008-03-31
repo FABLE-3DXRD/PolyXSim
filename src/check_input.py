@@ -104,7 +104,11 @@ class parse_input:
                         val = val[0]
 
                     self.entries[key] = eval(val)
-                
+					
+                    if 'U_grains' in key:
+                        self.entries[key] = N.array(self.entries[key])
+                        self.entries[key].shape = (3,3)
+           
 
                 
     def check(self):

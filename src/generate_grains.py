@@ -115,3 +115,44 @@ def generate_grains(param):
 			
 	return param
 	
+	
+def save_grains(param):
+#  Save the generated grain parameters, pos, U and eps
+#
+# INPUT: The parameter set from the input file and the grain generator
+# OUTPUT: grainno x y z U11 U12 U13 U21 U22 U23 U31 U32 U33 eps11 eps12 eps13 eps22 eps23 eps33
+#
+# Jette Oddershede, Risoe DTU, March 31 2008
+#
+
+    filename = '%s/%s_%0.4dgrains.txt' %(param['direc'],param['stem'],param['no_grains'])
+    f = open(filename,'w')
+    format = "%d "*1 + "%f "*18 +"\n"
+    out = "# grainno x y z U11 U12 U13 U21 U22 U23 U31 U32 U33 eps11 eps12 eps13 eps22 eps23 eps33 \n"
+    f.write(out)
+    for i in range(param['no_grains']):
+        out = format %(param['grain_list'][i],
+                       param['pos_grains_%s' %(param['grain_list'][i])][0],
+                       param['pos_grains_%s' %(param['grain_list'][i])][1],
+                       param['pos_grains_%s' %(param['grain_list'][i])][2],
+                       param['U_grains_%s' %(param['grain_list'][i])][0,0],
+                       param['U_grains_%s' %(param['grain_list'][i])][0,1],
+                       param['U_grains_%s' %(param['grain_list'][i])][0,2],
+                       param['U_grains_%s' %(param['grain_list'][i])][1,0],
+                       param['U_grains_%s' %(param['grain_list'][i])][1,1],
+                       param['U_grains_%s' %(param['grain_list'][i])][1,2],
+                       param['U_grains_%s' %(param['grain_list'][i])][2,0],
+                       param['U_grains_%s' %(param['grain_list'][i])][2,1],
+                       param['U_grains_%s' %(param['grain_list'][i])][2,2],
+                       param['eps_grains_%s' %(param['grain_list'][i])][0],
+                       param['eps_grains_%s' %(param['grain_list'][i])][1],
+                       param['eps_grains_%s' %(param['grain_list'][i])][2],
+                       param['eps_grains_%s' %(param['grain_list'][i])][3],
+                       param['eps_grains_%s' %(param['grain_list'][i])][4],
+                       param['eps_grains_%s' %(param['grain_list'][i])][5],
+                           )
+        f.write(out)
+    f.close()   
+            
+
+

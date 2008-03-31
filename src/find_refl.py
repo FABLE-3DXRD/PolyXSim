@@ -58,8 +58,7 @@ class find_refl:
         # Generate orientations of the grains and loop over all grains
         for grainno in range(self.param['no_grains']):
             A = []
-            U = N.array(self.param['U_grains_%s' %(self.param['grain_list'][grainno])])
-            U.shape = (3,3)
+            U = self.param['U_grains_%s' %(self.param['grain_list'][grainno])]
             self.grain.append(variables.grain_cont(U))
             gr_pos = N.array(self.param['pos_grains_%s' %(self.param['grain_list'][grainno])])
             gr_eps = N.array(self.param['eps_grains_%s' %(self.param['grain_list'][grainno])])

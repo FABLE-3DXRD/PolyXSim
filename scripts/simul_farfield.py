@@ -5,6 +5,7 @@ import sys
 from Simul_farfield import check_input
 from Simul_farfield import find_refl
 from Simul_farfield import generate_grains
+from Simul_farfield import make_image
 import logging
 logging.basicConfig(level=logging.INFO,format='\n%(levelname)s: %(message)s')
 
@@ -38,11 +39,13 @@ if myinput.missing == True:                   # if problem exit
 myinput.initialize()                            # if ok initialize
 
 generate_grains.generate_grains(myinput.entries)
+generate_grains.save_grains(myinput.entries)
 #print myinput.entries
-
 
 # Determine the reflection parameters for grains
 graindata = find_refl.find_refl(myinput.entries)
 graindata.run()
 graindata.save()
+
+make_image.make_image(myinput.entries,myinput.frameinfo,graindata)
 
