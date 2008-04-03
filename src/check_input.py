@@ -6,7 +6,6 @@
 
 from string import split
 import sys, os 
-from fabio import deconstruct_filename, jump_filename
 import variables
 from xfab import tools
 
