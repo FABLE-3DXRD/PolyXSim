@@ -2,17 +2,17 @@ import numpy as n
 from xfab import tools
 import variables
 from fabio import edfimage
+import time
 
 A_id = variables.refarray().A_id
 
 
 def make_image(param,frameinfo,graindata):
-		param = param
-		graindata = graindata
-# makeimage script produces tiff diffraction images using the reflection information in A
+# makeimage script produces edf diffraction images using the reflection information
 #
 #Henning Osholm Sorensen, June 23, 2006.
 # python translation Jette Oddershede, March 31, 2008
+	if param['make_image'] != 0:
 	
 		peakshape = 0
 		intensity = 1000
@@ -58,7 +58,7 @@ def make_image(param,frameinfo,graindata):
 						
 #			print nrefl			
 			frame = frame + bgint*n.ones((param['dety_size'],param['detz_size']))
-			filename = '%s/%s_frame%0.4d.edf' %(param['direc'],param['stem'],i)
+			filename = frameinfo[i].name
 			write(filename,frame)
 				
 def write(fname,frame):
@@ -73,6 +73,7 @@ def write(fname,frame):
 		e.header['DataType']='UnsignedShort'
 		e.header['Image']=1
 		e.header['ByteOrder']='Low'
+		e.header['time']=time.asctime()
 #		e.header['Omega']=
 #		e.header['OmegaStep']=
 		e.write(fname)

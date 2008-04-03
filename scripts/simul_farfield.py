@@ -30,6 +30,7 @@ if options.filename == None:
 # Is the input file available?
 
 # Read and check input
+print '\n'
 myinput = check_input.parse_input(input_file=options.filename)  # Make instance of parse_input class
 myinput.read()                                # read input file
 myinput.check()                               # check validity of input
@@ -38,14 +39,17 @@ if myinput.missing == True:                   # if problem exit
     sys.exit()
 myinput.initialize()                            # if ok initialize
 
+#print myinput.entries
 generate_grains.generate_grains(myinput.entries)
 generate_grains.save_grains(myinput.entries)
-#print myinput.entries
 
 # Determine the reflection parameters for grains
 graindata = find_refl.find_refl(myinput.entries)
 graindata.run()
 graindata.save()
+graindata.write_gve()
 
-make_image.make_image(myinput.entries,myinput.frameinfo,graindata)
+if 'make_image' in myinput.entries:
+	if myinput.entries['make_image'] != 0:
+		make_image.make_image(myinput.entries,myinput.frameinfo,graindata)
 

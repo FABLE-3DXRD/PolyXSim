@@ -1,11 +1,6 @@
-#
-# Parameters describing experimental setup 
-#
-
-# Experimental setup
+### Instrumental
 wavelength  0.5092836 # in angstrom
 distance  95.00			# sample-detector distance (mm)
-# Frelon2K non-binned specs below
 dety_center  511.5				# beamcenter, y in pixel coordinatees
 detz_center  511.5				# beamcenter, z in pixel coordinatees
 y_size  0.0936   # Pixel size y (mm)
@@ -29,26 +24,16 @@ o21   0              #  [o21,o22]]
 o22  -1              # 
 
 
-### File spec
-direc  '.'
-imagefile  '/usr/scratch/simulate_data/FableTest1/FableTest1_25gr0001.tif.gz'
-#direc  '../../../../FableTest1/pyfabric_out'
-#imagefile  '../../../../FableTest1/FableTest1_25gr0001.tif.gz'
-    
-### Cell and space group
-unit_cell  8.531200 4.832100 10.125000 90.000000 92.031000 90.000000
-sgno  4
-sysconditions  23*[0]
-
+### Grains
+no_grains  2
 
 gen_U 0        # generate grain orientations
 gen_pos 1      # generate grain positions
 gen_eps 0 0 0 0 # generate strain tensors [mean (diag) spread (diag) mean (off-diag) spread (off-diag)]
-sample_xyz 0.3 0.3 0.3  # sample size in mm
-#sample_cyl 0.2 0.3    # cylinder dimension, radius and length, of sample in mm
-
-#no_grains  25
-no_grains  25
+#sample_xyz 0.3 0.3 0.3  # sample size in mm
+sample_cyl 0.17 0.3    # cylinder dimension, radius and length, of sample in mm
+#grain_size 0.05        # median grain size for log normal distribution
+grain_min_max 0.01 0.25 # min and max cutoffs for the grain size distribution
 
 U_grains_1 -0.888246 0.411253 -0.204671 -0.201101 -0.748709 -0.631659 -0.413011 -0.519909 0.747741
 U_grains_2 -0.158282 -0.986955 0.029458 -0.929214 0.158978 0.333597 -0.333929 0.025430 -0.942255
@@ -79,6 +64,23 @@ U_grains_2 -0.158282 -0.986955 0.029458 -0.929214 0.158978 0.333597 -0.333929 0.
 pos_grains_1 0 0 0
 pos_grains_2 0.01 -0.05 0.2
 
-#eps_grains_1 0.01 0 0 0.01 0 0.01
-#eps_grains_2 0.001 0 0 0.001 0 0.001
+eps_grains_1 0.01 0 0 0.01 0 0.01
+eps_grains_2 0.001 0 0 0.001 0 0.001
  
+size_grains_1 0.04
+size_grains_2 0.06
+
+
+### Structural
+unit_cell  8.531200 4.832100 10.125000 90.000000 92.031000 90.000000
+sgno  4
+sysconditions  23*[0]
+
+
+### Files
+direc  '.'
+prefix 'monoclinic'
+
+### Images
+make_image 1
+    

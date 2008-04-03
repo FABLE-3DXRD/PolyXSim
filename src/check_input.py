@@ -39,8 +39,7 @@ class parse_input:
                     'direc'      : 'Missing input: direc [directory to save output]',
                     'theta_min'   : 'Missing input: theta_min [Minimum theta angle for generation of reflections in degrees]',
                     'theta_max'   : 'Missing input: theta_max [Maximum theta angle for generation of reflections in degrees]',
-                    'imagefile' :  'Missing input: imagefile [the first image file to be processed]'
-                    }
+					}
         self.optional_items = {
             'sgno': 1,
             'tilt_x'     : 0,
@@ -48,6 +47,8 @@ class parse_input:
             'tilt_z'     : 0,
             'beampol_factor' : 1,
             'beampol_angle' : 0.0,
+			'start_frame': 0,
+			'omega_sign': 1,
             'spatial' : None,
             'flood' : None,
             'dark' : None,
@@ -56,7 +57,12 @@ class parse_input:
 			'gen_pos' : None,
 			'gen_eps' : None,	
 			'sample_xyz': None,
-			'sample_cyl': None
+			'sample_cyl': None,
+			'grain_size': None,
+			'grain_min_max': None,
+			'direc': '.',
+            'prefix': 'test',
+			'make_image': None
             }
 
         
@@ -80,8 +86,8 @@ class parse_input:
                     val = line[1:]
 
 # assert that the correct number of arguments are given
-                    if key == 'sample_cyl':
-                        assert len(val) == 2, 'Wrong number of arguments for %s' %key
+                    if key == 'sample_cyl'or key == 'grain_min_max' :
+                        assert len(val) == 2 , 'Wrong number of arguments for %s' %key
                     elif key == 'sample_xyz' or 'pos_grains' in key:
                         assert len(val) == 3, 'Wrong number of arguments for %s' %key
                     elif key == 'gen_eps':
@@ -122,9 +128,10 @@ class parse_input:
 		grain_list_U = []
 		grain_list_pos = []
 		grain_list_eps = []
+		grain_list_size = []
 		no_grains = self.entries['no_grains']
 
-# read U, pos and eps for all grains		
+# read U, pos, eps and size for all grains		
 		for item in self.entries:
 			if '_grains_' in item:
 				if 'U' in item:
@@ -133,11 +140,14 @@ class parse_input:
 					grain_list_pos.append(eval(split(item,'_grains_')[1]))
 				elif 'eps' in item:
 					grain_list_eps.append(eval(split(item,'_grains_')[1]))
+				elif 'size' in item:
+					grain_list_size.append(eval(split(item,'_grains_')[1]))
 					
-# assert that input U, pos and eps are correct in format (same number of grains and same specifiers or else not input) 
+# assert that input U, pos, eps size are correct in format (same number of grains and same specifiers or else not input) 
 		grain_list_U.sort()
 		grain_list_pos.sort()
 		grain_list_eps.sort()
+		grain_list_size.sort()
 		if len(grain_list_U) != 0 and 'gen_U' not in self.entries:
 			assert len(grain_list_U) == no_grains, 'Input number of grains does not agree with number of U_grains, check for multiple names'
 			self.entries['grain_list'] = grain_list_U
@@ -145,40 +155,80 @@ class parse_input:
 				assert grain_list_U == grain_list_pos, 'Specified grain number for U_grains and pos_grains disagree'
 			if len(grain_list_eps) != 0 and 'gen_eps' not in self.entries:
 				assert grain_list_U == grain_list_eps, 'Specified grain number for U_grains and eps_grains disagree'
+			if len(grain_list_size) != 0 and 'grain_size' not in self.entries:
+				assert grain_list_U == grain_list_size, 'Specified grain number for U_grains and size_grains disagree'
 		else:
 			if len(grain_list_pos) != 0 and 'gen_pos' not in self.entries:
 				assert len(grain_list_pos) == no_grains, 'Input number of grains does not agree with number of pos_grains, check for multiple names'
 				self.entries['grain_list'] = grain_list_pos
 				if len(grain_list_eps) != 0 and 'gen_eps' not in self.entries:
 					assert grain_list_pos == grain_list_eps, 'Specified grain number for pos_grains and eps_grains disagree'
+				if len(grain_list_size) != 0 and 'grain_size' not in self.entries:
+					assert grain_list_pos == grain_list_size, 'Specified grain number for pos_grains and size_grains disagree'
 			elif len(grain_list_eps) != 0 and 'gen_eps' not in self.entries:
 				assert len(grain_list_eps) == no_grains, 'Input number of grains does not agree with number of eps_grains, check for multiple names'
 				self.entries['grain_list'] = grain_list_eps
+				if len(grain_list_size) != 0 and 'grain_size' not in self.entries:
+					assert grain_list_eps == grain_list_size, 'Specified grain number for eps_grains and size_grains disagree'
+			elif len(grain_list_size) != 0 and 'grain_size' not in self.entries:
+				assert len(grain_list_size) == no_grains, 'Input number of grains does not agree with number of size_grains, check for multiple names'
+				self.entries['grain_list'] = grain_list_size
 			else:
 				self.entries['grain_list'] = range(no_grains)
-				
+
+# give default values for generation if no info is read				
 		if len(grain_list_U) == 0 and 'gen_U' not in self.entries:
 			self.entries['gen_U'] = 0
 		if len(grain_list_pos) == 0 and 'gen_pos' not in self.entries:
 			self.entries['gen_pos'] = 0
 		if len(grain_list_eps) == 0 and 'gen_eps' not in self.entries:
 			self.entries['gen_eps'] = [0,0,0,0]
-							
-	
-    def initialize(self):
-        fileinfo = deconstruct_filename(self.entries['imagefile'])
-        self.entries['filetype'] = fileinfo.format
-        self.entries['stem'] = fileinfo.stem
-        if 'start_frame' not in self.entries:            
-            self.entries['start_frame'] = fileinfo.num
-        self.entries['filetype'] = fileinfo.format
+		if len(grain_list_size) == 0 and 'grain_size' not in self.entries:
+			self.entries['grain_size'] = -0.075
+		if 'grain_min_max' not in self.entries:
+			self.entries['grain_min_max'] = [0,10*abs(self.entries['grain_size'])]			
+			
+#assert that not both sample_xyz and sample_cyl are given
+		if 'sample_xyz' in self.entries:
+			assert 'sample_cyl' not in self.entries, 'Both sample_xyz and sample_cyl are given'
+			
+# assert that mean grain size != 0 and if mean > 0 then min < mean < max, assure that min non-negative
+		if 'grain_size' in self.entries:
+			assert self.entries['grain_size'] != 0, 'grain_size 0 is an invalid command'
+			if self.entries['grain_size'] > 0:
+				assert self.entries['grain_min_max'][0] < self.entries['grain_size'], 'grain_min larger than grain_size'
+				assert self.entries['grain_min_max'][1] > self.entries['grain_size'], 'grain_max smaller than grain_size'
+				if self.entries['grain_min_max'][0] < 0:
+					self.entries['grain_min_max'][0] = 0
+		
+#check that the given grain_size and no_grains are consistent with sample_vol, adjust max to sample size
+			if 'sample_xyz' in self.entries:
+				self.entries['sample_vol'] = self.entries['sample_xyz'][0]*self.entries['sample_xyz'][1]*self.entries['sample_xyz'][2]
+				diam_limit = (6*self.entries['sample_vol']/(N.exp(.5)*N.pi*self.entries['no_grains']))**(1/3.)
+				assert abs(self.entries['grain_size']) < diam_limit, 'The sample volume is too small to contain the specified number of grains with the given grain size'
+				self.entries['grain_min_max'][1] = min(self.entries['sample_xyz'][0],self.entries['sample_xyz'][1],self.entries['sample_xyz'][2])
+			elif 'sample_cyl' in self.entries:
+				self.entries['sample_vol'] = N.pi*self.entries['sample_cyl'][0]*self.entries['sample_cyl'][0]*self.entries['sample_cyl'][1]
+				diam_limit = (6*self.entries['sample_vol']/(N.exp(.5)*N.pi*self.entries['no_grains']))**(1/3.)
+				assert abs(self.entries['grain_size']) < diam_limit, 'The sample volume is too small to contain the specified number of grains with the given grain size'
+				self.entries['grain_min_max'][1] = min(2*self.entries['sample_cyl'][0],self.entries['sample_cyl'][1])
+			else:					
+				self.entries['sample_vol'] = None
+
+			
+    def initialize(self): 
+		# set all non-read items to defaults
         for item in self.optional_items:
             if (item not in self.entries):
                 self.entries[item] = self.optional_items[item]
             if (self.entries[item] == []):
                 self.entries[item] = self.optional_items[item]*self.entries['no_grains']
+ 
+        # Does output directory exist?
+        if not os.path.exists(self.entries['direc']):
+            os.mkdir(self.entries['direc'])
 
-        # Generate FILENAME of frames
+			# Generate FILENAME of frames
         omega_step = self.entries['omega_step']
         omega_start  = self.entries['omega_start']
         omega_end  = self.entries['omega_end']
@@ -187,9 +237,8 @@ class parse_input:
         omegalist = omega_sign*N.arange(omega_start,omega_end+omega_step,omega_step)
         nframes = int((omega_end-omega_start)/omega_step)
         omegalist.sort()
-        i=0
-        logging.info("Generating frame data...")
-
+#        i=0
+#        logging.info("Generating frame data...")
         #Initialize frameinfo container
         self.frameinfo = [] 
         
@@ -203,16 +252,12 @@ class parse_input:
 
         for no in filerange:
             self.frameinfo.append(variables.frameinfo_cont(no))
-            self.frameinfo[i].name = jump_filename(self.entries['imagefile'],no)
-            self.frameinfo[i].omega = omegalist[i];
-            self.frameinfo[i].nrefl = 0 # Initialize number of reflections on frame
-            self.frameinfo[i].refs = [] # Initialize number of reflections on frame
-            i += 1
-        logging.debug("Printing frameinfo...")
-
-        # Does output directory exist?
-        if not os.path.exists(self.entries['direc']):
-            os.mkdir(self.entries['direc'])
+            self.frameinfo[no].name = '%s/%s_frame%0.4d.edf' %(self.entries['direc'],self.entries['prefix'],no)
+            self.frameinfo[no].omega = omegalist[no];
+            self.frameinfo[no].nrefl = 0 # Initialize number of reflections on frame
+            self.frameinfo[no].refs = [] # Initialize number of reflections on frame
+#            i += 1
+#        logging.debug("Printing frameinfo...")
             
 # if exist('theta_max') == 0
 #         disp('Warning - missing input: theta_max [Maximum theta angle for generation of reflections in degrees]')

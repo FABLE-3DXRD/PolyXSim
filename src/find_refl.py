@@ -1,5 +1,6 @@
 import numpy as N
 from xfab import tools
+from xfab import sg
 import variables
 import sys
 from ImageD11 import blobcorrector
@@ -7,6 +8,7 @@ import logging
 logging.basicConfig(level=logging.DEBUG,format='%(levelname)s %(message)s')
 
 A_id = variables.refarray().A_id
+
 
 class find_refl:
     def __init__(self,param):
@@ -63,12 +65,10 @@ class find_refl:
             gr_pos = N.array(self.param['pos_grains_%s' %(self.param['grain_list'][grainno])])
             gr_eps = N.array(self.param['eps_grains_%s' %(self.param['grain_list'][grainno])])
             B = tools.epsilon2B(gr_eps,self.A0inv)  # Calculate the B-matrix based on the strain tensor for each grain
-            print 'GRAIN NO: ',self.param['grain_list'][grainno]
-            print 'GRAIN POSITION of grain ',self.param['grain_list'][grainno],': ',gr_pos
-            print 'STRAIN TENSOR COMPONENTS (e11 e12 e13 e22 e23 e33) of grain ',self.param['grain_list'][grainno],':\n',gr_eps
-            print 'U of grain ',self.param['grain_list'][grainno],':\n',U
-#            print self.grain[grainno].U
-#            self.grain[grainno].pos = gr_pos
+#            print 'GRAIN NO: ',self.param['grain_list'][grainno]
+#            print 'GRAIN POSITION of grain ',self.param['grain_list'][grainno],': ',gr_pos
+#            print 'STRAIN TENSOR COMPONENTS (e11 e12 e13 e22 e23 e33) of grain ',self.param['grain_list'][grainno],':\n',gr_eps
+#            print 'U of grain ',self.param['grain_list'][grainno],':\n',U
             nrefl = 0
   
             # Calculate these values:
@@ -120,7 +120,7 @@ class find_refl:
                                 dety = self.param['dety_center'] + (ty + Gt[1]*konst)/self.param['y_size']
                                 detz = self.param['detz_center'] + (tz + Gt[2]*konst)/self.param['z_size']
 
-                            if self.param['spatial'] != None:
+                            if self.param['spatial'] != None :
                                 # To match the coordinate system of the spline file
                                 # SPLINE(i,j): i = detz; j = (dety_size-1)-dety
                                 x = detz 
@@ -224,11 +224,11 @@ class find_refl:
             A = self.grain[grainno].refs
             setno = 0
             filename = '%s/%s_gr%0.4d_set%0.4d.ref' \
-                %(self.param['direc'],self.param['stem'],grainno,setno)
+                %(self.param['direc'],self.param['prefix'],grainno,setno)
             f = open(filename,'w')
             format = "%d "*6 + "%f "*12 + "%d "*3 + "\n"
             ( nrefl, ncol ) = A.shape
-            print nrefl, ncol
+#            print nrefl, ncol
             out = "#"
             A_col = dict([[v,k] for k,v in A_id.items()])
             for col in A_col:
@@ -263,11 +263,62 @@ class find_refl:
 #                               A[i,A_id['overlaps']]
                            )
                 f.write(out)
+        
             f.close()   
             
-
-
-#     #save Grain
     
-    
+    def write_gve(self):
+#  Write gvector (gve) file, for format see
+# http://fable.wiki.sourceforge.net/imaged11+-+file+formats
+# 
+#Henning Osholm 2008,
+# python translation: Jette Oddershede, Risoe DTU, March 31 2008
+#
+        filename = '%s/%s.gve' %(self.param['direc'],self.param['prefix'])
+        f = open(filename,'w')
+        lattice = sg.sg(sgno=self.param['sgno']).name[0]
+        format = "%f "*6 + "%s "*1 +"\n"
+        out = format %(self.param['unit_cell'][0],self.param['unit_cell'][1],
+		               self.param['unit_cell'][2],self.param['unit_cell'][3],
+					   self.param['unit_cell'][4],self.param['unit_cell'][5], lattice)
+        f.write(out)
+        out = "# wavelength = %s\n" %(self.param['wavelength'])
+        f.write(out)
+        out = "# wedge = 0\n"
+        f.write(out)
+        out = "# ds h k l\n" 
+        f.write(out)
+		
+        A = self.grain[0].refs
+        A = A[N.argsort(-A,0)[:,A_id['tth']],:] # sort rows according to tth, descending
+        format = "%f "*1 + "%d "*3 +"\n"
+        for i in range(A.shape[0]):
+            out = format %(self.param['wavelength']/(2*N.sin(.5*A[i,A_id['tth']])),
+                           A[i,A_id['h']],
+                           A[i,A_id['k']],
+                           A[i,A_id['l']]
+                            )
+            f.write(out)
+
+        out = "# xr yr zr dety detz ds eta omega\n" 
+        f.write(out)
+        format = "%f "*8 + "\n"
+        for grainno in range(1,self.param['no_grains']):
+            A = N.concatenate((A,self.grain[grainno].refs))
+			
+        nrefl = A.shape[0]
+        for i in range(nrefl):
+            out = format %(A[i,A_id['gv1']],
+			               A[i,A_id['gv2']],
+			               A[i,A_id['gv3']],
+			               A[i,A_id['dety']],
+			               A[i,A_id['detz']],
+						   self.param['wavelength']/(2*N.sin(.5*A[i,A_id['tth']])),
+			               A[i,A_id['eta']]*180/N.pi,
+			               A[i,A_id['omega']]*180/N.pi
+                           )
+            f.write(out)
+		
+        f.close()   
+            
     

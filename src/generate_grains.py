@@ -93,7 +93,43 @@ def generate_eps(no_grains,gen_eps):
 					eps[i,j] = n.random.normal(gen_eps[2],gen_eps[3])
 			
 	return eps
+
+def grain_size(no_grains,grain_size,grain_min_max,sample_vol=None):
+	# generate grain sizes (mean diameters) from a lognormal distribution
+	# with a specified mean (grain_size) and upper and lower cut-offs given by grain_min_max
+	# For specified sample shape and size calculate the space filling fraction
+	#
+	# INPUT: no_grains, gen_size (mean size), 
+	#               grain_min_max (optional)[min,max]
+	#               sample_xyz (optional) sample volume 
+	# OUTPUT: mean diameter (in mm) for each grain
+	#
+	# Jette Oddershede, RISOE DTU, April 2 2008
 	
+	size = n.zeros((no_grains,1))
+	grain_vol = 0
+	if grain_size < 0:
+		print 'All grains have the following mean diameter: ', abs(grain_size), ' mm\n'
+		for i in range(no_grains):
+			size[i] = abs(grain_size)
+			grain_vol = grain_vol + n.pi/6*size[i]**3
+			
+	else:
+	# NB the standard lognormal distribution lognormal() = exp(normal(mean=0, spread=1) has a mean of exp(.5)
+		print 'Grain sizes from a lognormal distribution with a mean diameter of: ', abs(grain_size), ' mm\n'
+		for i in range(no_grains):
+			while size[i] <= grain_min_max[0] or size[i] > grain_min_max[1]:
+				size[i] = grain_size*n.random.lognormal()/n.exp(.5)
+
+			grain_vol = grain_vol + n.pi/6*size[i]**3
+	
+	if sample_vol != None:
+		fraction = grain_vol/sample_vol
+		print 'The generated grains cover the following fraction of the sample volume: \n', fraction, '\n'
+	
+	return size
+	
+
 def generate_grains(param):
 # Generate U if gen_U exists
 	if param['gen_U'] != None: 
@@ -103,7 +139,7 @@ def generate_grains(param):
 			
 # Generate pos if gen_pos exists
 	if param['gen_pos'] != None: 
-		pos = generate_pos(param['no_grains'],param['gen_pos'],param['sample_xyz'],param['sample_cyl'])
+		pos = generate_pos(param['no_grains'],param['gen_pos'],sample_xyz=param['sample_xyz'],sample_cyl=param['sample_cyl'])
 		for i in range(param['no_grains']):
 			param['pos_grains_%s' %(param['grain_list'][i])] = pos[i]
 
@@ -113,6 +149,12 @@ def generate_grains(param):
 		for i in range(param['no_grains']):
 			param['eps_grains_%s' %(param['grain_list'][i])] = eps[i]
 			
+# Generate size if grain_size exists
+	if param['grain_size'] != None: 
+		size = grain_size(param['no_grains'],param['grain_size'],param['grain_min_max'],sample_vol=param['sample_vol'])
+		for i in range(param['no_grains']):
+			param['size_grains_%s' %(param['grain_list'][i])] = size[i]
+	
 	return param
 	
 	
@@ -125,13 +167,16 @@ def save_grains(param):
 # Jette Oddershede, Risoe DTU, March 31 2008
 #
 
-    filename = '%s/%s_%0.4dgrains.txt' %(param['direc'],param['stem'],param['no_grains'])
+    filename = '%s/%s_%0.4dgrains.txt' %(param['direc'],param['prefix'],param['no_grains'])
     f = open(filename,'w')
-    format = "%d "*1 + "%f "*18 +"\n"
-    out = "# grainno x y z U11 U12 U13 U21 U22 U23 U31 U32 U33 eps11 eps12 eps13 eps22 eps23 eps33 \n"
+#    format = "%d "*1 + "%f "*1 + "%e"*1 + "%f"*18 + "\n"
+    format = "%d "*1 + "%f "*1 + "%e "*1 + "%f "*18 + "\n"
+    out = "# grainno grainsize grainvolume x y z U11 U12 U13 U21 U22 U23 U31 U32 U33 eps11 eps12 eps13 eps22 eps23 eps33 \n"
     f.write(out)
     for i in range(param['no_grains']):
         out = format %(param['grain_list'][i],
+                       param['size_grains_%s' %(param['grain_list'][i])],
+                       n.pi/6*(param['size_grains_%s' %(param['grain_list'][i])])**3.,
                        param['pos_grains_%s' %(param['grain_list'][i])][0],
                        param['pos_grains_%s' %(param['grain_list'][i])][1],
                        param['pos_grains_%s' %(param['grain_list'][i])][2],
