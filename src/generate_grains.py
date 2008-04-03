@@ -125,7 +125,7 @@ def grain_size(no_grains,grain_size,grain_min_max,sample_vol=None):
 	
 	if sample_vol != None:
 		fraction = grain_vol/sample_vol
-		print 'The generated grains cover the following fraction of the sample volume: \n', fraction, '\n'
+		print 'The generated grains cover the following fraction of the sample volume: %6f' %fraction
 	
 	return size
 	
@@ -155,7 +155,6 @@ def generate_grains(param):
 		for i in range(param['no_grains']):
 			param['size_grains_%s' %(param['grain_list'][i])] = size[i]
 	
-	return param
 	
 	
 def save_grains(param):

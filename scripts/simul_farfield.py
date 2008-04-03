@@ -32,24 +32,30 @@ if options.filename == None:
 # Read and check input
 print '\n'
 myinput = check_input.parse_input(input_file=options.filename)  # Make instance of parse_input class
-myinput.read()                                # read input file
+try:
+    myinput.read()                                # read input file
+except:
+    sys.exit()
+
 myinput.check()                               # check validity of input
 if myinput.missing == True:                   # if problem exit
     logging.info('MISSING ITEMS')
     sys.exit()
 myinput.initialize()                            # if ok initialize
 
-#print myinput.entries
-generate_grains.generate_grains(myinput.entries)
-generate_grains.save_grains(myinput.entries)
+#print myinput.param
+generate_grains.generate_grains(myinput.param)
+generate_grains.save_grains(myinput.param)
 
 # Determine the reflection parameters for grains
-graindata = find_refl.find_refl(myinput.entries)
+graindata = find_refl.find_refl(myinput.param)
+graindata.frameinfo = myinput.frameinfo
 graindata.run()
 graindata.save()
 graindata.write_gve()
 
-if 'make_image' in myinput.entries:
-	if myinput.entries['make_image'] != 0:
-		make_image.make_image(myinput.entries,myinput.frameinfo,graindata)
 
+if 'make_image' in myinput.param:
+	if myinput.param['make_image'] != 0:
+		image = make_image.make_image(graindata)
+                image.make_image()

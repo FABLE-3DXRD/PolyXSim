@@ -170,7 +170,10 @@ class find_refl:
             A[:,A_id['ref_id']] = N.arange(nrefl)     # Renumber the reflections  
             A[:,A_id['spot_id']] = N.arange(N.min(A[:,A_id['spot_id']]),N.max(A[:,A_id['spot_id']])+1) # Renumber the spot_id
             self.grain[grainno].refs = A
-            
+            print '\rDone %i grain(s) of %i' %(grainno+1,self.param['no_grains']),
+            sys.stdout.flush()
+
+        print '\n'
 
     def overlap(self):
         
