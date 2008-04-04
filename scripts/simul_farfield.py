@@ -46,6 +46,7 @@ myinput.initialize()                            # if ok initialize
 #print myinput.param
 generate_grains.generate_grains(myinput.param)
 generate_grains.save_grains(myinput.param)
+generate_grains.save_ubi(myinput.param)
 
 # Determine the reflection parameters for grains
 graindata = find_refl.find_refl(myinput.param)
@@ -54,8 +55,6 @@ graindata.run()
 graindata.save()
 graindata.write_gve()
 
-
-if 'make_image' in myinput.param:
-	if myinput.param['make_image'] != 0:
-		image = make_image.make_image(graindata)
-                image.make_image()
+if myinput.param['make_image'] != 0:
+	image = make_image.make_image(graindata)
+	image.make_image()

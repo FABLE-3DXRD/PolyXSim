@@ -49,6 +49,10 @@ class parse_input:
             'start_frame': 0,
             'omega_sign': 1,
             'noise' : 0,
+			'psf': 0,
+            'make_image': 1,
+			'bg': 0,
+			'peakshape': [0,0],
             'spatial' : None,
             'flood' : None,
             'dark' : None,
@@ -62,7 +66,6 @@ class parse_input:
             'grain_min_max': None,
             'direc': '.',
             'prefix': 'test',
-            'make_image': None,
             'format' : '.edf'
             }
 
@@ -87,7 +90,9 @@ class parse_input:
                     val = line[1:]
 
 # assert that the correct number of arguments are given
-                    if key == 'sample_cyl'or key == 'grain_min_max' :
+                    if key == 'peakshape':
+                        assert len(val) == 2 or len(val) == 3, 'Wrong number of arguments for %s' %key
+                    elif key == 'sample_cyl'or key == 'grain_min_max':
                         assert len(val) == 2 , 'Wrong number of arguments for %s' %key
                     elif key == 'sample_xyz' or 'pos_grains' in key:
                         assert len(val) == 3, 'Wrong number of arguments for %s' %key
@@ -186,8 +191,8 @@ class parse_input:
 			self.param['gen_eps'] = [0,0,0,0]
 		if len(grain_list_size) == 0 and 'grain_size' not in self.param:
 			self.param['grain_size'] = -0.075
-                        if 'grain_min_max' not in self.param:
-                            self.param['grain_min_max'] = [0,10*abs(self.param['grain_size'])]			
+		if 'grain_size' in self.param and 'grain_min_max' not in self.param:
+			self.param['grain_min_max'] = [0,10*abs(self.param['grain_size'])]			
 			
 #assert that not both sample_xyz and sample_cyl are given
 		if 'sample_xyz' in self.param:
