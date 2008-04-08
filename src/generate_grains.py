@@ -215,7 +215,7 @@ def save_ubi(param):
     for i in range(param['no_grains']):
         U = param['U_grains_%s' %(param['grain_list'][i])]
         gr_eps = n.array(param['eps_grains_%s' %(param['grain_list'][i])])
-        B = tools.epsilon2B(gr_eps,A0inv)  # Calculate the B-matrix based on the strain tensor for each grain
+        B = tools.epsilon2B(gr_eps,A0inv)/(2*n.pi)  # Calculate the B-matrix based on the strain tensor for each grain
         UBI = n.linalg.inv(n.dot(U,B))
         for j in range(3):
             out = format %(UBI[j,0],UBI[j,1],UBI[j,2])
