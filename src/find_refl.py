@@ -23,23 +23,9 @@ class find_refl:
         self.S = N.array([[1, 0, 0],[0, 1, 0],[0, 0, 1]])
         self.A0inv = N.array(tools.FormAinv(self.param['unit_cell']))
         self.V = N.array(tools.CellVolume(self.param['unit_cell']))
-    #    self.sbox_y_half = (self.param['sbox_y']-1)/2
-    #    self.sbox_z_half = (self.param['sbox_z']-1)/2
         # Detector tilt correction matrix
         if self.param['tilt_x'] != 0 or self.param['tilt_y'] != 0 or self.param['tilt_z'] != 0:
-             tilt_x = self.param['tilt_x']
-             tilt_y = self.param['tilt_y']
-             tilt_z = self.param['tilt_z']
-             Rx = N.array([[            1,            0,            0],
-                           [            0,  cos(tilt_x), -sin(tilt_x)],
-                           [            0,  sin(tilt_x),  cos(tilt_x)]])
-             Ry = N.array([[  cos(tilt_y),            0,  sin(tilt_y)],
-                           [            0,            1,            0],
-                           [ -sin(tilt_y),            0,  cos(tilt_y)]])
-             Rz = N.array([[  cos(tilt_z), -sin(tilt_z),            0],
-                           [  sin(tilt_z),  cos(tilt_z),            0],
-                           [            0,            0,            1]])
-             self.R = N.dot(Rx,N.dot(Ry,Rz))
+            self.R = tools.detect_tilt(self.param['tilt_x'],self.param['tilt_y'],self.param['tilt_z'])
         else:
             self.R = [0]
         # Spatial distortion
@@ -51,8 +37,8 @@ class find_refl:
         
         # Generate Miller indices for reflections within a certain resolution
         print 'Generating reflections'
-        self.hkl  = tools.genhkl(self.param['unit_cell'],self.param['sysconditions'],sintlmin,sintlmax)
-        #print self.hkl
+        self.hkl  = tools.genhkl(self.param['unit_cell'],sg.sg(sgno=self.param['sgno']).syscond,sintlmin,sintlmax)
+#        print self.hkl
         print 'Finished generating reflections\n'
     
     def run(self):
