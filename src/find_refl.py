@@ -279,10 +279,10 @@ class find_refl:
         f.write(out)
 		
         A = self.grain[0].refs
-        A = A[N.argsort(-A,0)[:,A_id['tth']],:] # sort rows according to tth, descending
+        A = A[N.argsort(A,0)[:,A_id['tth']],:] # sort rows according to tth, descending
         format = "%f "*1 + "%d "*3 +"\n"
         for i in range(A.shape[0]):
-            out = format %(self.param['wavelength']/(2*N.sin(.5*A[i,A_id['tth']])),
+            out = format %((2*N.sin(.5*A[i,A_id['tth']])/self.param['wavelength']),
                            A[i,A_id['h']],
                            A[i,A_id['k']],
                            A[i,A_id['l']]
@@ -297,12 +297,12 @@ class find_refl:
 			
         nrefl = A.shape[0]
         for i in range(nrefl):
-            out = format %(A[i,A_id['gv1']],
-			               A[i,A_id['gv2']],
-			               A[i,A_id['gv3']],
+            out = format %(A[i,A_id['gv1']]/(2*N.pi),
+			               A[i,A_id['gv2']]/(2*N.pi),
+			               A[i,A_id['gv3']]/(2*N.pi),
 			               A[i,A_id['dety']],
 			               A[i,A_id['detz']],
-						   self.param['wavelength']/(2*N.sin(.5*A[i,A_id['tth']])),
+						   (2*N.sin(.5*A[i,A_id['tth']])/self.param['wavelength']),
 			               A[i,A_id['eta']]*180/N.pi,
 			               A[i,A_id['omega']]*180/N.pi
                            )
