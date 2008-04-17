@@ -169,8 +169,8 @@ def save_grains(param):
     filename = '%s/%s_%0.4dgrains.txt' %(param['direc'],param['prefix'],param['no_grains'])
     f = open(filename,'w')
 #    format = "%d "*1 + "%f "*1 + "%e"*1 + "%f"*18 + "\n"
-    format = "%d "*1 + "%f "*1 + "%e "*1 + "%f "*12 + "\n"
-    out = "# grainno grainsize grainvolume x y z phi1 PHI phi2 eps11 eps12 eps13 eps22 eps23 eps33 \n"
+    format = "%d "*1 + "%f "*1 + "%e "*1 + "%f "*21 + "\n"
+    out = "# grainno grainsize grainvolume x y z phi1 PHI phi2 U11 U12 U13 U21 U22 U23 U31 U32 U33 eps11 eps12 eps13 eps22 eps23 eps33 \n"
     f.write(out)
     for i in range(param['no_grains']):
         euler = 180/n.pi*tools.U2euler(param['U_grains_%s' %(param['grain_list'][i])])
@@ -183,6 +183,15 @@ def save_grains(param):
                        euler[0],
                        euler[1],
                        euler[2],
+                       param['U_grains_%s' %(param['grain_list'][i])][0,0],
+                       param['U_grains_%s' %(param['grain_list'][i])][0,1],
+                       param['U_grains_%s' %(param['grain_list'][i])][0,2],
+                       param['U_grains_%s' %(param['grain_list'][i])][1,0],
+                       param['U_grains_%s' %(param['grain_list'][i])][1,1],
+                       param['U_grains_%s' %(param['grain_list'][i])][1,2],
+                       param['U_grains_%s' %(param['grain_list'][i])][2,0],
+                       param['U_grains_%s' %(param['grain_list'][i])][2,1],
+                       param['U_grains_%s' %(param['grain_list'][i])][2,2],
                        param['eps_grains_%s' %(param['grain_list'][i])][0],
                        param['eps_grains_%s' %(param['grain_list'][i])][1],
                        param['eps_grains_%s' %(param['grain_list'][i])][2],
