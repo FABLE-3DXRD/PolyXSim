@@ -54,8 +54,8 @@ class make_image:
 							break
 						elif self.graindata.grain[j].refs[k,A_id['omega']]*180/n.pi < omega-2*peakwsig:
 							continue
-						dety = int(round(self.graindata.grain[j].refs[k,A_id['dety']]))+1
-						detz = int(round(self.graindata.grain[j].refs[k,A_id['detz']]))+1
+						dety = int(round(self.graindata.grain[j].refs[k,A_id['dety']]))
+						detz = int(round(self.graindata.grain[j].refs[k,A_id['detz']]))
 						yrange = range(dety+frame_add-peak_add,dety+frame_add+peak_add+1)
 						zrange = range(detz+frame_add-peak_add,detz+frame_add+peak_add+1)
 						nrefl = nrefl + 1
