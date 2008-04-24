@@ -161,7 +161,7 @@ def save_grains(param):
 #  Save the generated grain parameters, pos, U and eps
 #
 # INPUT: The parameter set from the input file and the grain generator
-# OUTPUT: grainno x y z U11 U12 U13 U21 U22 U23 U31 U32 U33 eps11 eps12 eps13 eps22 eps23 eps33
+# OUTPUT: grainno x y z phi1 PHI phi2 U11 U12 U13 U21 U22 U23 U31 U32 U33 eps11 eps12 eps13 eps22 eps23 eps33
 #
 # Jette Oddershede, Risoe DTU, March 31 2008
 #
@@ -211,15 +211,13 @@ def save_ubi(param):
 #
 # Jette Oddershede, Risoe DTU, April 4 2008
 #
-    A0inv = n.array(tools.FormAinv(param['unit_cell']))
-
     filename = '%s/%s_%0.4dgrains.ubi' %(param['direc'],param['prefix'],param['no_grains'])
     f = open(filename,'w')
     format = "%f "*3 + "\n"
     for i in range(param['no_grains']):
         U = param['U_grains_%s' %(param['grain_list'][i])]
         gr_eps = n.array(param['eps_grains_%s' %(param['grain_list'][i])])
-        B = tools.epsilon2B(gr_eps,A0inv)/(2*n.pi)  # Calculate the B-matrix based on the strain tensor for each grain
+        B = tools.epsilon2B(gr_eps,param['unit_cell'])/(2*n.pi)  # Calculate the B-matrix based on the strain tensor for each grain
         UBI = n.linalg.inv(n.dot(U,B))
         for j in range(3):
             out = format %(UBI[j,0],UBI[j,1],UBI[j,2])

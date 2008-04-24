@@ -21,7 +21,6 @@ class find_refl:
         sintlmax = N.sin(self.param['theta_max']*N.pi/180)/self.param['wavelength']
         self.K = -2*N.pi/self.param['wavelength']
         self.S = N.array([[1, 0, 0],[0, 1, 0],[0, 0, 1]])
-        self.A0inv = N.array(tools.FormAinv(self.param['unit_cell']))
         self.V = N.array(tools.CellVolume(self.param['unit_cell']))
         # Detector tilt correction matrix
         if self.param['tilt_x'] != 0 or self.param['tilt_y'] != 0 or self.param['tilt_z'] != 0:
@@ -50,7 +49,7 @@ class find_refl:
             self.grain.append(variables.grain_cont(U))
             gr_pos = N.array(self.param['pos_grains_%s' %(self.param['grain_list'][grainno])])
             gr_eps = N.array(self.param['eps_grains_%s' %(self.param['grain_list'][grainno])])
-            B = tools.epsilon2B(gr_eps,self.A0inv)  # Calculate the B-matrix based on the strain tensor for each grain
+            B = tools.epsilon2B(gr_eps,self.param['unit_cell'])  # Calculate the B-matrix based on the strain tensor for each grain
 #            print 'GRAIN NO: ',self.param['grain_list'][grainno]
 #            print 'GRAIN POSITION of grain ',self.param['grain_list'][grainno],': ',gr_pos
 #            print 'STRAIN TENSOR COMPONENTS (e11 e12 e13 e22 e23 e33) of grain ',self.param['grain_list'][grainno],':\n',gr_eps
