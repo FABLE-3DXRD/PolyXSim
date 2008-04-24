@@ -67,10 +67,10 @@ class find_refl:
                 #Gw = self.S*U*self.B*hkl
                 #print G
                 Glen = N.sqrt(N.dot(Gw,Gw))
-                theta = N.arcsin(Glen/(2*abs(self.K)))
-                costth = N.cos(2*theta)
+                tth = 2*N.arcsin(Glen/(2*abs(self.K)))
+                costth = N.cos(tth)
 
-                Omega = tools.find_omega(Gw,costth)
+                Omega = tools.find_omega(Gw,tth)
   
                 if len(Omega) > 0:
                     for omega in Omega:
@@ -127,10 +127,10 @@ class find_refl:
                             #Polarization factor (Kahn et al, J. Appl. Cryst. (1982) 15, 330-337.)
                             rho = N.pi/2.0 + eta + self.param['beampol_direct']*N.pi/180.0 
                             P = 0.5 * (1 + costth*costth +\
-                                        self.param['beampol_factor']*N.cos(2*rho)*N.sin(2*theta)*N.sin(2*theta))
+                                        self.param['beampol_factor']*N.cos(2*rho)*N.sin(tth)*N.sin(tth))
                             #Lorentz factor
                             if eta != 0:
-                                L=1/(N.sin(2*theta)*abs(N.sin(eta)))
+                                L=1/(N.sin(tth)*abs(N.sin(eta)))
                             else:
                                 L=N.inf;
  
@@ -139,7 +139,7 @@ class find_refl:
                             #logging.debug("frame_limits: %i, %i" %(frame_limits[0],frame_limits[1]))
                             A.append([grainno,nrefl,spot_id,
                                       hkl[0],hkl[1],hkl[2],
-                                      2*theta,omega,eta,
+                                      tth,omega,eta,
                                       dety,detz,
                                       detyd,detzd,
                                       Gw[0],Gw[1],Gw[2],
