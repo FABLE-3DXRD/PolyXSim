@@ -62,10 +62,11 @@ class make_image:
 						totalrefl = totalrefl + 1
 						# Gaussian along omega
 						if peakshape[0] == 1:
-							fraction = norm.cdf((self.graindata.grain[j].refs[k,A_id['omega']]*180/n.pi+omega_step-omega)/(0.5*peakwsig))\
-							          -norm.cdf((self.graindata.grain[j].refs[k,A_id['omega']]*180/n.pi-omega)/(0.5*peakwsig))
+							fraction = norm.cdf((omega-self.graindata.grain[j].refs[k,A_id['omega']]*180/n.pi+omega_step)/(0.5*peakwsig))\
+							          -norm.cdf((omega-self.graindata.grain[j].refs[k,A_id['omega']]*180/n.pi)/(0.5*peakwsig))
 						else:
 							fraction = 1
+
 						# Generate spikes, possibly more than 1x1 pixel
 						for y in yrange:
 							for z in zrange:
