@@ -66,7 +66,7 @@ class refarray:
                       'gv3'            :15,
                       'L'              :16,
                       'P'              :17,
-                      'frame_start'    :18,
+                      'F2'    	       :18,
                       'frame_end'      :19,
                       'overlaps'       :20
                       }

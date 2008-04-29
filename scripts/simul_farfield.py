@@ -55,7 +55,9 @@ generate_grains.save_ubi(myinput.param)
 # Generate reflections
 if 'structure_file' in myinput.param:
     xtal_structure = reflections.open_structure(myinput.param)
+    logging.info('Generating miller indices')
     hkl = reflections.gen_miller(myinput.param)
+    logging.info('Structure factor calculation')
     hkl = reflections.calc_intensity(hkl,xtal_structure)
 else:
     hkl = reflections.gen_miller(myinput.param)

@@ -36,9 +36,11 @@ class find_refl:
         self.nframes = (self.param['omega_end']-self.param['omega_start'])/self.param['omega_step']
         
         # Generate Miller indices for reflections within a certain resolution
-        print 'Generating reflections'
-        #self.hkl  = tools.genhkl(self.param['unit_cell'],sg.sg(sgno=self.param['sgno']).syscond,sintlmin,sintlmax)
-#        print self.hkl
+        logging.info('Generating reflections')
+        #self.hkl  = tools.genhkl(self.param['unit_cell'],
+        #                          sg.sg(sgno=self.param['sgno']).syscond,
+        #                          sintlmin,sintlmax)
+
         print 'Finished generating reflections\n'
     
     def run(self):
@@ -50,7 +52,8 @@ class find_refl:
             self.grain.append(variables.grain_cont(U))
             gr_pos = N.array(self.param['pos_grains_%s' %(self.param['grain_list'][grainno])])
             gr_eps = N.array(self.param['eps_grains_%s' %(self.param['grain_list'][grainno])])
-            B = tools.epsilon2B(gr_eps,self.param['unit_cell'])  # Calculate the B-matrix based on the strain tensor for each grain
+            # Calculate the B-matrix based on the strain tensor for each grain
+            B = tools.epsilon2B(gr_eps,self.param['unit_cell']) 
 #            print 'GRAIN NO: ',self.param['grain_list'][grainno]
 #            print 'GRAIN POSITION of grain ',self.param['grain_list'][grainno],': ',gr_pos
 #            print 'STRAIN TENSOR COMPONENTS (e11 e12 e13 e22 e23 e33) of grain ',self.param['grain_list'][grainno],':\n',gr_eps
@@ -62,7 +65,7 @@ class find_refl:
             # For all reflections in Ahkl that fulfill omega_start < omega < omega_end.
             # All angles in Grain are in degrees
             for hkl in self.hkl:
-                Gtmp = N.dot(B,hkl)
+                Gtmp = N.dot(B,hkl[0:3])
                 Gtmp = N.dot(U,Gtmp)
                 Gw =   N.dot(self.S,Gtmp)
                 #Gw = self.S*U*self.B*hkl
@@ -119,7 +122,10 @@ class find_refl:
                                 detyd = dety
                                 detzd = detz
                              #If shoebox extends outside detector exclude it
- #                           if ( self.param['sbox_y'] > detyd) or (detyd > self.param['dety_size']-self.param['sbox_y']) or (self.param['sbox_z'] > detzd) or (detzd > self.param['detz_size']-self.param['sbox_z']):
+ #                           if ( self.param['sbox_y'] > detyd) or \
+ #                              (detyd > self.param['dety_size']-self.param['sbox_y']) or\
+ #                              (self.param['sbox_z'] > detzd) or\
+ #                              (detzd > self.param['detz_size']-self.param['sbox_z']):
  #                                continue
                             
  #                           frame_center = N.floor((omega*180/N.pi-self.param['omega_start'])/self.param['omega_step'])
@@ -144,9 +150,7 @@ class find_refl:
                                       dety,detz,
                                       detyd,detzd,
                                       Gw[0],Gw[1],Gw[2],
-                                      L,P])
- #                                     frame_limits[0],frame_limits[1],
-  #                                    overlaps])
+                                      L,P,hkl[3]])
                             nrefl = nrefl+1
                             spot_id = spot_id+1
 
@@ -215,7 +219,7 @@ class find_refl:
             filename = '%s/%s_gr%0.4d_set%0.4d.ref' \
                 %(self.param['direc'],self.param['prefix'],grainno,setno)
             f = open(filename,'w')
-            format = "%d "*6 + "%f "*12 + "%d "*3 + "\n"
+            format = "%d "*6 + "%f "*13 + "%d "*2 + "\n"
             ( nrefl, ncol ) = A.shape
 #            print nrefl, ncol
             out = "#"
@@ -244,7 +248,7 @@ class find_refl:
                                A[i,A_id['gv3']],
                                A[i,A_id['L']],
                                A[i,A_id['P']],
-                               A[i,0],
+                               A[i,A_id['F2']],
                                A[i,0],
                                A[i,0]
 #                               A[i,A_id['frame_start']],
