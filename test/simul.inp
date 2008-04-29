@@ -22,8 +22,6 @@ o11  -1              # Orientation matrix of detector
 o12   0              # [[o11,o12]
 o21   0              #  [o21,o22]]
 o22  -1              # 
-
-
 ### Grains
 no_grains  25
 
@@ -74,7 +72,7 @@ eps_grains_2 0.001 0 0 0.001 0 0.001
 ### Structural
 unit_cell  8.531200 4.832100 10.125000 90.000000 92.031000 90.000000
 sgno  4
-sysconditions  23*[0]
+#sysconditions  23*[0]
 
 
 ### Files

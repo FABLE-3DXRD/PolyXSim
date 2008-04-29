@@ -6,6 +6,7 @@ from Simul_farfield import check_input
 from Simul_farfield import find_refl
 from Simul_farfield import generate_grains
 from Simul_farfield import make_image
+from Simul_farfield import reflections
 import logging
 logging.basicConfig(level=logging.INFO,format='\n%(levelname)s: %(message)s')
 
@@ -25,13 +26,16 @@ if options.filename == None:
     print "\nNo input file supplied [-i filename]\n"
     sys.exit()
 
+print '\n'
 
 
 # Is the input file available?
 
 # Read and check input
-print '\n'
-myinput = check_input.parse_input(input_file=options.filename)  # Make instance of parse_input class
+
+# Make instance of parse_input class
+myinput = check_input.parse_input(input_file=options.filename)
+
 try:
     myinput.read()                                # read input file
 except:
@@ -48,8 +52,16 @@ generate_grains.generate_grains(myinput.param)
 generate_grains.save_grains(myinput.param)
 generate_grains.save_ubi(myinput.param)
 
+# Generate reflections
+if 'structure_file' in myinput.param:
+    xtal_structure = reflections.open_structure(myinput.param)
+    hkl = reflections.gen_miller(myinput.param)
+    hkl = reflections.calc_intensity(hkl,xtal_structure)
+else:
+    hkl = reflections.gen_miller(myinput.param)
+
 # Determine the reflection parameters for grains
-graindata = find_refl.find_refl(myinput.param)
+graindata = find_refl.find_refl(myinput.param,hkl)
 graindata.frameinfo = myinput.frameinfo
 graindata.run()
 graindata.save()

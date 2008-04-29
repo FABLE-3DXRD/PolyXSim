@@ -7,8 +7,8 @@ def gen_miller(param):
 	Henning Osholm Sorensen, Risoe DTU,
 	"""
 
-        sintlmin = N.sin(param['theta_min']*n.pi/180)/param['wavelength']
-        sintlmax = N.sin(param['theta_max']*n.pi/180)/param['wavelength']
+        sintlmin = n.sin(param['theta_min']*n.pi/180)/param['wavelength']
+        sintlmax = n.sin(param['theta_max']*n.pi/180)/param['wavelength']
 
 	hkl  = tools.genhkl(param['unit_cell'],
 				 sg.sg(sgno=param['sgno']).syscond,
@@ -18,9 +18,15 @@ def gen_miller(param):
 	return hkl
 		
 def open_structure(param):
-	file = param['structure']
+	file = param['structure_file']
+	if 'structure_datablock' in param:
+		datablock = param['structure_datablock']
+	else:
+		datablock = None
 	struct = structure.build_atomlist()
-	struct.CIFread(file)
+	struct.CIFread(ciffile=file,cifblkname=datablock)
+	param['sgno'] = sg.sg(sgname=struct.atomlist.sgname).no
+	param['unit_cell'] =  struct.atomlist.cell
 	return struct
 
 def calc_intensity(hkl,struct):
@@ -29,10 +35,11 @@ def calc_intensity(hkl,struct):
         """
 	int = n.zeros((len(hkl),1))
 	for i in range(len(hkl)):
-		(Fr, Fi) = structure.StructureFactor(hkl[i], struct.atomlist.cell,
-                  	                               	struct.atomlist.sgname,
-                                                 	struct.atomlist.atom,
-                                                 	struct.atomlist.dispersion)
+		(Fr, Fi) = structure.StructureFactor(hkl[i],
+						     struct.atomlist.cell,
+						     struct.atomlist.sgname,
+						     struct.atomlist.atom,
+						     struct.atomlist.dispersion)
 		int[i] = Fr**2 + Fi**2			
 	hkl = n.concatenate((hkl,int),1)
 	return hkl

@@ -11,17 +11,18 @@ A_id = variables.refarray().A_id
 
 
 class find_refl:
-    def __init__(self,param):
+    def __init__(self,param,hkl):
         self.param = param
+        self.hkl = hkl
         self.grain = []
         # determine position of reflections
     
         # Simple transforms of input and set constants
-        sintlmin = N.sin(self.param['theta_min']*N.pi/180)/self.param['wavelength']
-        sintlmax = N.sin(self.param['theta_max']*N.pi/180)/self.param['wavelength']
+        #sintlmin = N.sin(self.param['theta_min']*N.pi/180)/self.param['wavelength']
+        #sintlmax = N.sin(self.param['theta_max']*N.pi/180)/self.param['wavelength']
         self.K = -2*N.pi/self.param['wavelength']
         self.S = N.array([[1, 0, 0],[0, 1, 0],[0, 0, 1]])
-        self.V = N.array(tools.CellVolume(self.param['unit_cell']))
+        #self.V = N.array(tools.CellVolume(self.param['unit_cell']))
         # Detector tilt correction matrix
         if self.param['tilt_x'] != 0 or self.param['tilt_y'] != 0 or self.param['tilt_z'] != 0:
             self.R = tools.detect_tilt(self.param['tilt_x'],self.param['tilt_y'],self.param['tilt_z'])
@@ -36,7 +37,7 @@ class find_refl:
         
         # Generate Miller indices for reflections within a certain resolution
         print 'Generating reflections'
-        self.hkl  = tools.genhkl(self.param['unit_cell'],sg.sg(sgno=self.param['sgno']).syscond,sintlmin,sintlmax)
+        #self.hkl  = tools.genhkl(self.param['unit_cell'],sg.sg(sgno=self.param['sgno']).syscond,sintlmin,sintlmax)
 #        print self.hkl
         print 'Finished generating reflections\n'
     
