@@ -61,6 +61,8 @@ if 'structure_file' in myinput.param:
     hkl = reflections.calc_intensity(hkl,xtal_structure)
 else:
     hkl = reflections.gen_miller(myinput.param)
+    hkl = reflections.add_intensity(hkl,myinput.param)
+
 
 # Determine the reflection parameters for grains
 graindata = find_refl.find_refl(myinput.param,hkl)
