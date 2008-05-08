@@ -56,3 +56,4 @@ def add_intensity(hkl,param):
 	int = n.ones((len(hkl),1))*int
 	hkl = n.concatenate((hkl,int),1)
 	return hkl
+

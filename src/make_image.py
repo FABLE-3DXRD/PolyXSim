@@ -23,7 +23,6 @@ class make_image:
 		if self.graindata.param['make_image'] != 0:
 	
 			peakshape = self.graindata.param['peakshape']
-			intensity = 10000
 	
 			if peakshape[0] == 0: # spike peak, (2peak_add+1)x(2peak_add+1) pixels
 				peak_add = int(round(peakshape[1]))
@@ -58,6 +57,7 @@ class make_image:
 						detz = int(round(self.graindata.grain[j].refs[k,A_id['detz']]))
 						yrange = range(dety+frame_add-peak_add,dety+frame_add+peak_add+1)
 						zrange = range(detz+frame_add-peak_add,detz+frame_add+peak_add+1)
+						intensity = int(round(self.graindata.grain[j].refs[k,A_id['Int']]))
 						nrefl = nrefl + 1
 						totalrefl = totalrefl + 1
 						# Gaussian along omega

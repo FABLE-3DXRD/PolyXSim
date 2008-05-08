@@ -106,7 +106,7 @@ def grain_size(no_grains,grain_size,grain_min_max,sample_vol=None):
 	#
 	# Jette Oddershede, RISOE DTU, April 2 2008
 	
-	size = n.zeros((no_grains,1))
+	size = n.zeros((no_grains))
 	grain_vol = 0
 	if grain_size < 0:
 		print 'All grains have the following mean diameter: ', abs(grain_size), ' mm\n'
@@ -115,8 +115,10 @@ def grain_size(no_grains,grain_size,grain_min_max,sample_vol=None):
 			grain_vol = grain_vol + n.pi/6*size[i]**3
 			
 	else:
-	# NB the standard lognormal distribution lognormal() = exp(normal(mean=0, spread=1) has a mean of exp(.5)
-		print 'Grain sizes from a lognormal distribution with a mean diameter of: ', abs(grain_size), ' mm\n'
+	# NB the standard lognormal distribution
+        # lognormal() = exp(normal(mean=0, spread=1) has a mean of exp(.5)
+		print 'Grain sizes from a lognormal distribution with a mean diameter of: ',\
+		abs(grain_size), ' mm\n'
 		for i in range(no_grains):
 			while size[i] <= grain_min_max[0] or size[i] > grain_min_max[1]:
 				size[i] = grain_size*n.random.lognormal()/n.exp(.5)
@@ -126,7 +128,7 @@ def grain_size(no_grains,grain_size,grain_min_max,sample_vol=None):
 	if sample_vol != None:
 		fraction = grain_vol/sample_vol
 		print 'The generated grains cover the following fraction of the sample volume: %6f' %fraction
-	
+	print 'SIZE: ',size
 	return size
 	
 

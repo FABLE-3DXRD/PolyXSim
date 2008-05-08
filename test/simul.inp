@@ -1,4 +1,5 @@
 ### Instrumental
+beamflux 1e15
 wavelength  0.5092836 # in angstrom
 distance  95.00			# sample-detector distance (mm)
 dety_center  511.5				# beamcenter, y in pixel coordinatees

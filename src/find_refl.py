@@ -1,6 +1,7 @@
 import numpy as N
 from xfab import tools
 from xfab import sg
+from xfab.structure import int_intensity
 import variables
 import sys
 from ImageD11 import blobcorrector
@@ -54,6 +55,10 @@ class find_refl:
             gr_eps = N.array(self.param['eps_grains_%s' %(self.param['grain_list'][grainno])])
             # Calculate the B-matrix based on the strain tensor for each grain
             B = tools.epsilon2B(gr_eps,self.param['unit_cell']) 
+            V = tools.CellVolume(self.param['unit_cell'])
+            print self.param['size_grains_%s' %grainno]
+            grain_vol = N.pi/6 * self.param['size_grains_%s' %grainno]**3 
+
 #            print 'GRAIN NO: ',self.param['grain_list'][grainno]
 #            print 'GRAIN POSITION of grain ',self.param['grain_list'][grainno],': ',gr_pos
 #            print 'STRAIN TENSOR COMPONENTS (e11 e12 e13 e22 e23 e33) of grain ',self.param['grain_list'][grainno],':\n',gr_eps
@@ -78,7 +83,8 @@ class find_refl:
   
                 if len(Omega) > 0:
                     for omega in Omega:
-                        if  (self.param['omega_start']*N.pi/180) < omega and omega < (self.param['omega_end']*N.pi/180):
+                        if  (self.param['omega_start']*N.pi/180) < omega and\
+                                omega < (self.param['omega_end']*N.pi/180):
                             Om = N.array([[N.cos(omega), -N.sin(omega), 0],
                                         [N.sin(omega),  N.cos(omega), 0],
                                         [  0       ,    0       , 1]])
@@ -102,12 +108,17 @@ class find_refl:
                                              self.param['wavelength']/(2*N.pi)*Gt[2]])
                                 t = R[0,0]*self.param['distance']/N.sum(R[:,0]*v)
                                 Ltv = N.array([tx-self.param['distance'], ty, tz])+ t*v
-                                dety = N.sum(R[:,1]*Ltv)/self.param['y_size'] + self.param['dety_center']
-                                detz = N.sum(R[:,2]*Ltv)/self.param['z_size'] + self.param['detz_center']
+                                dety = N.sum(R[:,1]*Ltv)/self.param['y_size'] +\
+                                    self.param['dety_center']
+                                detz = N.sum(R[:,2]*Ltv)/self.param['z_size'] +\
+                                    self.param['detz_center']
                             else:
-                                konst = self.param['wavelength']*(self.param['distance'] - tx)/(2*N.pi*costth)
-                                dety = self.param['dety_center'] + (ty + Gt[1]*konst)/self.param['y_size']
-                                detz = self.param['detz_center'] + (tz + Gt[2]*konst)/self.param['z_size']
+                                konst = self.param['wavelength']*\
+                                    (self.param['distance'] - tx)/(2*N.pi*costth)
+                                dety = self.param['dety_center'] + \
+                                    (ty + Gt[1]*konst)/self.param['y_size']
+                                detz = self.param['detz_center'] + \
+                                    (tz + Gt[2]*konst)/self.param['z_size']
 
                             if self.param['spatial'] != None :
                                 # To match the coordinate system of the spline file
@@ -134,7 +145,7 @@ class find_refl:
                             #Polarization factor (Kahn et al, J. Appl. Cryst. (1982) 15, 330-337.)
                             rho = N.pi/2.0 + eta + self.param['beampol_direct']*N.pi/180.0 
                             P = 0.5 * (1 + costth*costth +\
-                                        self.param['beampol_factor']*N.cos(2*rho)*N.sin(tth)*N.sin(tth))
+                                        self.param['beampol_factor']*N.cos(2*rho)*N.sin(tth)**2)
                             #Lorentz factor
                             if eta != 0:
                                 L=1/(N.sin(tth)*abs(N.sin(eta)))
@@ -144,13 +155,21 @@ class find_refl:
                             overlaps = 0 # set the number overlaps to zero
                             #logging.debug("frame_center: %i, omega: %f" %(frame_center,omega*180/N.pi))
                             #logging.debug("frame_limits: %i, %i" %(frame_limits[0],frame_limits[1]))
+                            intensity = int_intensity(hkl[3],
+                                                 L,
+                                                 P,
+                                                 self.param['beamflux'],
+                                                 self.param['wavelength'],
+                                                 V,
+                                                 grain_vol)
+                            print hkl[3],intensity
                             A.append([grainno,nrefl,spot_id,
                                       hkl[0],hkl[1],hkl[2],
                                       tth,omega,eta,
                                       dety,detz,
                                       detyd,detzd,
                                       Gw[0],Gw[1],Gw[2],
-                                      L,P,hkl[3]])
+                                      L,P,hkl[3],intensity])
                             nrefl = nrefl+1
                             spot_id = spot_id+1
 
@@ -219,7 +238,7 @@ class find_refl:
             filename = '%s/%s_gr%0.4d_set%0.4d.ref' \
                 %(self.param['direc'],self.param['prefix'],grainno,setno)
             f = open(filename,'w')
-            format = "%d "*6 + "%f "*13 + "%d "*2 + "\n"
+            format = "%d "*6 + "%f "*14 + "%d "*1 + "\n"
             ( nrefl, ncol ) = A.shape
 #            print nrefl, ncol
             out = "#"
@@ -249,7 +268,7 @@ class find_refl:
                                A[i,A_id['L']],
                                A[i,A_id['P']],
                                A[i,A_id['F2']],
-                               A[i,0],
+                               A[i,A_id['Int']],
                                A[i,0]
 #                               A[i,A_id['frame_start']],
 #                               A[i,A_id['frame_end']],

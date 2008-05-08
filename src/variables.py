@@ -67,7 +67,7 @@ class refarray:
                       'L'              :16,
                       'P'              :17,
                       'F2'    	       :18,
-                      'frame_end'      :19,
+                      'Int'            :19,
                       'overlaps'       :20
                       }
 
