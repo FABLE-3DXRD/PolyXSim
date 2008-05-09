@@ -2,6 +2,7 @@ import numpy as n
 from xfab import tools
 import variables
 
+
 def generate_U(no_grains):
 	# generate random U (orientations) for no_grains grains
 	#
