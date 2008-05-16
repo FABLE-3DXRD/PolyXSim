@@ -56,7 +56,6 @@ class find_refl:
             # Calculate the B-matrix based on the strain tensor for each grain
             B = tools.epsilon2B(gr_eps,self.param['unit_cell']) 
             V = tools.CellVolume(self.param['unit_cell'])
-            print self.param['size_grains_%s' %grainno]
             grain_vol = N.pi/6 * self.param['size_grains_%s' %grainno]**3 
 
 #            print 'GRAIN NO: ',self.param['grain_list'][grainno]
@@ -162,7 +161,6 @@ class find_refl:
                                                  self.param['wavelength'],
                                                  V,
                                                  grain_vol)
-                            print hkl[3],intensity
                             A.append([grainno,nrefl,spot_id,
                                       hkl[0],hkl[1],hkl[2],
                                       tth,omega,eta,
@@ -179,7 +177,7 @@ class find_refl:
             A[:,A_id['ref_id']] = N.arange(nrefl)     # Renumber the reflections  
             A[:,A_id['spot_id']] = N.arange(N.min(A[:,A_id['spot_id']]),N.max(A[:,A_id['spot_id']])+1) # Renumber the spot_id
             self.grain[grainno].refs = A
-            print '\rDone %i grain(s) of %i' %(grainno+1,self.param['no_grains']),
+            print '\rDone %3i grain(s) of %3i' %(grainno+1,self.param['no_grains']),
             sys.stdout.flush()
 
         print '\n'
