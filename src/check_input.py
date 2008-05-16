@@ -139,87 +139,116 @@ class parse_input:
 
 # read U, pos, eps and size for all grains		
 		for item in self.param:
-			if '_grains_' in item:
-				if 'U' in item:
-					grain_list_U.append(eval(split(item,'_grains_')[1]))
-				elif 'pos' in item:
-					grain_list_pos.append(eval(split(item,'_grains_')[1]))
-				elif 'eps' in item:
-					grain_list_eps.append(eval(split(item,'_grains_')[1]))
-				elif 'size' in item:
-					grain_list_size.append(eval(split(item,'_grains_')[1]))
+                    if '_grains_' in item:
+                        if 'U' in item:
+                            grain_list_U.append(eval(split(item,'_grains_')[1]))
+                        elif 'pos' in item:
+                            grain_list_pos.append(eval(split(item,'_grains_')[1]))
+                        elif 'eps' in item:
+                            grain_list_eps.append(eval(split(item,'_grains_')[1]))
+                        elif 'size' in item:
+                            grain_list_size.append(eval(split(item,'_grains_')[1]))
 					
-# assert that input U, pos, eps size are correct in format (same number of grains and same specifiers or else not input) 
+# assert that input U, pos, eps size are correct in format
+# (same number of grains and same specifiers or else not input) 
 		grain_list_U.sort()
 		grain_list_pos.sort()
 		grain_list_eps.sort()
 		grain_list_size.sort()
 		if len(grain_list_U) != 0 and 'gen_U' not in self.param:
-			assert len(grain_list_U) == no_grains, 'Input number of grains does not agree with number of U_grains, check for multiple names'
-			self.param['grain_list'] = grain_list_U
-			if len(grain_list_pos) != 0 and 'gen_pos' not in self.param:
-				assert grain_list_U == grain_list_pos, 'Specified grain number for U_grains and pos_grains disagree'
-			if len(grain_list_eps) != 0 and 'gen_eps' not in self.param:
-				assert grain_list_U == grain_list_eps, 'Specified grain number for U_grains and eps_grains disagree'
-			if len(grain_list_size) != 0 and 'grain_size' not in self.param:
-				assert grain_list_U == grain_list_size, 'Specified grain number for U_grains and size_grains disagree'
+                    assert len(grain_list_U) == no_grains, \
+                        'Input number of grains does not agree with number' +\
+                        ' of U_grains, check for multiple names'
+                    self.param['grain_list'] = grain_list_U
+                    if len(grain_list_pos) != 0 and 'gen_pos' not in self.param:
+                        assert grain_list_U == grain_list_pos, \
+                            'Specified grain number for U_grains and pos_grains disagree'
+                    if len(grain_list_eps) != 0 and 'gen_eps' not in self.param:
+                        assert grain_list_U == grain_list_eps, \
+                            'Specified grain number for U_grains and eps_grains disagree'
+                    if len(grain_list_size) != 0 and 'grain_size' not in self.param:
+                        assert grain_list_U == grain_list_size, \
+                            'Specified grain number for U_grains and size_grains disagree'
 		else:
-			if len(grain_list_pos) != 0 and 'gen_pos' not in self.param:
-				assert len(grain_list_pos) == no_grains, 'Input number of grains does not agree with number of pos_grains, check for multiple names'
-				self.param['grain_list'] = grain_list_pos
-				if len(grain_list_eps) != 0 and 'gen_eps' not in self.param:
-					assert grain_list_pos == grain_list_eps, 'Specified grain number for pos_grains and eps_grains disagree'
-				if len(grain_list_size) != 0 and 'grain_size' not in self.param:
-					assert grain_list_pos == grain_list_size, 'Specified grain number for pos_grains and size_grains disagree'
-			elif len(grain_list_eps) != 0 and 'gen_eps' not in self.param:
-				assert len(grain_list_eps) == no_grains, 'Input number of grains does not agree with number of eps_grains, check for multiple names'
-				self.param['grain_list'] = grain_list_eps
-				if len(grain_list_size) != 0 and 'grain_size' not in self.param:
-					assert grain_list_eps == grain_list_size, 'Specified grain number for eps_grains and size_grains disagree'
-			elif len(grain_list_size) != 0 and 'grain_size' not in self.param:
-				assert len(grain_list_size) == no_grains, 'Input number of grains does not agree with number of size_grains, check for multiple names'
-				self.param['grain_list'] = grain_list_size
-			else:
-				self.param['grain_list'] = range(no_grains)
+                    if len(grain_list_pos) != 0 and 'gen_pos' not in self.param:
+                        assert len(grain_list_pos) == no_grains, \
+                            'Input number of grains does not agree with number'+\
+                            ' of pos_grains, check for multiple names'
+                        self.param['grain_list'] = grain_list_pos
+                        if len(grain_list_eps) != 0 and 'gen_eps' not in self.param:
+                            assert grain_list_pos == grain_list_eps, \
+                                'Specified grain number for pos_grains and eps_grains disagree'
+                        if len(grain_list_size) != 0 and 'grain_size' not in self.param:
+                            assert grain_list_pos == grain_list_size, \
+                                'Specified grain number for pos_grains and size_grains disagree'
+                    elif len(grain_list_eps) != 0 and 'gen_eps' not in self.param:
+                        assert len(grain_list_eps) == no_grains, \
+                            'Input number of grains does not agree with number'+\
+                            ' of eps_grains, check for multiple names'
+                        self.param['grain_list'] = grain_list_eps
+                        if len(grain_list_size) != 0 and 'grain_size' not in self.param:
+                            assert grain_list_eps == grain_list_size, \
+                                'Specified grain number for eps_grains and size_grains disagree'
+                    elif len(grain_list_size) != 0 and 'grain_size' not in self.param:
+                        assert len(grain_list_size) == no_grains, \
+                            'Input number of grains does not agree with number'+\
+                            ' of size_grains, check for multiple names'
+                        self.param['grain_list'] = grain_list_size
+                    else:
+                        self.param['grain_list'] = range(no_grains)
 
 # give default values for generation if no info is read				
 		if len(grain_list_U) == 0 and 'gen_U' not in self.param:
-			self.param['gen_U'] = 0
+                    self.param['gen_U'] = 0
 		if len(grain_list_pos) == 0 and 'gen_pos' not in self.param:
-			self.param['gen_pos'] = 0
+                    self.param['gen_pos'] = 0
 		if len(grain_list_eps) == 0 and 'gen_eps' not in self.param:
-			self.param['gen_eps'] = [0,0,0,0]
+                    self.param['gen_eps'] = [0,0,0,0]
 		if len(grain_list_size) == 0 and 'grain_size' not in self.param:
-			self.param['grain_size'] = -0.075
+                    self.param['grain_size'] = -0.075
 		if 'grain_size' in self.param and 'grain_min_max' not in self.param:
-			self.param['grain_min_max'] = [0,10*abs(self.param['grain_size'])]			
+                    self.param['grain_min_max'] = [0,10*abs(self.param['grain_size'])]			
 			
 #assert that not both sample_xyz and sample_cyl are given
 		if 'sample_xyz' in self.param:
-			assert 'sample_cyl' not in self.param, 'Both sample_xyz and sample_cyl are given'
+                    assert 'sample_cyl' not in self.param, 'Both sample_xyz and sample_cyl are given'
 			
 # assert that mean grain size != 0 and if mean > 0 then min < mean < max, assure that min non-negative
 		if 'grain_size' in self.param:
-			assert self.param['grain_size'] != 0, 'grain_size 0 is an invalid command'
-			if self.param['grain_size'] > 0:
-				assert self.param['grain_min_max'][0] < self.param['grain_size'], 'grain_min larger than grain_size'
-				assert self.param['grain_min_max'][1] > self.param['grain_size'], 'grain_max smaller than grain_size'
-				if self.param['grain_min_max'][0] < 0:
-					self.param['grain_min_max'][0] = 0
+                    assert self.param['grain_size'] != 0, 'grain_size 0 is an invalid command'
+                    if self.param['grain_size'] > 0:
+                        assert self.param['grain_min_max'][0] < self.param['grain_size'], \
+                            'grain_min larger than grain_size'
+                        assert self.param['grain_min_max'][1] > self.param['grain_size'], \
+                            'grain_max smaller than grain_size'
+                        if self.param['grain_min_max'][0] < 0:
+                            self.param['grain_min_max'][0] = 0
 		
 #check that the given grain_size and no_grains are consistent with sample_vol, adjust max to sample size
-			if 'sample_xyz' in self.param:
-				self.param['sample_vol'] = self.param['sample_xyz'][0]*self.param['sample_xyz'][1]*self.param['sample_xyz'][2]
-				diam_limit = (6*self.param['sample_vol']/(N.exp(.5)*N.pi*self.param['no_grains']))**(1/3.)
-				assert abs(self.param['grain_size']) < diam_limit, 'The sample volume is too small to contain the specified number of grains with the given grain size'
-				self.param['grain_min_max'][1] = min(self.param['sample_xyz'][0],self.param['sample_xyz'][1],self.param['sample_xyz'][2])
-			elif 'sample_cyl' in self.param:
-				self.param['sample_vol'] = N.pi*self.param['sample_cyl'][0]*self.param['sample_cyl'][0]*self.param['sample_cyl'][1]
-				diam_limit = (6*self.param['sample_vol']/(N.exp(.5)*N.pi*self.param['no_grains']))**(1/3.)
-				assert abs(self.param['grain_size']) < diam_limit, 'The sample volume is too small to contain the specified number of grains with the given grain size'
-				self.param['grain_min_max'][1] = min(2*self.param['sample_cyl'][0],self.param['sample_cyl'][1])
-			else:					
-				self.param['sample_vol'] = None
+                    if 'sample_xyz' in self.param:
+                        self.param['sample_vol'] = self.param['sample_xyz'][0]*\
+                                                   self.param['sample_xyz'][1]*\
+                                                   self.param['sample_xyz'][2]
+                        diam_limit = (6*self.param['sample_vol']/\
+                                          (N.exp(.5)*N.pi*self.param['no_grains']))**(1/3.)
+                        assert abs(self.param['grain_size']) < diam_limit, \
+                            'The sample volume is too small to contain the '+\
+                            'specified number of grains with the given grain size'
+                        self.param['grain_min_max'][1] = min(self.param['sample_xyz'][0],
+                                                             self.param['sample_xyz'][1],
+                                                             self.param['sample_xyz'][2])
+                    elif 'sample_cyl' in self.param:
+                        self.param['sample_vol'] = N.pi*self.param['sample_cyl'][0]*\
+                                   self.param['sample_cyl'][0]*self.param['sample_cyl'][1]
+                        diam_limit = (6*self.param['sample_vol']/\
+                                       (N.exp(.5)*N.pi*self.param['no_grains']))**(1/3.)
+                        assert abs(self.param['grain_size']) < diam_limit, \
+                            'The sample volume is too small to contain the '+\
+                            'specified number of grains with the given grain size'
+                        self.param['grain_min_max'][1] = min(2*self.param['sample_cyl'][0],
+                                                             self.param['sample_cyl'][1])
+                    else:					
+                        self.param['sample_vol'] = None
 
 			
     def initialize(self): 
@@ -258,7 +287,8 @@ class parse_input:
 
         for no in filerange:
             self.frameinfo.append(variables.frameinfo_cont(no))
-            self.frameinfo[no].name = '%s/%s_frame%0.4d%s' %(self.param['direc'],self.param['prefix'],no,self.param['format'])
+            self.frameinfo[no].name = '%s/%s_frame%0.4d%s' \
+                %(self.param['direc'],self.param['prefix'],no,self.param['format'])
             self.frameinfo[no].omega = omegalist[no];
             self.frameinfo[no].nrefl = 0 # Initialize number of reflections on frame
             self.frameinfo[no].refs = [] # Initialize number of reflections on frame
