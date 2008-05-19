@@ -2,11 +2,11 @@
 
 # Modules to import 
 import sys
-from Simul_farfield import check_input
-from Simul_farfield import find_refl
-from Simul_farfield import generate_grains
-from Simul_farfield import make_image
-from Simul_farfield import reflections
+from PolyXSim import check_input
+from PolyXSim import find_refl
+from PolyXSim import generate_grains
+from PolyXSim import make_image
+from PolyXSim import reflections
 import logging
 logging.basicConfig(level=logging.INFO,format='\n%(levelname)s: %(message)s')
 

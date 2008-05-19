@@ -9,7 +9,7 @@ setup(
   license='GPL', maintainer='Henning Osholm Soerensen',
   maintainer_email='henning.sorensen@risoe.dk',
   url='http://fable.wiki.sourceforge.net',
-  packages=['Simul_farfield'],
-  package_dir={"Simul_farfield": "src"},
-  scripts=["scripts/simul_farfield.py"]
+  packages=['PolyXSim'],
+  package_dir={"PolyXSim": "src"},
+  scripts=["scripts/PolyXSim.py"]
 )
