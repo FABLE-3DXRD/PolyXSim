@@ -9,7 +9,7 @@ import sys, os
 import variables
 from xfab import tools
 
-import numpy as N
+import numpy as n
 import logging
 
 logging.basicConfig(level=logging.DEBUG,format='%(levelname)s %(message)s')
@@ -118,7 +118,7 @@ class parse_input:
                     self.param[key] = eval(val)
 					
                     if 'U_grains' in key:
-                        self.param[key] = N.array(self.param[key])
+                        self.param[key] = n.array(self.param[key])
                         self.param[key].shape = (3,3)
            
 
@@ -230,7 +230,7 @@ class parse_input:
                                                    self.param['sample_xyz'][1]*\
                                                    self.param['sample_xyz'][2]
                         diam_limit = (6*self.param['sample_vol']/\
-                                          (N.exp(.5)*N.pi*self.param['no_grains']))**(1/3.)
+                                          (n.exp(.5)*n.pi*self.param['no_grains']))**(1/3.)
                         assert abs(self.param['grain_size']) < diam_limit, \
                             'The sample volume is too small to contain the '+\
                             'specified number of grains with the given grain size'
@@ -238,10 +238,10 @@ class parse_input:
                                                              self.param['sample_xyz'][1],
                                                              self.param['sample_xyz'][2])
                     elif 'sample_cyl' in self.param:
-                        self.param['sample_vol'] = N.pi*self.param['sample_cyl'][0]*\
+                        self.param['sample_vol'] = n.pi*self.param['sample_cyl'][0]*\
                                    self.param['sample_cyl'][0]*self.param['sample_cyl'][1]
                         diam_limit = (6*self.param['sample_vol']/\
-                                       (N.exp(.5)*N.pi*self.param['no_grains']))**(1/3.)
+                                       (n.exp(.5)*n.pi*self.param['no_grains']))**(1/3.)
                         assert abs(self.param['grain_size']) < diam_limit, \
                             'The sample volume is too small to contain the '+\
                             'specified number of grains with the given grain size'
@@ -269,7 +269,7 @@ class parse_input:
         omega_end  = self.param['omega_end']
         omega_sign = self.param['omega_sign']
         start_frame = self.param['start_frame']
-        omegalist = omega_sign*N.arange(omega_start,omega_end+omega_step,omega_step)
+        omegalist = omega_sign*n.arange(omega_start,omega_end+omega_step,omega_step)
         nframes = int((omega_end-omega_start)/omega_step)
         omegalist.sort()
 #        i=0
@@ -278,9 +278,9 @@ class parse_input:
         self.frameinfo = [] 
         
         if omega_sign > 0:
-            filerange = N.arange(start_frame,start_frame+nframes)
+            filerange = n.arange(start_frame,start_frame+nframes)
         else:
-            filerange = N.arange((start_frame-1)+nframes,(start_frame-1),omega_sign)
+            filerange = n.arange((start_frame-1)+nframes,(start_frame-1),omega_sign)
             # reverse omega_start/omega_end
             self.param['omega_end'] = omega_start*omega_sign 
             self.param['omega_start'] = omega_end*omega_sign

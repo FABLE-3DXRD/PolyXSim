@@ -10,7 +10,7 @@ dety_size  1024.0     # detector y size (pixels)
 detz_size  1024.0     # detector z size (pixels)
 tilt_x    0.0        # detector tilt counterclockwise around lab x axis in rad 
 tilt_y    0.0        # detector tilt counterclockwise around lab y axis in rad 
-tilt_z    0.0        # detector tilt counterclockwise around lab z axis in rad 
+tilt_z    0.0       # detector tilt counterclockwise around lab z axis in rad 
 omega_start  -90.0   # Minimum Omega in range of interest (in deg)
 omega_end  -85.0      # Maximum Omega in range of interest (in deg)
 omega_step  0.5      # Omega step size (in deg)

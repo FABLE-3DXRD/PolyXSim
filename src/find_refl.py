@@ -1,6 +1,7 @@
-import numpy as N
+import numpy as n
 from xfab import tools
 from xfab import sg
+from xfab import detector
 from xfab.structure import int_intensity
 import variables
 import sys
@@ -16,19 +17,14 @@ class find_refl:
         self.param = param
         self.hkl = hkl
         self.grain = []
-        # determine position of reflections
     
         # Simple transforms of input and set constants
-        #sintlmin = N.sin(self.param['theta_min']*N.pi/180)/self.param['wavelength']
-        #sintlmax = N.sin(self.param['theta_max']*N.pi/180)/self.param['wavelength']
-        self.K = -2*N.pi/self.param['wavelength']
-        self.S = N.array([[1, 0, 0],[0, 1, 0],[0, 0, 1]])
-        #self.V = N.array(tools.CellVolume(self.param['unit_cell']))
+        self.K = -2*n.pi/self.param['wavelength']
+        self.S = n.array([[1, 0, 0],[0, 1, 0],[0, 0, 1]])
+        
         # Detector tilt correction matrix
-        if self.param['tilt_x'] != 0 or self.param['tilt_y'] != 0 or self.param['tilt_z'] != 0:
-            self.R = tools.detect_tilt(self.param['tilt_x'],self.param['tilt_y'],self.param['tilt_z'])
-        else:
-            self.R = [0]
+        self.R = tools.detect_tilt(self.param['tilt_x'],self.param['tilt_y'],self.param['tilt_z'])
+
         # Spatial distortion
         if self.param['spatial'] != None:
             self.spatial = blobcorrector.correctorclass(self.param['spatial'])
@@ -38,9 +34,7 @@ class find_refl:
         
         # Generate Miller indices for reflections within a certain resolution
         logging.info('Generating reflections')
-        #self.hkl  = tools.genhkl(self.param['unit_cell'],
-        #                          sg.sg(sgno=self.param['sgno']).syscond,
-        #                          sintlmin,sintlmax)
+
 
         print 'Finished generating reflections\n'
     
@@ -51,12 +45,12 @@ class find_refl:
             A = []
             U = self.param['U_grains_%s' %(self.param['grain_list'][grainno])]
             self.grain.append(variables.grain_cont(U))
-            gr_pos = N.array(self.param['pos_grains_%s' %(self.param['grain_list'][grainno])])
-            gr_eps = N.array(self.param['eps_grains_%s' %(self.param['grain_list'][grainno])])
+            gr_pos = n.array(self.param['pos_grains_%s' %(self.param['grain_list'][grainno])])
+            gr_eps = n.array(self.param['eps_grains_%s' %(self.param['grain_list'][grainno])])
             # Calculate the B-matrix based on the strain tensor for each grain
             B = tools.epsilon2B(gr_eps,self.param['unit_cell']) 
             V = tools.CellVolume(self.param['unit_cell'])
-            grain_vol = N.pi/6 * self.param['size_grains_%s' %grainno]**3 
+            grain_vol = n.pi/6 * self.param['size_grains_%s' %grainno]**3 
 
 #            print 'GRAIN NO: ',self.param['grain_list'][grainno]
 #            print 'GRAIN POSITION of grain ',self.param['grain_list'][grainno],': ',gr_pos
@@ -69,59 +63,49 @@ class find_refl:
             # For all reflections in Ahkl that fulfill omega_start < omega < omega_end.
             # All angles in Grain are in degrees
             for hkl in self.hkl:
-                Gtmp = N.dot(B,hkl[0:3])
-                Gtmp = N.dot(U,Gtmp)
-                Gw =   N.dot(self.S,Gtmp)
+                Gtmp = n.dot(B,hkl[0:3])
+                Gtmp = n.dot(U,Gtmp)
+                Gw =   n.dot(self.S,Gtmp)
                 #Gw = self.S*U*self.B*hkl
                 #print G
-                Glen = N.sqrt(N.dot(Gw,Gw))
-                tth = 2*N.arcsin(Glen/(2*abs(self.K)))
-                costth = N.cos(tth)
+                Glen = n.sqrt(n.dot(Gw,Gw))
+                tth = 2*n.arcsin(Glen/(2*abs(self.K)))
+                costth = n.cos(tth)
 
                 Omega = tools.find_omega(Gw,tth)
   
                 if len(Omega) > 0:
                     for omega in Omega:
-                        if  (self.param['omega_start']*N.pi/180) < omega and\
-                                omega < (self.param['omega_end']*N.pi/180):
-                            Om = N.array([[N.cos(omega), -N.sin(omega), 0],
-                                        [N.sin(omega),  N.cos(omega), 0],
+                        if  (self.param['omega_start']*n.pi/180) < omega and\
+                                omega < (self.param['omega_end']*n.pi/180):
+                            Om = n.array([[n.cos(omega), -n.sin(omega), 0],
+                                        [n.sin(omega),  n.cos(omega), 0],
                                         [  0       ,    0       , 1]])
-                            Gt = N.dot(Om,Gw)
-                            eta = N.arctan2(-Gt[1],Gt[2])
+                            Gt = n.dot(Om,Gw)
+                            eta = n.arctan2(-Gt[1],Gt[2])
                             if eta < 0.0:  # We want eta to be [0,2pi] not [-pi,pi]
-                                eta = eta +2*N.pi 
+                                eta = eta +2*n.pi 
   
                             # Calc crystal position at present omega
-                            tx = 0
-                            ty = 0
-                            tz = 0
-                            [tx,ty]= N.dot(Om[:2,:2],gr_pos[:2])
+                            [tx,ty]= n.dot(Om[:2,:2],gr_pos[:2])
                             tz = gr_pos[2]
                             
-                            # NOTE THE + signs here means that the detector coord system adheres to standard
-                            if len(self.R) == 3: # If detector tilt calc position like this 
-                                R = self.R
-                                v = N.array([costth, 
-                                             self.param['wavelength']/(2*N.pi)*Gt[1],
-                                             self.param['wavelength']/(2*N.pi)*Gt[2]])
-                                t = R[0,0]*self.param['distance']/N.sum(R[:,0]*v)
-                                Ltv = N.array([tx-self.param['distance'], ty, tz])+ t*v
-                                dety = N.sum(R[:,1]*Ltv)/self.param['y_size'] +\
-                                    self.param['dety_center']
-                                detz = N.sum(R[:,2]*Ltv)/self.param['z_size'] +\
-                                    self.param['detz_center']
-                            else:
-                                konst = self.param['wavelength']*\
-                                    (self.param['distance'] - tx)/(2*N.pi*costth)
-                                dety = self.param['dety_center'] + \
-                                    (ty + Gt[1]*konst)/self.param['y_size']
-                                detz = self.param['detz_center'] + \
-                                    (tz + Gt[2]*konst)/self.param['z_size']
+                            # Calc detector coordinate for peak 
+                            (dety, detz) = detector.det_coor(Gt, 
+                                                             costth,
+                                                             self.param['wavelength'],
+                                                             self.param['distance'],
+                                                             self.param['y_size'],
+                                                             self.param['z_size'],
+                                                             self.param['dety_center'],
+                                                             self.param['detz_center'],
+                                                             self.R,
+                                                             tx,ty,tz)
 
                             if self.param['spatial'] != None :
                                 # To match the coordinate system of the spline file
                                 # SPLINE(i,j): i = detz; j = (dety_size-1)-dety
+                                # Well at least if the spline file is for frelon2k
                                 x = detz 
                                 y = self.param['dety_size']-1-dety
                                 
@@ -138,21 +122,23 @@ class find_refl:
  #                              (detzd > self.param['detz_size']-self.param['sbox_z']):
  #                                continue
                             
- #                           frame_center = N.floor((omega*180/N.pi-self.param['omega_start'])/self.param['omega_step'])
+ #                           frame_center = n.floor((omega*180/n.pi-self.param['omega_start'])/self.param['omega_step'])
  #                           delta_sbox_omega =  int((self.param['sbox_omega']-1)/2)
  #                           frame_limits = [frame_center - delta_sbox_omega, frame_center + delta_sbox_omega]
+
                             #Polarization factor (Kahn et al, J. Appl. Cryst. (1982) 15, 330-337.)
-                            rho = N.pi/2.0 + eta + self.param['beampol_direct']*N.pi/180.0 
+                            rho = n.pi/2.0 + eta + self.param['beampol_direct']*n.pi/180.0 
                             P = 0.5 * (1 + costth*costth +\
-                                        self.param['beampol_factor']*N.cos(2*rho)*N.sin(tth)**2)
+                                        self.param['beampol_factor']*n.cos(2*rho)*n.sin(tth)**2)
+
                             #Lorentz factor
                             if eta != 0:
-                                L=1/(N.sin(tth)*abs(N.sin(eta)))
+                                L=1/(n.sin(tth)*abs(n.sin(eta)))
                             else:
-                                L=N.inf;
+                                L=n.inf;
  
                             overlaps = 0 # set the number overlaps to zero
-                            #logging.debug("frame_center: %i, omega: %f" %(frame_center,omega*180/N.pi))
+                            #logging.debug("frame_center: %i, omega: %f" %(frame_center,omega*180/n.pi))
                             #logging.debug("frame_limits: %i, %i" %(frame_limits[0],frame_limits[1]))
                             intensity = int_intensity(hkl[3],
                                                  L,
@@ -172,11 +158,14 @@ class find_refl:
                             spot_id = spot_id+1
 
 #           print 'Length of Grain', len(self.grain[0].refl)
-            A = N.array(A)
-            A = A[N.argsort(A,0)[:,A_id['omega']],:] # sort rows according to omega
-            A[:,A_id['ref_id']] = N.arange(nrefl)     # Renumber the reflections  
-            A[:,A_id['spot_id']] = N.arange(N.min(A[:,A_id['spot_id']]),N.max(A[:,A_id['spot_id']])+1) # Renumber the spot_id
-            self.grain[grainno].refs = A
+            A = n.array(A)
+            A = A[n.argsort(A,0)[:,A_id['omega']],:] # sort rows according to omega
+            A[:,A_id['ref_id']] = n.arange(nrefl)     # Renumber the reflections  
+            A[:,A_id['spot_id']] = n.arange(n.min(A[:,A_id['spot_id']]),
+                                            n.max(A[:,A_id['spot_id']])+1) # Renumber the spot_id
+ 
+            # save reflection info in grain container
+            self.grain[grainno].refs = A 
             print '\rDone %3i grain(s) of %3i' %(grainno+1,self.param['no_grains']),
             sys.stdout.flush()
 
@@ -184,18 +173,18 @@ class find_refl:
 
     def overlap(self):
         
-        dtth = 1*N.pi/180.  # Don't compare position of refs further apart than dtth 
+        dtth = 1*n.pi/180.  # Don't compare position of refs further apart than dtth 
 
         # build one big array of reflection info of all grains
         A = self.grain[0].refs
         for grainno in range(1,self.param['no_grains']):
-            A = N.concatenate((A,self.grain[grainno].refs))
+            A = n.concatenate((A,self.grain[grainno].refs))
         logging.debug('Finished concatenating ref arrays')
-        A = A[N.argsort(A,0)[:,A_id['tth']],:] # sort rows according to tth
+        A = A[n.argsort(A,0)[:,A_id['tth']],:] # sort rows according to tth
         logging.debug('Sorted full ref array after twotheta')
         nrefl = A.shape[0]
         
-        nover=N.zeros((nrefl))
+        nover=n.zeros((nrefl))
         logging.debug('Ready to compare all %i reflections',nrefl)
         overlaps = dict([(i,[]) for i in range(nrefl)])
         for i in range(1,nrefl):
@@ -203,18 +192,21 @@ class find_refl:
                 logging.debug('Comparing reflection %i', i)
             j=i-1
             while j > -1 and A[i,A_id['tth']]-A[j,A_id['tth']] < dtth :
-                if abs(A[i,A_id['omega']]-A[j,A_id['omega']]) < N.pi/180.0*self.param['omega_step']*self.param['sbox_omega']:
-#                    if abs(A[i,A_id['detyd']]-A[j,A_id['detyd']]) < self.param['sbox_y']:
-#                        if abs(A[i,A_id['detzd']]-A[j,A_id['detzd']]) < self.param['sbox_z']:
-                    peak_distance = N.sqrt((A[i,A_id['detyd']]-A[j,A_id['detyd']])**2+\
+                if abs(A[i,A_id['omega']]-A[j,A_id['omega']]) \
+                        < n.pi/180.0*self.param['omega_step']*self.param['sbox_omega']:
+                    peak_distance = n.sqrt((A[i,A_id['detyd']]-A[j,A_id['detyd']])**2+\
                         (A[i,A_id['detzd']]-A[j,A_id['detzd']])**2)
                     if peak_distance < (self.param['sbox_y']+self.param['sbox_z'])/2.0:
-                            overlaps[A[i,A_id['spot_id']]].append([A[j,A_id['grain_id']],A[j,A_id['ref_id']]])
-                            overlaps[A[j,A_id['spot_id']]].append([A[i,A_id['grain_id']],A[i,A_id['ref_id']]])
-                            self.grain[int(A[i,A_id['grain_id']])].refs[A[i,A_id['ref_id']],A_id['overlaps']] += 1
-                            self.grain[int(A[j,A_id['grain_id']])].refs[A[j,A_id['ref_id']],A_id['overlaps']] += 1
+                            overlaps[A[i,A_id['spot_id']]].append([A[j,A_id['grain_id']],
+                                                                   A[j,A_id['ref_id']]])
+                            overlaps[A[j,A_id['spot_id']]].append([A[i,A_id['grain_id']],
+                                                                   A[i,A_id['ref_id']]])
+                            self.grain[int(A[i,A_id['grain_id']])].refs[A[i,A_id['ref_id']],
+                                                                        A_id['overlaps']] += 1
+                            self.grain[int(A[j,A_id['grain_id']])].refs[A[j,A_id['ref_id']],
+                                                                        A_id['overlaps']] += 1
                 j = j - 1
-        print 'Number of overlaps %i out of %i refl.' %(N.sum(nover),nrefl)
+        print 'Number of overlaps %i out of %i refl.' %(n.sum(nover),nrefl)
         co = 0
         # How to find the info for reflection with spot_id
         #refl_with_spotid = A[(A[:,A_id['spot_id']]==spot_id),:]
@@ -253,9 +245,9 @@ class find_refl:
                                A[i,A_id['h']],
                                A[i,A_id['k']],
                                A[i,A_id['l']],
-                               A[i,A_id['tth']]*180/N.pi,
-                               A[i,A_id['omega']]*180/N.pi,
-                               A[i,A_id['eta']]*180/N.pi,
+                               A[i,A_id['tth']]*180/n.pi,
+                               A[i,A_id['omega']]*180/n.pi,
+                               A[i,A_id['eta']]*180/n.pi,
                                A[i,A_id['dety']],
                                A[i,A_id['detz']],
                                A[i,A_id['detyd']],
@@ -268,8 +260,6 @@ class find_refl:
                                A[i,A_id['F2']],
                                A[i,A_id['Int']],
                                A[i,0]
-#                               A[i,A_id['frame_start']],
-#                               A[i,A_id['frame_end']],
 #                               A[i,A_id['overlaps']]
                            )
                 f.write(out)
@@ -278,19 +268,21 @@ class find_refl:
             
     
     def write_gve(self):
-#  Write gvector (gve) file, for format see
-# http://fable.wiki.sourceforge.net/imaged11+-+file+formats
-# 
-#Henning Osholm 2008,
-# python translation: Jette Oddershede, Risoe DTU, March 31 2008
-#
+        """
+        Write gvector (gve) file, for format see
+        http://fable.wiki.sourceforge.net/imaged11+-+file+formats
+        
+        Henning Osholm Sorense, RisoeDTU, 2008.
+        python translation: Jette Oddershede, Risoe DTU, March 31 2008
+        """
+
         filename = '%s/%s.gve' %(self.param['direc'],self.param['prefix'])
         f = open(filename,'w')
         lattice = sg.sg(sgno=self.param['sgno']).name[0]
         format = "%f "*6 + "%s "*1 +"\n"
         out = format %(self.param['unit_cell'][0],self.param['unit_cell'][1],
-		               self.param['unit_cell'][2],self.param['unit_cell'][3],
-					   self.param['unit_cell'][4],self.param['unit_cell'][5], lattice)
+                       self.param['unit_cell'][2],self.param['unit_cell'][3],
+                       self.param['unit_cell'][4],self.param['unit_cell'][5], lattice)
         f.write(out)
         out = "# wavelength = %s\n" %(self.param['wavelength'])
         f.write(out)
@@ -300,10 +292,10 @@ class find_refl:
         f.write(out)
 		
         A = self.grain[0].refs
-        A = A[N.argsort(A,0)[:,A_id['tth']],:] # sort rows according to tth, descending
+        A = A[n.argsort(A,0)[:,A_id['tth']],:] # sort rows according to tth, descending
         format = "%f "*1 + "%d "*3 +"\n"
         for i in range(A.shape[0]):
-            out = format %((2*N.sin(.5*A[i,A_id['tth']])/self.param['wavelength']),
+            out = format %((2*n.sin(.5*A[i,A_id['tth']])/self.param['wavelength']),
                            A[i,A_id['h']],
                            A[i,A_id['k']],
                            A[i,A_id['l']]
@@ -314,18 +306,18 @@ class find_refl:
         f.write(out)
         format = "%f "*8 + "\n"
         for grainno in range(1,self.param['no_grains']):
-            A = N.concatenate((A,self.grain[grainno].refs))
+            A = n.concatenate((A,self.grain[grainno].refs))
 			
         nrefl = A.shape[0]
         for i in range(nrefl):
-            out = format %(A[i,A_id['gv1']]/(2*N.pi),
-			               A[i,A_id['gv2']]/(2*N.pi),
-			               A[i,A_id['gv3']]/(2*N.pi),
-			               A[i,A_id['dety']],
-			               A[i,A_id['detz']],
-						   (2*N.sin(.5*A[i,A_id['tth']])/self.param['wavelength']),
-			               A[i,A_id['eta']]*180/N.pi,
-			               A[i,A_id['omega']]*180/N.pi
+            out = format %(A[i,A_id['gv1']]/(2*n.pi),
+                           A[i,A_id['gv2']]/(2*n.pi),
+                           A[i,A_id['gv3']]/(2*n.pi),
+                           A[i,A_id['dety']],
+                           A[i,A_id['detz']],
+                           (2*n.sin(.5*A[i,A_id['tth']])/self.param['wavelength']),
+                           A[i,A_id['eta']]*180/n.pi,
+                           A[i,A_id['omega']]*180/n.pi
                            )
             f.write(out)
 		

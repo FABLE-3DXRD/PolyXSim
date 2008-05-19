@@ -121,7 +121,7 @@ if __name__=='__main__':
  #self.grain[grainno].refl[nrefl].zbox = self.param['zbox']
  #self.grain[grainno].refl[nrefl].wbox = self.param['wbox']
  #self.grain[grainno].refl[nrefl].framectr =\
- #                               floor(((omega*180/N.pi-self.param['omega_start'])/self.param['omega_step'])+1)
+ #                               floor(((omega*180/n.pi-self.param['omega_start'])/self.param['omega_step'])+1)
  #self.grain[grainno].refl[nrefl].AOI  = [round(dety-self.yboxhalf), round(detz-self.zboxhalf),\
  #                                        round(dety+self.yboxhalf), round(detz+self.zboxhalf)]
  #self.grain[grainno].refl[nrefl].frames = range(\
