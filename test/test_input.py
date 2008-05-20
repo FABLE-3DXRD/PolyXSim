@@ -1,6 +1,6 @@
 import unittest
 import numpy as n
-from Simul_farfield import check_input
+from polyxsim import check_input
 
 class test_input(unittest.TestCase):
     def test_reading(self):  ## test method names begin 'test*'

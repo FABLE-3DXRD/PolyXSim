@@ -1,6 +1,6 @@
 import unittest
-from Simul_farfield import check_input
-from Simul_farfield import reflections
+from polyxsim import check_input
+from polyxsim import reflections
 import numpy as n
 
 class test_gen_miller(unittest.TestCase):
