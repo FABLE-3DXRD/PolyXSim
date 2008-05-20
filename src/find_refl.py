@@ -281,6 +281,20 @@ class find_refl:
         python translation: Jette Oddershede, Risoe DTU, March 31 2008
         """
 
+        A = self.grain[0].refs
+
+        for grainno in range(1,self.param['no_grains']):
+            A = n.concatenate((A,self.grain[grainno].refs))
+
+
+        # sort rows according to tth, descending
+        if len(A) > 0: 
+            A = A[n.argsort(A,0)[:,A_id['tth']],:]
+        else:
+            logging.warning('No reflections simulated, hence no gve file is made')
+            return
+
+
         filename = '%s/%s.gve' %(self.param['direc'],self.param['prefix'])
         f = open(filename,'w')
         lattice = sg.sg(sgno=self.param['sgno']).name[0]
@@ -296,8 +310,8 @@ class find_refl:
         out = "# ds h k l\n" 
         f.write(out)
 		
-        A = self.grain[0].refs
-        A = A[n.argsort(A,0)[:,A_id['tth']],:] # sort rows according to tth, descending
+
+
         format = "%f "*1 + "%d "*3 +"\n"
         for i in range(A.shape[0]):
             out = format %((2*n.sin(.5*A[i,A_id['tth']])/self.param['wavelength']),
@@ -310,8 +324,6 @@ class find_refl:
         out = "# xr yr zr dety detz ds eta omega\n" 
         f.write(out)
         format = "%f "*8 + "\n"
-        for grainno in range(1,self.param['no_grains']):
-            A = n.concatenate((A,self.grain[grainno].refs))
 			
         nrefl = A.shape[0]
         for i in range(nrefl):
