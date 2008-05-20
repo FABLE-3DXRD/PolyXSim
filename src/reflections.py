@@ -19,12 +19,18 @@ def gen_miller(param):
 		
 def open_structure(param):
 	file = param['structure_file']
-	if 'structure_datablock' in param:
-		datablock = param['structure_datablock']
+	if param['structure_file'][-3:] == 'cif':
+		if 'structure_datablock' in param:
+			datablock = param['structure_datablock']
+		else:
+			datablock = None
+		struct = structure.build_atomlist()
+		struct.CIFread(ciffile=file,cifblkname=datablock)
+	elif param['structure_file'][-3:] == 'pdb':
+		struct = structure.build_atomlist()
+		struct.PDBread(pdbfile=file)
 	else:
-		datablock = None
-	struct = structure.build_atomlist()
-	struct.CIFread(ciffile=file,cifblkname=datablock)
+		raise Error, 'Unknown structure file format'
 	param['sgno'] = sg.sg(sgname=struct.atomlist.sgname).no
 	param['unit_cell'] =  struct.atomlist.cell
 	return struct

@@ -73,7 +73,6 @@ class find_refl:
                 costth = n.cos(tth)
 
                 Omega = tools.find_omega(Gw,tth)
-  
                 if len(Omega) > 0:
                     for omega in Omega:
                         if  (self.param['omega_start']*n.pi/180) < omega and\
@@ -159,10 +158,14 @@ class find_refl:
 
 #           print 'Length of Grain', len(self.grain[0].refl)
             A = n.array(A)
-            A = A[n.argsort(A,0)[:,A_id['omega']],:] # sort rows according to omega
-            A[:,A_id['ref_id']] = n.arange(nrefl)     # Renumber the reflections  
-            A[:,A_id['spot_id']] = n.arange(n.min(A[:,A_id['spot_id']]),
-                                            n.max(A[:,A_id['spot_id']])+1) # Renumber the spot_id
+            if len(A) > 0:
+                # sort rows according to omega
+                A = A[n.argsort(A,0)[:,A_id['omega']],:]
+                # Renumber the reflections  
+                A[:,A_id['ref_id']] = n.arange(nrefl)
+                # Renumber the spot_id
+                A[:,A_id['spot_id']] = n.arange(n.min(A[:,A_id['spot_id']]),
+                                            n.max(A[:,A_id['spot_id']])+1)
  
             # save reflection info in grain container
             self.grain[grainno].refs = A 
@@ -229,7 +232,6 @@ class find_refl:
                 %(self.param['direc'],self.param['prefix'],grainno,setno)
             f = open(filename,'w')
             format = "%d "*6 + "%f "*14 + "%d "*1 + "\n"
-            ( nrefl, ncol ) = A.shape
 #            print nrefl, ncol
             out = "#"
             A_col = dict([[v,k] for k,v in A_id.items()])
@@ -238,31 +240,34 @@ class find_refl:
             out = out +"\n"
 
             f.write(out)
-            for i in range(nrefl):
-                out = format %(A[i,A_id['grain_id']],
-                               A[i,A_id['ref_id']],
-                               A[i,A_id['spot_id']],   
-                               A[i,A_id['h']],
-                               A[i,A_id['k']],
-                               A[i,A_id['l']],
-                               A[i,A_id['tth']]*180/n.pi,
-                               A[i,A_id['omega']]*180/n.pi,
-                               A[i,A_id['eta']]*180/n.pi,
-                               A[i,A_id['dety']],
-                               A[i,A_id['detz']],
-                               A[i,A_id['detyd']],
-                               A[i,A_id['detzd']],
-                               A[i,A_id['gv1']],
-                               A[i,A_id['gv2']],
-                               A[i,A_id['gv3']],
-                               A[i,A_id['L']],
-                               A[i,A_id['P']],
-                               A[i,A_id['F2']],
-                               A[i,A_id['Int']],
-                               A[i,0]
-#                               A[i,A_id['overlaps']]
+            # Only write reflections to file if some present
+            if len(A) > 0:
+                ( nrefl, ncol ) = A.shape
+                for i in range(nrefl):
+                    out = format %(A[i,A_id['grain_id']],
+                                   A[i,A_id['ref_id']],
+                                   A[i,A_id['spot_id']],   
+                                   A[i,A_id['h']],
+                                   A[i,A_id['k']],
+                                   A[i,A_id['l']],
+                                   A[i,A_id['tth']]*180/n.pi,
+                                   A[i,A_id['omega']]*180/n.pi,
+                                   A[i,A_id['eta']]*180/n.pi,
+                                   A[i,A_id['dety']],
+                                   A[i,A_id['detz']],
+                                   A[i,A_id['detyd']],
+                                   A[i,A_id['detzd']],
+                                   A[i,A_id['gv1']],
+                                   A[i,A_id['gv2']],
+                                   A[i,A_id['gv3']],
+                                   A[i,A_id['L']],
+                                   A[i,A_id['P']],
+                                   A[i,A_id['F2']],
+                                   A[i,A_id['Int']],
+                                   A[i,0]
+ #                                 A[i,A_id['overlaps']]
                            )
-                f.write(out)
+                    f.write(out)
         
             f.close()   
             

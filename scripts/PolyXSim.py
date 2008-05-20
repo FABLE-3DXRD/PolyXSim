@@ -2,11 +2,11 @@
 
 # Modules to import 
 import sys
-from PolyXSim import check_input
-from PolyXSim import find_refl
-from PolyXSim import generate_grains
-from PolyXSim import make_image
-from PolyXSim import reflections
+from polyxsim import check_input
+from polyxsim import find_refl
+from polyxsim import generate_grains
+from polyxsim import make_image
+from polyxsim import reflections
 import logging
 logging.basicConfig(level=logging.INFO,format='\n%(levelname)s: %(message)s')
 
