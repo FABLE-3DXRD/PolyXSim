@@ -50,7 +50,7 @@ class find_refl:
             # Calculate the B-matrix based on the strain tensor for each grain
             B = tools.epsilon2B(gr_eps,self.param['unit_cell']) 
             V = tools.CellVolume(self.param['unit_cell'])
-            grain_vol = n.pi/6 * self.param['size_grains_%s' %grainno]**3 
+            grain_vol = n.pi/6 * self.param['size_grains_%s' %self.param['grain_list'][grainno]]**3 
 
 #            print 'GRAIN NO: ',self.param['grain_list'][grainno]
 #            print 'GRAIN POSITION of grain ',self.param['grain_list'][grainno],': ',gr_pos
@@ -146,7 +146,8 @@ class find_refl:
                                                  self.param['wavelength'],
                                                  V,
                                                  grain_vol)
-                            A.append([grainno,nrefl,spot_id,
+                            A.append([self.param['grain_list'][grainno],
+                                      nrefl,spot_id,
                                       hkl[0],hkl[1],hkl[2],
                                       tth,omega,eta,
                                       dety,detz,
@@ -229,7 +230,7 @@ class find_refl:
             A = self.grain[grainno].refs
             setno = 0
             filename = '%s/%s_gr%0.4d_set%0.4d.ref' \
-                %(self.param['direc'],self.param['prefix'],grainno,setno)
+                %(self.param['direc'],self.param['prefix'],self.param['grain_list'][grainno],setno)
             f = open(filename,'w')
             format = "%d "*6 + "%f "*14 + "%d "*1 + "\n"
 #            print nrefl, ncol
