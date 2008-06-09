@@ -229,3 +229,22 @@ def save_ubi(param):
         out = "\n"
         f.write(out)
     f.close()   
+
+
+
+def gen_odf(sigma,pos,mapsize):
+    """
+    Generate a 3D orietation distributio function as a 3D Gaussion
+    Henning Osholm Sorensen, Risoe-DTU, June 9, 2008
+    """
+    odf = n.zeros(mapsize)
+    
+    for i in range(int(mapsize[0])):
+	for j in range(int(mapsize[1])):
+            for k in range(int(mapsize[2])):
+                odf[i,j,k] = -0.5*(((i-pos[0])/sigma[0])**2\
+			          +((j-pos[1])/sigma[1])**2\
+                                  +((k-pos[2])/sigma[2])**2)
+
+    odf = 1/(2*n.pi*n.sqrt(2*n.pi)*sigma[0]*sigma[1]*sigma[2])*n.exp(odf)
+    return odf
