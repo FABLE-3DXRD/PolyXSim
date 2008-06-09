@@ -46,12 +46,16 @@ class make_image:
 				frame = n.zeros((framedimy,framedimz))
 				omega = self.graindata.frameinfo[i].omega
 				omega_step = self.graindata.param['omega_step']
-				for j in range(self.graindata.param['no_grains']):  # loop over grains
-					for k in range(len(self.graindata.grain[j].refs)): # loop over reflections for each grain
+				# loop over grains
+				for j in range(self.graindata.param['no_grains']):
+					# loop over reflections for each grain
+					for k in range(len(self.graindata.grain[j].refs)):
 						# exploit that the reflection list is sorted according to omega
-						if self.graindata.grain[j].refs[k,A_id['omega']]*180/n.pi > omega+omega_step+2*peakwsig:
+						if self.graindata.grain[j].refs[k,A_id['omega']]*180/n.pi > \
+							    omega+omega_step+2*peakwsig:
 							break
-						elif self.graindata.grain[j].refs[k,A_id['omega']]*180/n.pi < omega-2*peakwsig:
+						elif self.graindata.grain[j].refs[k,A_id['omega']]*180/n.pi < \
+							    omega-2*peakwsig:
 							continue
 						dety = int(round(self.graindata.grain[j].refs[k,A_id['dety']]))
 						detz = int(round(self.graindata.grain[j].refs[k,A_id['detz']]))
