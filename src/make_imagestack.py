@@ -30,9 +30,9 @@ class make_image:
                 odf_center = [(r1_range)/2, r2_range/2, r3_range/2]
 
 
-            Uodf = n.zeros(r1_range*r2_range*r3_range*9).\
+            self.Uodf = n.zeros(r1_range*r2_range*r3_range*9).\
 		reshape(r1_range,r2_range,r3_range,3,3)
-	    print Uodf
+	    print self.Uodf
             for i in range(odf.shape[0]):
                 for j in range(odf.shape[1]):
                     for k in range(odf.shape[2]):
@@ -41,9 +41,9 @@ class make_image:
                                      j-odf_center[1],
                                      k-odf_center[2]])
 
-                        Uodf[i,j,k,:,:] = tools.rod2U(r)
+                        self.Uodf[i,j,k,:,:] = tools.rod2U(r)
 
-	    return Uodf
+	    return self.Uodf
 
 # % Makes spheric ODF for debug purpuses
 # %for i = 1:size(odf,1)
@@ -72,20 +72,75 @@ class make_image:
 						self.graindata.param['detz_size'])
 
 
-# nr = size(A,1);
-# A = sortrows(A,14);
+	    # nr = size(A,1);
+	    # A = sortrows(A,14);
+
             # loop over grains
 	    for grainno in range(self.graindata.param['no_grains']):
-		    gr_pos = n.array(self.grainno.param['pos_grains_%s' %(self.param['grain_list'][grainno])])
-		    gr_eps = n.array(self.grainno.param['eps_grains_%s' %(self.param['grain_list'][grainno])])
-		    B = tools.epsilon2B(gr_eps,self.param['unit_cell'])
+		    gr_pos = n.array(self.graindata.param['pos_grains_%s' \
+				     %(self.graindata.param['grain_list'][grainno])])
+		    gr_eps = n.array(self.graindata.param['eps_grains_%s' \
+                                     %(self.graindata.param['grain_list'][grainno])])
+		    B = self.graindata.grain[grainno].B
+		    SU = n.dot(self.graindata.S,self.graindata.grain[grainno].U)
 		    # loop over reflections for each grain
-		    for k in range(len(self.graindata.grain[j].refs)):
+		    for nref in range(len(self.graindata.grain[grainno].refs)):
 			    # exploit that the reflection list is sorted according to omega
-			    hkl = self.graindata.grain[j].refs[k,A_id['omega']]
-			    Gtmp = n.dot(B,hkl)
-			    Gtmp = n.dot(U,Gtmp)
-			    Gw =   n.dot(self.S,Gtmp)
+			    hkl = n.array([self.graindata.grain[grainno].refs[nref,A_id['h']],
+					   self.graindata.grain[grainno].refs[nref,A_id['k']],
+					   self.graindata.grain[grainno].refs[nref,A_id['l']]])
+			    Gc  = n.dot(B,hkl)
+			    for i in range(odf.shape[0]):
+				    for j in range(odf.shape[1]):
+					    for k in range(odf.shape[2]):
+                                                Gtmp = n.dot(self.Uodf[i,j,k],Gc)
+						Gw =   n.dot(SU,Gtmp)
+						Glen = n.sqrt(n.dot(Gw,Gw))
+						tth = 2*n.arcsin(Glen/(2*abs(self.K)))
+						costth = n.cos(tth)
+						Omega = tools.find_omega(Gw,tth)
+						minpos = n.argmin(n.abs(Omega*180/pi-\
+						omega = Omega[minpos]
+						# if omega not in rotation range continue to next step
+						if (self.graindata.param['omega_start']*n.pi/180) > omega or\
+						       omega > (self.param['omega_end']*n.pi/180):
+						     continue
+						Om = tools.OMEGA(Omega[minpos])
+						Gt = n.dot(Om,Gw)
+						
+	                                        # Calc crystal position at present omega
+						[tx,ty]= n.dot(Om[:2,:2],gr_pos[:2])
+						tz = gr_pos[2]
+
+						(dety, detz) = detector.det_coor(Gt, 
+										 costth,
+										 self.graindata.param['wavelength'],
+										 self.graindata.param['distance'],
+										 self.graindata.param['y_size'],
+										 self.graindata.param['z_size'],
+										 self.graindata.param['dety_center'],
+										 self.graindata.param['detz_center'],
+										 self.graindata.R,
+										 tx,ty,tz)
+
+
+						if self.param['spatial'] != None :
+							# To match the coordinate system of the spline file
+							# SPLINE(i,j): i = detz; j = (dety_size-1)-dety
+							# Well at least if the spline file is for frelon2k
+							x = detz 
+							y = self.param['dety_size']-1-dety
+                                
+							(xd,yd) = self.spatial.distort(x,y)
+							dety = self.param['dety_size']-1-yd
+							detz = x
+								   
+						if dety > -0.5 & dety <= self.param['dety_size']-0.5 &\
+						   detz > -0.5 & detz <= self.param['detz_size']-0.5:
+						      dety = int(round(dety))
+						      detz = int(round(detz))
+						      
+
 
 # for reflex=1:nr
 #     int=A(reflex,21); % Integrated intensity
