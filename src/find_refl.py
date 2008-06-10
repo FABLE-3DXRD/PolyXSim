@@ -48,7 +48,9 @@ class find_refl:
             gr_pos = n.array(self.param['pos_grains_%s' %(self.param['grain_list'][grainno])])
             gr_eps = n.array(self.param['eps_grains_%s' %(self.param['grain_list'][grainno])])
             # Calculate the B-matrix based on the strain tensor for each grain
+            self.grain.append(variables.grain_cont(U))
             B = tools.epsilon2B(gr_eps,self.param['unit_cell']) 
+            self.grain[grainno].B = B
             V = tools.CellVolume(self.param['unit_cell'])
             grain_vol = n.pi/6 * self.param['size_grains_%s' %self.param['grain_list'][grainno]]**3 
 
@@ -77,9 +79,8 @@ class find_refl:
                     for omega in Omega:
                         if  (self.param['omega_start']*n.pi/180) < omega and\
                                 omega < (self.param['omega_end']*n.pi/180):
-                            Om = n.array([[n.cos(omega), -n.sin(omega), 0],
-                                        [n.sin(omega),  n.cos(omega), 0],
-                                        [  0       ,    0       , 1]])
+                            # form Omega rotation matrix
+                            Om = tools.OMEGA(omega)
                             Gt = n.dot(Om,Gw)
                             eta = n.arctan2(-Gt[1],Gt[2])
                             if eta < 0.0:  # We want eta to be [0,2pi] not [-pi,pi]
