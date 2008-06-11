@@ -22,7 +22,7 @@ class parse_input:
 #        self.no_pos = 0 # keeping track of no of grain position
         # Experimental setup
         self.needed_items = {
-                    'wavelength' : 'Missing input: wavelenght [wavelength in angstrom]',
+                    'wavelength' : 'Missing input: wavelength [wavelength in angstrom]',
                     'distance'   : 'Missing input: distance [sample-detector distance in mm)]',
                     'dety_center': 'Missing input: dety_center [beamcenter, y in pixel coordinatees]',
                     'detz_center': 'Missing input: detz_center [beamcenter, z in pixel coordinatees]',
@@ -49,10 +49,10 @@ class parse_input:
             'start_frame': 0,
             'omega_sign': 1,
             'noise' : 0,
-			'psf': 0,
+            'psf': 0,
             'make_image': 1,
-			'bg': 0,
-			'peakshape': [0,0],
+            'bg': 0,
+            'peakshape': [0,0],
             'spatial' : None,
             'flood' : None,
             'dark' : None,
@@ -66,7 +66,10 @@ class parse_input:
             'grain_min_max': None,
             'direc': '.',
             'prefix': 'test',
-            'format' : '.edf'
+            'format' : '.edf',
+            'odf_type' : 1,
+            'odf_scale' : 0.02,
+            'mosaicity' : 0.2
             }
 
         
@@ -114,7 +117,6 @@ class parse_input:
                         val = valtmp + ']'
                     else:
                         val = val[0]
-
                     self.param[key] = eval(val)
 					
                     if 'U_grains' in key:

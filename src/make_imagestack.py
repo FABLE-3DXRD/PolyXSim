@@ -42,10 +42,10 @@ class make_image:
 
             self.Uodf = n.zeros(r1_range*r2_range*r3_range*9).\
 		reshape(r1_range,r2_range,r3_range,3,3)
-	    print self.Uodf
-            for i in range(odf.shape[0]):
-                for j in range(odf.shape[1]):
-                    for k in range(odf.shape[2]):
+
+            for i in range(self.odf.shape[0]):
+                for j in range(self.odf.shape[1]):
+                    for k in range(self.odf.shape[2]):
                         r = odf_scale*n.pi/180.*\
                             n.array([i-odf_center[0],
                                      j-odf_center[1],
@@ -62,11 +62,12 @@ class make_image:
             from scipy import sparse
 
 	    #make stack of empty images as a dictionary of sparse matrices
+	    print 'Build sparse image stack'
             stacksize = len(self.graindata.frameinfo)
 	    self.frames = {}
-	    for i=1:stacksize:
-		    self.frames[i]=sparse.lil_matrix(self.graindata.param['dety_size']
-						self.graindata.param['detz_size'])
+	    for i in range(stacksize):
+		    self.frames[i]=sparse.lil_matrix((int(self.graindata.param['dety_size']),
+						      int(self.graindata.param['detz_size'])))
 
             # loop over grains
 	    for grainno in range(self.graindata.param['no_grains']):
@@ -83,9 +84,9 @@ class make_image:
 					   self.graindata.grain[grainno].refs[nref,A_id['k']],
 					   self.graindata.grain[grainno].refs[nref,A_id['l']]])
 			    Gc  = n.dot(B,hkl)
-			    for i in range(odf.shape[0]):
-				    for j in range(odf.shape[1]):
-					    for k in range(odf.shape[2]):
+			    for i in range(self.odf.shape[0]):
+				    for j in range(self.odf.shape[1]):
+					    for k in range(self.odf.shape[2]):
                                                 Gtmp = n.dot(self.Uodf[i,j,k],Gc)
 						Gw =   n.dot(SU,Gtmp)
 						Glen = n.sqrt(n.dot(Gw,Gw))
@@ -136,7 +137,7 @@ class make_image:
 									 self.graindata.param['omega_step'])
 						      self.frames[frame_no][dety,detz] = int(round(intensity*self.odf[i,j,k]))
 
-	  def correct_image(self):
+	def correct_image(self):
               for frame_no in self.frames:
 		      frame = self.frames[frame_no]
 		      if self.graindata.param['bg'] > 0:

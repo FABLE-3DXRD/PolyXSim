@@ -41,15 +41,18 @@ class find_refl:
     def run(self):
         spot_id = 0
         # Generate orientations of the grains and loop over all grains
+        print 'no of grains ',self.param['no_grains']
         for grainno in range(self.param['no_grains']):
             A = []
             U = self.param['U_grains_%s' %(self.param['grain_list'][grainno])]
+            print 'lenght 0 - ',len(self.grain)
+
             self.grain.append(variables.grain_cont(U))
             gr_pos = n.array(self.param['pos_grains_%s' %(self.param['grain_list'][grainno])])
             gr_eps = n.array(self.param['eps_grains_%s' %(self.param['grain_list'][grainno])])
             # Calculate the B-matrix based on the strain tensor for each grain
-            self.grain.append(variables.grain_cont(U))
             B = tools.epsilon2B(gr_eps,self.param['unit_cell']) 
+            # add B matrix to grain container
             self.grain[grainno].B = B
             V = tools.CellVolume(self.param['unit_cell'])
             grain_vol = n.pi/6 * self.param['size_grains_%s' %self.param['grain_list'][grainno]]**3 
@@ -176,6 +179,7 @@ class find_refl:
 
         print '\n'
 
+
     def overlap(self):
         
         dtth = 1*n.pi/180.  # Don't compare position of refs further apart than dtth 
@@ -227,6 +231,7 @@ class find_refl:
             savegrains = range(len(self.grain))
         else:
             savegrains = grainno
+
         for grainno in savegrains:
             A = self.grain[grainno].refs
             setno = 0

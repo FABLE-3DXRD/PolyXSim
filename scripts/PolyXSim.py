@@ -6,6 +6,7 @@ from polyxsim import check_input
 from polyxsim import find_refl
 from polyxsim import generate_grains
 from polyxsim import make_image
+from polyxsim import make_imagestack
 from polyxsim import reflections
 import logging
 logging.basicConfig(level=logging.INFO,format='\n%(levelname)s: %(message)s')
@@ -34,17 +35,24 @@ print '\n'
 # Read and check input
 
 # Make instance of parse_input class
+logging.info('Reading input\n')
+
 myinput = check_input.parse_input(input_file=options.filename)
 
-try:
-    myinput.read()                                # read input file
-except:
-    sys.exit()
+myinput.read()                                # read input file
+#except:
+#    logging.error('Cannot read input - exit')
+#sys.exit()
 
+logging.info('Checking input\n')
 myinput.check()                               # check validity of input
+
+
 if myinput.missing == True:                   # if problem exit
     logging.info('MISSING ITEMS')
     sys.exit()
+
+logging.info('Initialize parameters etc\n')
 myinput.initialize()                            # if ok initialize
 
 #print myinput.param
@@ -73,6 +81,11 @@ graindata.run()
 graindata.save()
 graindata.write_gve()
 
-if myinput.param['make_image'] != 0:
+if myinput.param['make_image'] == 1:
 	image = make_image.make_image(graindata)
 	image.make_image()
+elif  myinput.param['make_image'] == 2:
+	image = make_imagestack.make_image(graindata)
+	image.setup_odf()
+	image.make_image()
+    

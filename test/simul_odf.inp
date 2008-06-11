@@ -1,0 +1,68 @@
+### Instrumental
+beamflux 1e13
+wavelength  0.48593 # in angstrom
+distance   61.977			# sample-detector distance (mm)
+dety_center  981.383				# beamcenter, y in pixel coordinatees
+detz_center  1021.678				# beamcenter, z in pixel coordinatees
+y_size 0.04677648   # Pixel size y (mm)
+z_size 0.04808150   # Pixel size z (mm)
+dety_size  1024.0     # detector y size (pixels)
+detz_size  1024.0     # detector z size (pixels)
+tilt_x    0.0        # detector tilt counterclockwise around lab x axis in rad 
+tilt_y    0.0        # detector tilt counterclockwise around lab y axis in rad 
+tilt_z    0.0       # detector tilt counterclockwise around lab z axis in rad 
+omega_start  -90.0   # Minimum Omega in range of interest (in deg)
+omega_end  -70.0      # Maximum Omega in range of interest (in deg)
+omega_step  0.25      # Omega step size (in deg)
+omega_sign  1        # Sign of omega rotation
+beampol_factor  1    # Polarisation factor
+beampol_direct  0    # Polarisation direction
+theta_min  0                # Minimum theta angle for reflection generation
+theta_max  15               # Maximum theta angle for reflection generation
+o11  -1              # Orientation matrix of detector 
+o12   0              # [[o11,o12]
+o21   0              #  [o21,o22]]
+o22  -1              # 
+### Grains
+no_grains  1
+
+gen_U 0        # generate grain orientations
+gen_pos 0      # generate grain positions
+gen_eps 0 0 0 0 # generate strain tensors [mean (diag) spread (diag) mean (off-diag) spread (off-diag)]
+sample_xyz 0.3 0.3 0.3  # sample size in mm
+#sample_cyl 0.17 0.3    # cylinder dimension, radius and length, of sample in mm
+#grain_size 0.75        # median grain size for log normal distribution
+#grain_min_max 0.01 1.25 # min and max cutoffs for the grain size distribution
+
+U_grains_1   -0.5288    0.7846    0.3238 -0.5178    0.0040   -0.8555   -0.6725   -0.6200    0.4041
+
+ 
+size_grains_1 0.75
+
+
+
+### Structural
+unit_cell  4.04975 4.04975 4.04975 90 90 90
+sgno  225
+structure_file 'Al.cif'
+
+#sysconditions  23*[0]
+
+
+### Files
+direc  '.'
+prefix 'alu'
+
+### Images
+make_image 2       # generate images if different from 0, default generate
+format '.edf'
+noise 0            # put on noise if different from 0, default no noise
+psf 0              # spread of Gaussian point spread function (detector)
+                   # corresponds roughly to the number of affected pixels on either side		   
+peakshape 1 2 0.5  # type, spread (in pixels from the central pixel), (spread in omega for type=1)
+                   # type=0 spike, type=1 2D Gaussian
+		   # type=2 ODF
+odf_type 1
+odf_scale 0.02
+mosaicity 1.0
+bg 10              # background counts				
