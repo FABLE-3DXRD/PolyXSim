@@ -77,8 +77,11 @@ else:
 # Determine the reflection parameters for grains
 graindata = find_refl.find_refl(myinput.param,hkl)
 graindata.frameinfo = myinput.frameinfo
+logging.info('Determine reflections positions')
 graindata.run()
+logging.info('Save reflections')
 graindata.save()
+logging.info('Write g-vector file')
 graindata.write_gve()
 
 if myinput.param['make_image'] == 1:
@@ -88,4 +91,5 @@ elif  myinput.param['make_image'] == 2:
 	image = make_imagestack.make_image(graindata)
 	image.setup_odf()
 	image.make_image()
+	image.correct_image()
     

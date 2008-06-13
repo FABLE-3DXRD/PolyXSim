@@ -1,10 +1,13 @@
 import numpy as n
 
 from xfab import tools
+from xfab import detector
 from fabio import edfimage,tifimage
 
 import variables
 import generate_grains
+import time 
+import sys
 
 A_id = variables.refarray().A_id
 
@@ -13,9 +16,9 @@ class make_image:
             self.graindata = graindata
 
         def setup_odf(self):
-
+		
+            odf_scale = self.graindata.param['odf_scale'] 
             if self.graindata.param['odf_type'] == 1:
-                odf_scale = 0.02
                 odf_spread = self.graindata.param['mosaicity']/4
                 odf_spread_grid = odf_spread/odf_scale
                 sigma = odf_spread_grid*n.ones(3)
@@ -25,21 +28,53 @@ class make_image:
                 r3_range = r1_max*2 + 1
                 mapsize = r1_range*n.ones(3)
                 odf_center = r1_max*n.ones(3)
+
+		print 'size of ODF map', mapsize
                 self.odf = generate_grains.gen_odf(sigma,odf_center,mapsize)
+		#from pylab import *
+		#imshow(self.odf[:,:,odf_center[2]])
+		#show()
             elif self.graindata.param['odf_type'] == 3:
+                odf_spread = self.graindata.param['mosaicity']/4
+                odf_spread_grid = odf_spread/odf_scale
+                r1_max = n.ceil(3*odf_spread_grid)
+                r2_max = n.ceil(3*odf_spread_grid)
+                r3_max = n.ceil(3*odf_spread_grid)
+                r1_range = r1_max*2 + 1
+                r2_range = r2_max*2 + 1
+                r3_range = r3_max*2 + 1
+		print 'size of ODF map', r1_range*n.ones(3)
+                odf_center = r1_max*n.ones(3)
+		self.odf= zeros((r1_range,r2_range,r3_range))
 		# Makes spheric ODF for debug purpuses
-                for i in range(odf.shape[0]):
-                    for j in range(odf.shape[1]):
-                        for k in range(odf.shape[2]):
-                            r = [i-(r1_max+1), j-(r2_max+1), k-(r3_max+1)]
+                for i in range(self.odf.shape[0]):
+                    for j in range(self.odf.shape[1]):
+                        for k in range(self.odf.shape[2]):
+                            r = [i-(r1_max), j-(r2_max), k-(r3_max)]
                             if n.linalg.norm(r) > r1_max:
                                  self.odf[i,j,k] = 0
 			    else:
                                  self.odf[i,j,k] = 1
-            else:
-                [r1_range, r2_range, r3_range] = self.odf.shape
+		#from pylab import *
+		#imshow(self.odf[:,:,r3_max],interpolation=None)
+		#show()
+            elif self.graindata.param['odf_type'] == 2:
+                file = self.graindata.param['odf_file']
+		file = open('odf.dat','r')
+		(r1_range, r2_range, r3_range) = file.readline()[9:].split()
+		r1_range = int(r1_range)
+		r2_range = int(r2_range)
+		r3_range = int(r3_range)
+		oneD_odf = n.fromstring(file.readline(),sep=' ')
+		elements = r1_range*r2_range*r3_range
+		self.odf = oneD_odf[:elements].reshape(r3_range,r2_range,r1_range)
+
+                #[r1_range, r2_range, r3_range] = self.odf.shape
                 odf_center = [(r1_range)/2, r2_range/2, r3_range/2]
 
+		#from pylab import *
+		#imshow(self.odf[:,:,odf_center[2]])
+		#show()
             self.Uodf = n.zeros(r1_range*r2_range*r3_range*9).\
 		reshape(r1_range,r2_range,r3_range,3,3)
 
@@ -52,7 +87,14 @@ class make_image:
                                      k-odf_center[2]])
 
                         self.Uodf[i,j,k,:,:] = tools.rod2U(r)
-
+	    
+	    if self.graindata.param['odf_type'] == 1 or self.graindata.param['odf_type'] == 3:	    
+		    file = open('odf.dat','w')
+		    file.write('ODF size: %i %i %i\n' %(r1_range,r2_range,r3_range))
+		    for i in range(int(r3_range)):
+			    self.odf[:,:,i].tofile(file,sep=' ',format='%f')
+		    file.close()
+	    
 	    return self.Uodf
 
 
@@ -78,7 +120,11 @@ class make_image:
 		    # loop over reflections for each grain
 		    for nref in range(len(self.graindata.grain[grainno].refs)):
 			    # exploit that the reflection list is sorted according to omega
-			    intensity = self.graindata.grain[grainno].refs[nref,A_id['Int']]
+			    if self.graindata.param['odf_type'] == 3:
+				    intensity = 1
+			    else:
+				    intensity = self.graindata.grain[grainno].refs[nref,A_id['Int']]
+			    print 'Intensity ', intensity
 
 			    hkl = n.array([self.graindata.grain[grainno].refs[nref,A_id['h']],
 					   self.graindata.grain[grainno].refs[nref,A_id['k']],
@@ -90,11 +136,10 @@ class make_image:
                                                 Gtmp = n.dot(self.Uodf[i,j,k],Gc)
 						Gw =   n.dot(SU,Gtmp)
 						Glen = n.sqrt(n.dot(Gw,Gw))
-						tth = 2*n.arcsin(Glen/(2*abs(self.K)))
+						tth = 2*n.arcsin(Glen/(2*abs(self.graindata.K)))
 						costth = n.cos(tth)
 						Omega = tools.find_omega(Gw,tth)
-						minpos = n.argmin(n.abs(Omega*180/pi-\
-								  self.graindata.grain[grainno].refs[nref,A_id['omega']]))
+						minpos = n.argmin(n.abs(Omega*(180.0/n.pi)-self.graindata.grain[grainno].refs[nref,A_id['omega']]))
 						omega = Omega[minpos]
 						# if omega not in rotation range continue to next step
 						if (self.graindata.param['omega_start']*n.pi/180) > omega or\
@@ -129,17 +174,19 @@ class make_image:
 							dety = self.graindata.param['dety_size']-1-yd
 							detz = x
 								   
-						if dety > -0.5 & dety <= self.graindata.param['dety_size']-0.5 &\
-						   detz > -0.5 & detz <= self.graindata.param['detz_size']-0.5:
+						if dety > -0.5 and dety <= self.graindata.param['dety_size']-0.5 and\
+							    detz > -0.5 and detz <= self.graindata.param['detz_size']-0.5:
 						      dety = int(round(dety))
    						      detz = int(round(detz))
-						      frame_no = floor((omega*180/n.pi-self.graindata.param['omega_start'])/\
+						      frame_no = n.floor((omega*180/n.pi-self.graindata.param['omega_start'])/\
 									 self.graindata.param['omega_step'])
-						      self.frames[frame_no][dety,detz] = int(round(intensity*self.odf[i,j,k]))
+						      self.frames[frame_no][dety,detz] =  self.frames[frame_no][dety,detz]+ intensity*self.odf[i,j,k]
 
 	def correct_image(self):
               for frame_no in self.frames:
-		      frame = self.frames[frame_no]
+		      t1 = time.clock()
+
+		      frame = self.frames[frame_no].toarray()
 		      if self.graindata.param['bg'] > 0:
 			      frame = frame + self.graindata.param['bg']*n.ones((self.graindata.param['dety_size'],
 								       self.graindata.param['detz_size']))
@@ -149,14 +196,23 @@ class make_image:
 		      # apply psf
 		      if self.graindata.param['psf'] != 0:
 			      frame = ndimage.gaussian_filter(frame,self.graindata.param['psf']*0.5)
-	              # convert to integers and flip to same orientation as experimental frames
-		      frame = n.transpose(n.flipud(n.int16(frame)))
+	              # limit values above 16 bit to be 16bit
+		      frame = n.clip(frame,0,2**16-1)
+	              # convert to integers
+		      frame = n.uint16(frame)
+		      #flip detector orientation according to input: o11, o12, o21, o22
+		      frame = detector.trans_orientation(frame,
+							 self.graindata.param['o11'],
+							 self.graindata.param['o12'],
+							 self.graindata.param['o21'],
+							 self.graindata.param['o22'],
+							 'inverse')
 		      # Output frames 
 		      if self.graindata.param['format'] == '.edf':
 			      self.write_edf(frame_no,frame)
 		      elif self.graindata.param['format'] == '.tif':
 			      self.write_tif(frame_no,frame)
-		      print '\rDone frame %i took %8f s' %(i+1,time.clock()-t1),
+		      print '\rDone frame %i took %8f s' %(frame_no+1,time.clock()-t1),
 		      sys.stdout.flush()
 				
 	def write_edf(self,framenumber,frame):

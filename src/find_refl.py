@@ -45,7 +45,6 @@ class find_refl:
         for grainno in range(self.param['no_grains']):
             A = []
             U = self.param['U_grains_%s' %(self.param['grain_list'][grainno])]
-            print 'lenght 0 - ',len(self.grain)
 
             self.grain.append(variables.grain_cont(U))
             gr_pos = n.array(self.param['pos_grains_%s' %(self.param['grain_list'][grainno])])
@@ -150,6 +149,7 @@ class find_refl:
                                                  self.param['wavelength'],
                                                  V,
                                                  grain_vol)
+                            print 'FIND_REFL: intensity - ', intensity
                             A.append([self.param['grain_list'][grainno],
                                       nrefl,spot_id,
                                       hkl[0],hkl[1],hkl[2],
