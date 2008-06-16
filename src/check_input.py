@@ -44,6 +44,7 @@ class parse_input:
             'tilt_x'     : 0,
             'tilt_y'     : 0,
             'tilt_z'     : 0,
+            'wedge': 0.0,
             'beampol_factor' : 1,
             'beampol_angle' : 0.0,
             'start_frame': 0,
@@ -94,7 +95,7 @@ class parse_input:
 
 # assert that the correct number of arguments are given
                     if key == 'peakshape':
-                        assert len(val) =< 3, 'Wrong number of arguments for %s' %key
+                        assert len(val) <= 3, 'Wrong number of arguments for %s' %key
                     elif key == 'sample_cyl'or key == 'grain_min_max':
                         assert len(val) == 2 , 'Wrong number of arguments for %s' %key
                     elif key == 'sample_xyz' or 'pos_grains' in key:

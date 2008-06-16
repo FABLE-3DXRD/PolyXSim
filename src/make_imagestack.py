@@ -139,7 +139,7 @@ class make_image:
 						Glen = n.sqrt(n.dot(Gw,Gw))
 						tth = 2*n.arcsin(Glen/(2*abs(self.graindata.K)))
 						costth = n.cos(tth)
-						Omega = tools.find_omega(Gw,tth)
+						Omega = tools.find_omega_wedge(Gw,tth,self.graindata.param['wedge'])
 						minpos = n.argmin(n.abs(Omega*(180.0/n.pi)-self.graindata.grain[grainno].refs[nref,A_id['omega']]))
 						omega = Omega[minpos]
 						# if omega not in rotation range continue to next step

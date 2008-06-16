@@ -76,7 +76,7 @@ class find_refl:
                 tth = 2*n.arcsin(Glen/(2*abs(self.K)))
                 costth = n.cos(tth)
 
-                Omega = tools.find_omega(Gw,tth)
+                Omega = tools.find_omega_wedge(Gw,tth,self.param['wedge'])
                 if len(Omega) > 0:
                     for omega in Omega:
                         if  (self.param['omega_start']*n.pi/180) < omega and\

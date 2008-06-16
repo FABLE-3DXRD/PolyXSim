@@ -15,6 +15,7 @@ omega_start  -87.0   # Minimum Omega in range of interest (in deg)
 omega_end  -82.0      # Maximum Omega in range of interest (in deg)
 omega_step  0.1      # Omega step size (in deg)
 omega_sign  1        # Sign of omega rotation
+wedge  0.0
 beampol_factor  1    # Polarisation factor
 beampol_direct  0    # Polarisation direction
 theta_min  0         # Minimum theta angle for reflection generation
@@ -42,9 +43,9 @@ size_grains_1 0.75
 
 
 ### Structural
-unit_cell  4.04975 4.04975 4.04975 90 90 90
+#unit_cell  4.04975 4.04975 4.04975 90 90 90
 sgno  225
-#structure_file 'Al.cif'
+structure_file 'Al.cif'
 
 #sysconditions  23*[0]
 

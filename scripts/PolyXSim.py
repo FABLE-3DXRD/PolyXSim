@@ -55,14 +55,11 @@ if myinput.missing == True:                   # if problem exit
 logging.info('Initialize parameters etc\n')
 myinput.initialize()                            # if ok initialize
 
-#print myinput.param
-generate_grains.generate_grains(myinput.param)
-generate_grains.save_grains(myinput.param)
-generate_grains.save_ubi(myinput.param)
 
 # Generate reflections
 if 'structure_file' in myinput.param:
     xtal_structure = reflections.open_structure(myinput.param)
+    print 'UNIT CELL', myinput.param['unit_cell']
     logging.info('Generating miller indices')
     hkl = reflections.gen_miller(myinput.param)
     logging.info('Structure factor calculation')
@@ -71,6 +68,10 @@ else:
     hkl = reflections.gen_miller(myinput.param)
     hkl = reflections.add_intensity(hkl,myinput.param)
 
+#print myinput.param
+generate_grains.generate_grains(myinput.param)
+generate_grains.save_grains(myinput.param)
+generate_grains.save_ubi(myinput.param)
 
 
 
@@ -85,11 +86,13 @@ logging.info('Write g-vector file')
 graindata.write_gve()
 
 if myinput.param['make_image'] == 1:
-	image = make_image.make_image(graindata)
-	image.make_image()
-elif  myinput.param['make_image'] == 2:
+    if  myinput.param['peakshape'][0] == 2:
 	image = make_imagestack.make_image(graindata)
 	image.setup_odf()
 	image.make_image()
 	image.correct_image()
-    
+    else:
+	image = make_image.make_image(graindata)
+	image.make_image()
+
+
