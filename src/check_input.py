@@ -33,7 +33,7 @@ class parse_input:
                     'omega_start'       : 'Missing input: omega_start [Omega start in degrees]',
                     'omega_end'       : 'Missing input: omega_end [Omega end in degrees]',
                     'omega_step'      : 'Missing input: omega_step [Omega step size in degrees]',
-                    'unit_cell'  : 'Missing input: unit_cell [unit cell parameters: a,b,c,alpha,beta, gamma]',
+                    #'unit_cell'  : 'Missing input: unit_cell [unit cell parameters: a,b,c,alpha,beta, gamma]',
                     'no_grains'  : 'Missing input: no_grains [number of grains]',
                     'direc'      : 'Missing input: direc [directory to save output]',
                     'theta_min'   : 'Missing input: theta_min [Minimum theta angle for generation of reflections in degrees]',
@@ -94,7 +94,7 @@ class parse_input:
 
 # assert that the correct number of arguments are given
                     if key == 'peakshape':
-                        assert len(val) == 2 or len(val) == 3, 'Wrong number of arguments for %s' %key
+                        assert len(val) =< 3, 'Wrong number of arguments for %s' %key
                     elif key == 'sample_cyl'or key == 'grain_min_max':
                         assert len(val) == 2 , 'Wrong number of arguments for %s' %key
                     elif key == 'sample_xyz' or 'pos_grains' in key:
@@ -251,6 +251,17 @@ class parse_input:
                                                              self.param['sample_cyl'][1])
                     else:					
                         self.param['sample_vol'] = None
+
+#check that a file name with the odf file is input is odf_type chosen to be 2.
+                if self.param['peakshape'][0] == 2:
+                    if self.param['odf_type'] == 2:
+                        assert 'odf_file' in self.param, 'No filename given for ODF'
+
+#If no structure file is given - unit_cell should be               
+                if 'structure_file' not in self.param:
+                    print 'NO structure file'
+                    assert 'unit_cell' in  self.param, \
+                        'Missing input: structure_file or unit_cell' 
 
 			
     def initialize(self): 

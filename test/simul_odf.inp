@@ -54,13 +54,13 @@ direc  '.'
 prefix 'alu'
 
 ### Images
-make_image 2       # generate images if different from 0, default generate
+make_image 1       # generate images if different from 0, default generate
 format '.tif'
 noise 0            # put on noise if different from 0, default no noise
 psf 0              # spread of Gaussian point spread function (detector)
                    # corresponds roughly to the number of affected pixels on either side		   
 peakshape 1 2 0.5  # type, spread (in pixels from the central pixel), (spread in omega for type=1)
-                   # type=0 spike, type=1 2D Gaussian
+                   # type=0 spike, type=1 2D Gaussian, type = 2 based on ODF.
 odf_type 2
 odf_file 'odf.dat'
 odf_scale 0.02

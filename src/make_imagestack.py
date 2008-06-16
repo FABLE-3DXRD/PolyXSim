@@ -45,7 +45,7 @@ class make_image:
                 r3_range = r3_max*2 + 1
 		print 'size of ODF map', r1_range*n.ones(3)
                 odf_center = r1_max*n.ones(3)
-		self.odf= zeros((r1_range,r2_range,r3_range))
+		self.odf= n.zeros((r1_range,r2_range,r3_range))
 		# Makes spheric ODF for debug purpuses
                 for i in range(self.odf.shape[0]):
                     for j in range(self.odf.shape[1]):
@@ -67,7 +67,7 @@ class make_image:
 		r3_range = int(r3_range)
 		oneD_odf = n.fromstring(file.readline(),sep=' ')
 		elements = r1_range*r2_range*r3_range
-		self.odf = oneD_odf[:elements].reshape(r3_range,r2_range,r1_range)
+		self.odf = oneD_odf[:elements].reshape(r1_range,r2_range,r3_range)
 
                 #[r1_range, r2_range, r3_range] = self.odf.shape
                 odf_center = [(r1_range)/2, r2_range/2, r3_range/2]
@@ -88,11 +88,12 @@ class make_image:
 
                         self.Uodf[i,j,k,:,:] = tools.rod2U(r)
 	    
-	    if self.graindata.param['odf_type'] == 1 or self.graindata.param['odf_type'] == 3:	    
-		    file = open('odf.dat','w')
+	    if self.graindata.param['odf_type'] !=  2:
+		    file = open(self.graindata.param['prefix']+'.odf','w')
 		    file.write('ODF size: %i %i %i\n' %(r1_range,r2_range,r3_range))
-		    for i in range(int(r3_range)):
-			    self.odf[:,:,i].tofile(file,sep=' ',format='%f')
+		    for i in range(int(r1_range)):
+			    self.odf[i,:,:].tofile(file,sep=' ',format='%f')
+			    file.write(' ')
 		    file.close()
 	    
 	    return self.Uodf

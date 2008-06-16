@@ -149,7 +149,7 @@ class find_refl:
                                                  self.param['wavelength'],
                                                  V,
                                                  grain_vol)
-                            print 'FIND_REFL: intensity - ', intensity
+
                             A.append([self.param['grain_list'][grainno],
                                       nrefl,spot_id,
                                       hkl[0],hkl[1],hkl[2],
