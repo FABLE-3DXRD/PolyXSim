@@ -36,8 +36,8 @@ class parse_input:
                     #'unit_cell'  : 'Missing input: unit_cell [unit cell parameters: a,b,c,alpha,beta, gamma]',
                     'no_grains'  : 'Missing input: no_grains [number of grains]',
                     'direc'      : 'Missing input: direc [directory to save output]',
-                    'theta_min'   : 'Missing input: theta_min [Minimum theta angle for generation of reflections in degrees]',
-                    'theta_max'   : 'Missing input: theta_max [Maximum theta angle for generation of reflections in degrees]',
+                    #'theta_min'   : 'Missing input: theta_min [Minimum theta angle for generation of reflections in degrees]',
+                    #'theta_max'   : 'Missing input: theta_max [Maximum theta angle for generation of reflections in degrees]',
                                         }
         self.optional_items = {
             'sgno': 1,
@@ -70,7 +70,9 @@ class parse_input:
             'format' : '.edf',
             'odf_type' : 1,
             'odf_scale' : 0.02,
-            'mosaicity' : 0.2
+            'mosaicity' : 0.2,
+            'theta_min' : 0.0,
+            'theta_max' : None
             }
 
         
@@ -309,30 +311,22 @@ class parse_input:
 #            i += 1
 #        logging.debug("Printing frameinfo...")
             
-# if exist('theta_max') == 0
-#         disp('Warning - missing input: theta_max [Maximum theta angle for generation of reflections in degrees]')
-#         % Find maximum theta for generation of all possible reflections on
-#         % the detector from the detector specs
-#         dety_center_mm = dety_center * y_size;
-#         detz_center_mm = detz_center * y_size;
-#         dety_size_mm = dety_size * y_size;
-#         detz_size_mm = detz_size * y_size;
-#         c2c(1) = sqrt((dety_center_mm-dety_size_mm)^2 + (detz_center_mm-det_zsize_mm)^2);
-#         c2c(2) = sqrt((dety_center_mm-dety_size_mm)^2 + (detz_center_mm-0)^2);
-#         c2c(3) = sqrt((dety_center_mm-0)^2 + (detz_center_mm-det_zsize_mm)^2);
-#         c2c(4) = sqrt((dety_center_mm-0)^2 + (detz_center_mm-0)^2);
-#         c2c_max = max(c2c);
-#         theta_max = atan(c2c_max/distance)/2 * 180/pi;
-#         disp(['NOTICE: To make full detector coverage sets theta_max = ',num2str(theta_max)])
-#         clear dety_center_mm detz_center_mm dety_size_mm detz_size_mm c2c c2c_max
-# end
-
-
-
-# % Generate FILENAME of frame
-# for no=1:nframes
-#     file(no).name = sprintf('%s/%s%0.4d.tif',direc,fileprefix,no);
-# end
+        if self.param['theta_max'] == None:
+            # Find maximum theta for generation of all possible reflections on
+            # the detector from the detector specs
+            dety_center_mm = self.param['dety_center'] * self.param['y_size']
+            detz_center_mm = self.param['detz_center'] * self.param['z_size']
+            dety_size_mm = self.param['dety_size'] * self.param['y_size']
+            detz_size_mm = self.param['detz_size'] * self.param['z_size']
+            c2c = n.zeros((4))
+            c2c[0] = (dety_center_mm-dety_size_mm)**2 + (detz_center_mm-detz_size_mm)**2
+            c2c[1] = (dety_center_mm-dety_size_mm)**2 + (detz_center_mm-0)**2
+            c2c[2] = (dety_center_mm-0)**2 + (detz_center_mm-detz_size_mm)**2
+            c2c[3] = (dety_center_mm-0)**2 + (detz_center_mm-0)**2
+            c2c_max = n.max(n.sqrt(c2c))
+            theta_max = n.arctan(c2c_max/self.param['distance'])/2.0 * 180./n.pi
+            logging.info('To make full detector coverage sets theta_max: %f' %theta_max)
+            self.param['theta_max'] = theta_max
 
 
 if __name__=='__main__':
