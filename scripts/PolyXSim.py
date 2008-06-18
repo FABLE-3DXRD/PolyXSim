@@ -71,7 +71,14 @@ else:
 #print myinput.param
 generate_grains.generate_grains(myinput.param)
 generate_grains.save_grains(myinput.param)
-generate_grains.save_ubi(myinput.param)
+logging.info('Write res file')
+generate_grains.write_res(myinput.param)
+if '.ubi' in myinput.param['output']:
+    logging.info('Write UBI file')
+    generate_grains.write_ubi(myinput.param)
+if '.par' in myinput.param['output']:
+    logging.info('Write detector.par file')
+    generate_grains.write_par(myinput.param)
 
 
 
@@ -82,8 +89,12 @@ logging.info('Determine reflections positions')
 graindata.run()
 logging.info('Save reflections')
 graindata.save()
-logging.info('Write g-vector file')
-graindata.write_gve()
+if '.gve' in myinput.param['output']:
+    logging.info('Write g-vector file')
+    graindata.write_gve()
+if '.flt' in myinput.param['output']:
+    logging.info('Write filtered peaks file')
+    graindata.write_flt()
 
 if myinput.param['make_image'] == 1:
     if  myinput.param['peakshape'][0] == 2:

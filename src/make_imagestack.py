@@ -140,7 +140,10 @@ class make_image:
 						tth = 2*n.arcsin(Glen/(2*abs(self.graindata.K)))
 						costth = n.cos(tth)
 						Omega = tools.find_omega_wedge(Gw,tth,self.graindata.param['wedge'])
-						minpos = n.argmin(n.abs(Omega*(180.0/n.pi)-self.graindata.grain[grainno].refs[nref,A_id['omega']]))
+						try:
+							minpos = n.argmin(n.abs(Omega*(180.0/n.pi)-self.graindata.grain[grainno].refs[nref,A_id['omega']]))
+						except:
+							print Omega
 						omega = Omega[minpos]
 						# if omega not in rotation range continue to next step
 						if (self.graindata.param['omega_start']*n.pi/180) > omega or\
@@ -209,9 +212,9 @@ class make_image:
 							 self.graindata.param['o22'],
 							 'inverse')
 		      # Output frames 
-		      if self.graindata.param['format'] == '.edf':
+		      if '.edf' in self.graindata.param['output']:
 			      self.write_edf(frame_no,frame)
-		      elif self.graindata.param['format'] == '.tif':
+		      if '.tif' in self.graindata.param['output']:
 			      self.write_tif(frame_no,frame)
 		      print '\rDone frame %i took %8f s' %(frame_no+1,time.clock()-t1),
 		      sys.stdout.flush()

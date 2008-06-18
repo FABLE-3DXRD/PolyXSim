@@ -93,9 +93,9 @@ class make_image:
 				# convert to integers and flip to same orientation as experimental frames
 				frame = n.transpose(n.flipud(n.int16(frame)))
 				# Output frames 
-				if self.graindata.param['format'] == '.edf':
+				if '.edf' in self.graindata.param['output']:
 					self.write_edf(i,frame)
-				elif self.graindata.param['format'] == '.tif':
+				if '.tif' in self.graindata.param['output']:
 					self.write_tif(i,frame)
 				print '\rDone frame %i took %8f s' %(i+1,time.clock()-t1),
 				sys.stdout.flush()
@@ -118,9 +118,9 @@ class make_image:
 		e.header['OmegaStep']=self.graindata.param['omega_step']
 		e.header['grainfile']='%s/%s_%0.4dgrains.txt' \
 			%(self.graindata.param['direc'],self.graindata.param['prefix'],self.graindata.param['no_grains'])
-		e.write(self.graindata.frameinfo[framenumber].name)
+		e.write('%s%s' %(self.graindata.frameinfo[framenumber].name,'.edf'))
 				
 	def write_tif(self,framenumber,frame):
 		e=tifimage.tifimage()
 		e.data=frame
-		e.write(self.graindata.frameinfo[framenumber].name)
+		e.write('%s%s' %(self.graindata.frameinfo[framenumber].name,'.tif'))

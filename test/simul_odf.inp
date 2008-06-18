@@ -28,17 +28,16 @@ o22  -1              #
 no_grains  1
 
 #gen_U 0        # generate grain orientations
-gen_pos 0      # generate grain positions
-gen_eps 0 0 0 0 # generate strain tensors [mean (diag) spread (diag) mean (off-diag) spread (off-diag)]
+gen_pos 1 0    # generate grain positions
+gen_eps 1 0 0 0 0 # generate strain tensors [mean (diag) spread (diag) mean (off-diag) spread (off-diag)]
+gen_size 0 0.075 0 1
 sample_xyz 0.3 0.3 0.3  # sample size in mm
 #sample_cyl 0.17 0.3    # cylinder dimension, radius and length, of sample in mm
-#grain_size 0.75        # median grain size for log normal distribution
-#grain_min_max 0.01 1.25 # min and max cutoffs for the grain size distribution
 
 U_grains_1   -0.5288    0.7846    0.3238 -0.5178    0.0040   -0.8555   -0.6725   -0.6200    0.4041
 
  
-size_grains_1 0.75
+size_grains_1 0.075
 
 
 
@@ -53,14 +52,14 @@ structure_file 'Al.cif'
 ### Files
 direc  '.'
 prefix 'alu'
+output '.flt' '.tif' '.ubi' '.par'  
 
 ### Images
 make_image 1       # generate images if different from 0, default generate
-format '.tif'
 noise 0            # put on noise if different from 0, default no noise
 psf 0              # spread of Gaussian point spread function (detector)
                    # corresponds roughly to the number of affected pixels on either side		   
-peakshape 1 2 0.5  # type, spread (in pixels from the central pixel), (spread in omega for type=1)
+peakshape 2 2 0.5  # type, spread (in pixels from the central pixel), (spread in omega for type=1)
                    # type=0 spike, type=1 2D Gaussian, type = 2 based on ODF.
 odf_type 2
 odf_file 'odf.dat'

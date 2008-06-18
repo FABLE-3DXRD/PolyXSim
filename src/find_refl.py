@@ -348,3 +348,58 @@ class find_refl:
         f.close()   
             
     
+    def write_flt(self):
+#  Write filtered peaks (flt) file, for format see
+# http://fable.wiki.sourceforge.net/imaged11+-+file+formats
+# 
+# python translation: Jette Oddershede, Risoe DTU, June 4 2008
+#
+        filename = '%s/%s.flt' %(self.param['direc'],self.param['prefix'])
+        f = open(filename,'w')
+        out = '#  sc  fc  omega  Number_of_pixels  avg_intensity  s_raw  f_raw  sigs  sigf  covsf  sigo  covso  covfo  sum_intensity  sum_intensity^2  IMax_int  IMax_s  IMax_f  IMax_o  Min_s  Max_s  Min_f  Max_f  Min_o  Max_o  dety  detz  onfirst  onlast  spot3d_id \n'
+        f.write(out)
+		
+        A = self.grain[0].refs
+        for grainno in range(1,self.param['no_grains']):
+            A = n.concatenate((A,self.grain[grainno].refs))
+        A = A[n.argsort(A,0)[:,A_id['omega']],:] # sort rows according to omega
+        format = "%f "*3 + "%i "*1 +"%f "*12 + "%i "*2   +"%f "*1 + "%i "*4 +"%f "*4 + "%i "*3 +"\n"
+
+        print A.shape[0]
+        for i in range(A.shape[0]):
+            out = format %(A[i,A_id['detz']],
+                           self.param['dety_size']-A[i,A_id['dety']],
+                           A[i,A_id['omega']]*180/n.pi,
+                           25,
+						   A[i,A_id['Int']]/25,
+						   A[i,A_id['detz']],
+                           self.param['dety_size']-A[i,A_id['dety']],
+						   1,
+						   1,
+						   0,
+						   1,
+						   0,
+						   0,
+						   A[i,A_id['Int']],
+						   A[i,A_id['Int']]**2,
+						   A[i,A_id['Int']]/10,
+						   int(A[i,A_id['detz']]),
+						   int(self.param['dety_size']-A[i,A_id['dety']]),
+						   A[i,A_id['omega']]*180/n.pi,
+						   int(A[i,A_id['detz']])-2,
+						   int(A[i,A_id['detz']])+2,
+						   int(self.param['dety_size']-A[i,A_id['dety']])-2,
+						   int(self.param['dety_size']-A[i,A_id['dety']])+2,
+						   A[i,A_id['omega']]*180/n.pi,
+						   0,
+						   A[i,A_id['dety']]-self.param['dety_size'],
+                           A[i,A_id['detz']],
+						   0,
+						   0,
+                           A[i,A_id['spot_id']]
+                          )
+            f.write(out)
+
+		
+        f.close()   
+            

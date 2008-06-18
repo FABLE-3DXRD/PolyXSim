@@ -24,18 +24,17 @@ o12   0              # [[o11,o12]
 o21   0              #  [o21,o22]]
 o22  -1              # 
 ### Grains
-no_grains  25
+no_grains  3
 
-gen_U 0        # generate grain orientations
-gen_pos 1      # generate grain positions
-gen_eps 0 0 0 0 # generate strain tensors [mean (diag) spread (diag) mean (off-diag) spread (off-diag)]
+gen_U 1        # generate grain orientations (1=on, 0=off)
+gen_pos 1 1     # generate grain positions (1=on, 0=off); (1=random, 0=(0,0,0)
+gen_eps 1 0 0 0 0 # generate strain tensors (1=on, 0=off); [mean (diag) spread (diag) mean (off-diag) spread (off-diag)]
+gen_size 1 0.05 0.01 0.25 # generate grain size (1=on, 0=off); [mean, min, max]
 sample_xyz 0.3 0.3 0.3  # sample size in mm
 #sample_cyl 0.17 0.3    # cylinder dimension, radius and length, of sample in mm
-grain_size 0.05        # median grain size for log normal distribution
-grain_min_max 0.01 0.25 # min and max cutoffs for the grain size distribution
 
-U_grains_1 -0.888246 0.411253 -0.204671 -0.201101 -0.748709 -0.631659 -0.413011 -0.519909 0.747741
-U_grains_2 -0.158282 -0.986955 0.029458 -0.929214 0.158978 0.333597 -0.333929 0.025430 -0.942255
+#U_grains_1 -0.888246 0.411253 -0.204671 -0.201101 -0.748709 -0.631659 -0.413011 -0.519909 0.747741
+#U_grains_2 -0.158282 -0.986955 0.029458 -0.929214 0.158978 0.333597 -0.333929 0.025430 -0.942255
 # U_grains_3  -0.174660 -0.984504 0.015694 0.983236 -0.173543 0.055938 -0.052348 0.025201 0.998311
 # U_grains_4 -0.361515 -0.876335 0.318346 -0.233352 0.415615 0.879097 -0.902693 0.243520 -0.354745
 # U_grains_5 0.106886 -0.932239 -0.345697 -0.747534 0.153899 -0.646148 0.655567 0.327485 -0.680431
@@ -60,8 +59,8 @@ U_grains_2 -0.158282 -0.986955 0.029458 -0.929214 0.158978 0.333597 -0.333929 0.
 # U_grains_24 0.226129 0.960757 -0.160661 0.673011 -0.034857 0.738811 0.704218 -0.275193 -0.654482
 # U_grains_25 -0.493401 -0.260091 -0.830005 0.501570 0.694534 -0.515800 0.710622 -0.670802 -0.212230
 
-pos_grains_1 0 0 0
-pos_grains_2 0.01 -0.05 0.2
+#pos_grains_1 0 0 0
+#pos_grains_2 0.01 -0.05 0.2
 
 eps_grains_1 0.01 0 0 0.01 0 0.01
 eps_grains_2 0.001 0 0 0.001 0 0.001
@@ -81,10 +80,10 @@ structure_file 'oPPA.cif'
 ### Files
 direc  '.'
 prefix 'monoclinic'
+output '.flt' '.gve' '.ubi' '.par' '.edf' 
 
 ### Images
-make_image 1       # generate images if different from 0, default generate
-format '.edf'
+make_image 1
 noise 1            # put on noise if different from 0, default no noise
 psf 1              # spread of Gaussian point spread function (detector)
                    # corresponds roughly to the number of affected pixels on either side		   
