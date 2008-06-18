@@ -1,5 +1,5 @@
 ### Instrumental
-beamflux 1e7
+beamflux 1e12
 wavelength  0.48593 # in angstrom
 distance   61.977			# sample-detector distance (mm)
 dety_center  981.383/2.0				# beamcenter, y in pixel coordinatees
@@ -61,7 +61,7 @@ psf 0              # spread of Gaussian point spread function (detector)
                    # corresponds roughly to the number of affected pixels on either side		   
 peakshape 2 2 0.5  # type, spread (in pixels from the central pixel), (spread in omega for type=1)
                    # type=0 spike, type=1 2D Gaussian, type = 2 based on ODF.
-odf_type 2
+odf_type 1
 odf_file 'odf.dat'
 odf_scale 0.02
 mosaicity .2

@@ -125,8 +125,7 @@ class make_image:
 				    intensity = 1
 			    else:
 				    intensity = self.graindata.grain[grainno].refs[nref,A_id['Int']]
-			    print 'Intensity ', intensity
-
+        
 			    hkl = n.array([self.graindata.grain[grainno].refs[nref,A_id['h']],
 					   self.graindata.grain[grainno].refs[nref,A_id['k']],
 					   self.graindata.grain[grainno].refs[nref,A_id['l']]])
@@ -237,11 +236,11 @@ class make_image:
 		e.header['OmegaStep']=self.graindata.param['omega_step']
 		e.header['grainfile']='%s/%s_%0.4dgrains.txt' \
 			%(self.graindata.param['direc'],self.graindata.param['prefix'],self.graindata.param['no_grains'])
-		e.write(self.graindata.frameinfo[framenumber].name)
+		e.write('%s%s' %(self.graindata.frameinfo[framenumber].name,'.edf'))
 				
 	def write_tif(self,framenumber,frame):
 		e=tifimage.tifimage()
 		e.data=frame
-		e.write(self.graindata.frameinfo[framenumber].name)
+		e.write('%s%s' %(self.graindata.frameinfo[framenumber].name,'.tif'))
 
 
