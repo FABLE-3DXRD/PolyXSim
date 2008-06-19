@@ -104,29 +104,36 @@ class find_refl:
                                                              self.R,
                                                              tx,ty,tz)
 
+                            #If shoebox extends outside detector exclude it
+                            if (-0.5 > dety) or\
+                               (dety > self.param['dety_size']-0.5) or\
+                               (-0.5 > detz) or\
+                               (detz > self.param['detz_size']-0.5):
+                                continue
+
+
                             if self.param['spatial'] != None :
                                 # To match the coordinate system of the spline file
-                                # SPLINE(i,j): i = detz; j = (dety_size-1)-dety
-                                # Well at least if the spline file is for frelon2k
-                                x = detz 
-                                y = self.param['dety_size']-1-dety
-                                
+                                (x,y) = detector.detyz2xy([dety,detz],
+                                                          self.param['o11'],
+                                                          self.param['o12'],
+                                                          self.param['o21'],
+                                                          self.param['o22'],
+                                                          self.param['dety_size'],
+                                                          self.param['detz_size'])
+                                # Do the spatial distortion
                                 (xd,yd) = self.spatial.distort(x,y)
-                                detyd = self.param['dety_size']-1-yd
-                                detzd = x
+                                # transform coordinates back to dety,detz
+                                (detyd,detzd) = detector.xy2detyz([xd,yd],
+                                                          self.param['o11'],
+                                                          self.param['o12'],
+                                                          self.param['o21'],
+                                                          self.param['o22'],
+                                                          self.param['dety_size'],
+                                                          self.param['detz_size'])
                             else:
                                 detyd = dety
                                 detzd = detz
-                            #If shoebox extends outside detector exclude it
-                            if (-0.5 > detyd) or\
-                               (detyd > self.param['dety_size']-0.5) or\
-                               (-0.5 > detzd) or\
-                               (detzd > self.param['detz_size']-0.5):
-                                continue
-                            
- #                           frame_center = n.floor((omega*180/n.pi-self.param['omega_start'])/self.param['omega_step'])
- #                           delta_sbox_omega =  int((self.param['sbox_omega']-1)/2)
- #                           frame_limits = [frame_center - delta_sbox_omega, frame_center + delta_sbox_omega]
 
                             #Polarization factor (Kahn et al, J. Appl. Cryst. (1982) 15, 330-337.)
                             rho = n.pi/2.0 + eta + self.param['beampol_direct']*n.pi/180.0 
@@ -140,8 +147,7 @@ class find_refl:
                                 L=n.inf;
  
                             overlaps = 0 # set the number overlaps to zero
-                            #logging.debug("frame_center: %i, omega: %f" %(frame_center,omega*180/n.pi))
-                            #logging.debug("frame_limits: %i, %i" %(frame_limits[0],frame_limits[1]))
+
                             intensity = int_intensity(hkl[3],
                                                  L,
                                                  P,

@@ -91,3 +91,4 @@ psf 1              # spread of Gaussian point spread function (detector)
 peakshape 1 2 0.5  # type, spread (in pixels from the central pixel), (spread in omega for type=1)
                    # type=0 spike, type=1 2D Gaussian
 bg 20              # background counts				
+spatial 'spatial1k.spline'
