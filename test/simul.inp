@@ -70,8 +70,9 @@ sample_xyz 0.3 0.3 0.3  # sample size in mm
 
 
 ### Structural
-#unit_cell  8.531200 4.832100 10.125000 90.000000 92.031000 90.000000
-#sgno  4
+unit_cell  8.531200 4.832100 10.125000 90.000000 92.031000 90.000000
+#sgname  'P21'
+sgno  4
 structure_file 'oPPA.cif'
 
 #sysconditions  23*[0]
@@ -83,7 +84,7 @@ prefix 'monoclinic'
 output '.flt' '.gve' '.ubi' '.par' '.edf' 
 
 ### Images
-make_image 1
+make_image 0
 noise 1            # put on noise if different from 0, default no noise
 psf 1              # spread of Gaussian point spread function (detector)
                    # corresponds roughly to the number of affected pixels on either side		   

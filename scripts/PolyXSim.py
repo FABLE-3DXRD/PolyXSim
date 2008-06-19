@@ -57,7 +57,7 @@ myinput.initialize()                            # if ok initialize
 
 
 # Generate reflections
-if 'structure_file' in myinput.param:
+if  myinput.param['structure_file'] != None:
     xtal_structure = reflections.open_structure(myinput.param)
     print 'UNIT CELL', myinput.param['unit_cell']
     logging.info('Generating miller indices')

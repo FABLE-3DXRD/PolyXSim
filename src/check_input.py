@@ -37,7 +37,8 @@ class parse_input:
                     'direc'      : 'Missing input: direc [directory to save output]',
                                         }
         self.optional_items = {
-            'sgno': 1,
+            'sgno': None,
+            'sgname': None,
             'tilt_x'     : 0,
             'tilt_y'     : 0,
             'tilt_z'     : 0,
@@ -68,10 +69,10 @@ class parse_input:
             'mosaicity' : 0.2,
             'theta_min' : 0.0,
             'theta_max' : None,
-			'unit_cell' : None,
-			'structure_file': None,
-			'odf_file': None, 
-			'output': None
+            'unit_cell' : None,
+            'structure_file': None,
+            'odf_file': None, 
+            'output': None
             }
 
         
@@ -287,7 +288,14 @@ class parse_input:
             print 'NO structure file'
             assert self.param['unit_cell'] != None, \
                 'Missing input: structure_file or unit_cell' 
-
+            assert self.param['sgno'] != None or self.param['sgname'] != None , \
+                'Missing input: no space group information, please input either sgno or sgname' 
+            from xfab import sg
+            if self.param['sgno'] == None:
+                self.param['sgno'] = sg.sg(sgname = self.param['sgname']).no
+            else:
+                self.param['sgname'] = sg.sg(sgno = self.param['sgno']).name
+                
 			
     def initialize(self):
         # Frame generation
