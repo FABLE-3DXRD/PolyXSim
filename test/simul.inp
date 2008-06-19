@@ -1,25 +1,25 @@
 ### Instrumental
 beamflux 1e15
 wavelength  0.5092836 # in angstrom
-distance  95.00			# sample-detector distance (mm)
-dety_center  511.5				# beamcenter, y in pixel coordinatees
-detz_center  511.5				# beamcenter, z in pixel coordinatees
+distance  135.00			# sample-detector distance (mm)
+dety_center  521.5				# beamcenter, y in pixel coordinatees
+detz_center  531.5				# beamcenter, z in pixel coordinatees
 y_size  0.0936   # Pixel size y (mm)
 z_size  0.0962   # Pixel size z (mm)
 dety_size  1024.0     # detector y size (pixels)
 detz_size  1024.0     # detector z size (pixels)
 tilt_x    0.0        # detector tilt counterclockwise around lab x axis in rad 
-tilt_y    0.0        # detector tilt counterclockwise around lab y axis in rad 
-tilt_z    0.0       # detector tilt counterclockwise around lab z axis in rad 
+tilt_y    -0.1        # detector tilt counterclockwise around lab y axis in rad 
+tilt_z    0.2       # detector tilt counterclockwise around lab z axis in rad 
 omega_start  -90.0   # Minimum Omega in range of interest (in deg)
-omega_end  -85.0      # Maximum Omega in range of interest (in deg)
+omega_end  -50.0      # Maximum Omega in range of interest (in deg)
 omega_step  0.5      # Omega step size (in deg)
 omega_sign  1        # Sign of omega rotation
 beampol_factor  1    # Polarisation factor
 beampol_direct  0    # Polarisation direction
-theta_min  0                # Minimum theta angle for reflection generation
-theta_max  15               # Maximum theta angle for reflection generation
-o11  -1              # Orientation matrix of detector 
+#theta_min  0                # Minimum theta angle for reflection generation
+#theta_max  15               # Maximum theta angle for reflection generation
+o11   1              # Orientation matrix of detector 
 o12   0              # [[o11,o12]
 o21   0              #  [o21,o22]]
 o22  -1              # 
@@ -62,16 +62,16 @@ sample_xyz 0.3 0.3 0.3  # sample size in mm
 #pos_grains_1 0 0 0
 #pos_grains_2 0.01 -0.05 0.2
 
-eps_grains_1 0.01 0 0 0.01 0 0.01
-eps_grains_2 0.001 0 0 0.001 0 0.001
+#eps_grains_1 0.01 0 0 0.01 0 0.01
+#eps_grains_2 0.001 0 0 0.001 0 0.001
  
 #size_grains_1 0.04
 #size_grains_2 0.06
 
 
 ### Structural
-unit_cell  8.531200 4.832100 10.125000 90.000000 92.031000 90.000000
-sgno  4
+#unit_cell  8.531200 4.832100 10.125000 90.000000 92.031000 90.000000
+#sgno  4
 structure_file 'oPPA.cif'
 
 #sysconditions  23*[0]
@@ -89,4 +89,4 @@ psf 1              # spread of Gaussian point spread function (detector)
                    # corresponds roughly to the number of affected pixels on either side		   
 peakshape 1 2 0.5  # type, spread (in pixels from the central pixel), (spread in omega for type=1)
                    # type=0 spike, type=1 2D Gaussian
-bg 10              # background counts				
+bg 20              # background counts				

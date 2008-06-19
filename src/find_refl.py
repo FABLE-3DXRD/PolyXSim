@@ -117,12 +117,12 @@ class find_refl:
                             else:
                                 detyd = dety
                                 detzd = detz
-                             #If shoebox extends outside detector exclude it
- #                           if ( self.param['sbox_y'] > detyd) or \
- #                              (detyd > self.param['dety_size']-self.param['sbox_y']) or\
- #                              (self.param['sbox_z'] > detzd) or\
- #                              (detzd > self.param['detz_size']-self.param['sbox_z']):
- #                                continue
+                            #If shoebox extends outside detector exclude it
+                            if (-0.5 > detyd) or\
+                               (detyd > self.param['dety_size']-0.5) or\
+                               (-0.5 > detzd) or\
+                               (detzd > self.param['detz_size']-0.5):
+                                continue
                             
  #                           frame_center = n.floor((omega*180/n.pi-self.param['omega_start'])/self.param['omega_step'])
  #                           delta_sbox_omega =  int((self.param['sbox_omega']-1)/2)
