@@ -89,7 +89,7 @@ class make_image:
                         self.Uodf[i,j,k,:,:] = tools.rod2U(r)
 	    
 	    if self.graindata.param['odf_type'] !=  2:
-		    file = open(self.graindata.param['prefix']+'.odf','w')
+		    file = open(self.graindata.param['stem']+'.odf','w')
 		    file.write('ODF size: %i %i %i\n' %(r1_range,r2_range,r3_range))
 		    for i in range(int(r1_range)):
 			    self.odf[i,:,:].tofile(file,sep=' ',format='%f')
@@ -235,7 +235,7 @@ class make_image:
 		    self.graindata.param['omega_step']/2.0
 		e.header['OmegaStep']=self.graindata.param['omega_step']
 		e.header['grainfile']='%s/%s_%0.4dgrains.txt' \
-			%(self.graindata.param['direc'],self.graindata.param['prefix'],self.graindata.param['no_grains'])
+			%(self.graindata.param['direc'],self.graindata.param['stem'],self.graindata.param['no_grains'])
 		e.write('%s%s' %(self.graindata.frameinfo[framenumber].name,'.edf'))
 				
 	def write_tif(self,framenumber,frame):

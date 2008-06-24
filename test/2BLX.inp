@@ -55,7 +55,7 @@ structure_file '2BLX.pdb'
 
 ### Files
 direc  '.'
-prefix 'HEWL'
+stem 'HEWL'
 
 ### Images
 make_image 1       # generate images if different from 0, default generate

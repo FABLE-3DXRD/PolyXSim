@@ -63,7 +63,7 @@ class parse_input:
             'sample_xyz': None,
             'sample_cyl': None,
             'direc': '.',
-            'prefix': 'test',
+            'stem': 'test',
             'odf_type' : 1,
             'odf_scale' : 0.02,
             'mosaicity' : 0.2,
@@ -334,7 +334,7 @@ class parse_input:
         for no in filerange:
             self.frameinfo.append(variables.frameinfo_cont(no))
             self.frameinfo[no].name = '%s/%s_frame%0.4d' \
-                %(self.param['direc'],self.param['prefix'],no)
+                %(self.param['direc'],self.param['stem'],no)
             self.frameinfo[no].omega = omegalist[no];
             self.frameinfo[no].nrefl = 0 # Initialize number of reflections on frame
             self.frameinfo[no].refs = [] # Initialize number of reflections on frame

@@ -80,7 +80,7 @@ structure_file 'oPPA.cif'
 
 ### Files
 direc  '.'
-prefix 'monoclinic'
+stem 'monoclinic'
 output '.flt' '.gve' '.ubi' '.par' '.edf' 
 
 ### Images

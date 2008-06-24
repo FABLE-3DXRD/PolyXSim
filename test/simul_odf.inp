@@ -51,7 +51,7 @@ structure_file 'Al.cif'
 
 ### Files
 direc  '.'
-prefix 'alu'
+stem 'alu'
 output '.flt' '.tif' '.ubi' '.par'  
 
 ### Images

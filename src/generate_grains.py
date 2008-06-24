@@ -170,7 +170,7 @@ def save_grains(param):
 # Jette Oddershede, Risoe DTU, March 31 2008
 #
 
-    filename = '%s/%s_%0.4dgrains.txt' %(param['direc'],param['prefix'],param['no_grains'])
+    filename = '%s/%s_%0.4dgrains.txt' %(param['direc'],param['stem'],param['no_grains'])
     f = open(filename,'w')
 #    format = "%d "*1 + "%f "*1 + "%e"*1 + "%f"*18 + "\n"
     format = "%d "*1 + "%f "*1 + "%e "*1 + "%f "*21 + "\n"
@@ -215,7 +215,7 @@ def write_ubi(param):
 #
 # Jette Oddershede, Risoe DTU, April 4 2008
 #
-    filename = '%s/%s.ubi' %(param['direc'],param['prefix'])
+    filename = '%s/%s.ubi' %(param['direc'],param['stem'])
     f = open(filename,'w')
     format = "%f "*3 + "\n"
     for i in range(param['no_grains']):
@@ -243,7 +243,7 @@ def write_res(param):
 
     Jette Oddershede, Risoe DTU, June 18 2008
     """
-    filename = '%s/%s.res' %(param['direc'],param['prefix'])
+    filename = '%s/%s.res' %(param['direc'],param['stem'])
     f = open(filename,'w')
 			
     out = "### Instrumental\n" 
@@ -311,7 +311,7 @@ def write_res(param):
 
     out = out + "\n#### Files \n" 
     out = out + "direc %s\n" %("'"+param['direc']+"'")
-    out = out + "prefix 'test'\n" 
+    out = out + "stem 'test'\n" 
     out = out + "output "
     if param['output'] != None:
         if type(param['output']) == str:
@@ -349,7 +349,7 @@ def write_par(param):
 
     Jette Oddershede, Risoe DTU, June 17 2008
     """
-    filename = '%s/%s_detector.par' %(param['direc'],param['prefix'])
+    filename = '%s/%s_detector.par' %(param['direc'],param['stem'])
     f = open(filename,'w')
 			
     out = "cell__a %s\n" %param['unit_cell'][0]

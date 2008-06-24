@@ -117,7 +117,7 @@ class make_image:
 		    self.graindata.param['omega_step']/2.0
 		e.header['OmegaStep']=self.graindata.param['omega_step']
 		e.header['grainfile']='%s/%s_%0.4dgrains.txt' \
-			%(self.graindata.param['direc'],self.graindata.param['prefix'],self.graindata.param['no_grains'])
+			%(self.graindata.param['direc'],self.graindata.param['stem'],self.graindata.param['no_grains'])
 		e.write('%s%s' %(self.graindata.frameinfo[framenumber].name,'.edf'))
 				
 	def write_tif(self,framenumber,frame):
