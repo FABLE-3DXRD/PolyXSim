@@ -62,7 +62,7 @@ psf 0              # spread of Gaussian point spread function (detector)
 peakshape 2 2 0.5  # type, spread (in pixels from the central pixel), (spread in omega for type=1)
                    # type=0 spike, type=1 2D Gaussian, type = 2 based on ODF.
 odf_type 1
-odf_file 'odf.dat'
+#odf_file 'alu.odf'
 odf_scale 0.02
 mosaicity .2
 bg 0               # background counts				

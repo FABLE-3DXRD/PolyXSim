@@ -60,11 +60,12 @@ class make_image:
 		#show()
             elif self.graindata.param['odf_type'] == 2:
                 file = self.graindata.param['odf_file']
-		file = open('odf.dat','r')
+		file = open(file,'r')
 		(r1_range, r2_range, r3_range) = file.readline()[9:].split()
 		r1_range = int(r1_range)
 		r2_range = int(r2_range)
 		r3_range = int(r3_range)
+		odf_scale = float(file.readline()[10:])
 		oneD_odf = n.fromstring(file.readline(),sep=' ')
 		elements = r1_range*r2_range*r3_range
 		self.odf = oneD_odf[:elements].reshape(r1_range,r2_range,r3_range)
@@ -91,6 +92,7 @@ class make_image:
 	    if self.graindata.param['odf_type'] !=  2:
 		    file = open(self.graindata.param['stem']+'.odf','w')
 		    file.write('ODF size: %i %i %i\n' %(r1_range,r2_range,r3_range))
+		    file.write('ODF scale: %f\n' %(odf_scale))
 		    for i in range(int(r1_range)):
 			    self.odf[i,:,:].tofile(file,sep=' ',format='%f')
 			    file.write(' ')
