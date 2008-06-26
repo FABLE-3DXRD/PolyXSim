@@ -24,13 +24,13 @@ class make_image:
 	
 			peakshape = self.graindata.param['peakshape']
 	
-			if peakshape[0] == 0: # spike peak, (2peak_add+1)x(2peak_add+1) pixels
-				peak_add = int(round(peakshape[1]))
-				frame_add = 0
+			if peakshape[0] == 0: # spike peak, 2x2 pixels
+				peak_add = 1
+				frame_add = 1
 				peakwsig = 0
 			elif peakshape[0] == 1: # 3d Gaussian peak
-				peak_add = 0
-				frame_add = int(round(peakshape[1]))
+				peak_add = max(1,int(round(peakshape[1])))
+				frame_add = max(1,int(round(peakshape[1])))
 				peakwsig = peakshape[2]
 			
 			framedimy = self.graindata.param['dety_size']+2*frame_add
@@ -57,40 +57,41 @@ class make_image:
 						elif self.graindata.grain[j].refs[k,A_id['omega']]*180/n.pi < \
 							    omega-2*peakwsig:
 							continue
-						dety = int(round(self.graindata.grain[j].refs[k,A_id['dety']]))
-						detz = int(round(self.graindata.grain[j].refs[k,A_id['detz']]))
-						yrange = range(dety+frame_add-peak_add,dety+frame_add+peak_add+1)
-						zrange = range(detz+frame_add-peak_add,detz+frame_add+peak_add+1)
+						dety = self.graindata.grain[j].refs[k,A_id['dety']]
+						detz = self.graindata.grain[j].refs[k,A_id['detz']]
+						ndety = int(round(dety))
+						ndetz = int(round(detz))
+						yrange = range(ndety+frame_add-peak_add,ndety+frame_add+peak_add+1)
+						zrange = range(ndetz+frame_add-peak_add,ndetz+frame_add+peak_add+1)
 						intensity = int(round(self.graindata.grain[j].refs[k,A_id['Int']]))
 						nrefl = nrefl + 1
 						totalrefl = totalrefl + 1
 						# Gaussian along omega
 						if peakshape[0] == 1:
 							fraction = norm.cdf((omega-self.graindata.grain[j].refs[k,A_id['omega']]*180/n.pi+omega_step)/(0.5*peakwsig))\
-							          -norm.cdf((omega-self.graindata.grain[j].refs[k,A_id['omega']]*180/n.pi)/(0.5*peakwsig))
+									  -norm.cdf((omega-self.graindata.grain[j].refs[k,A_id['omega']]*180/n.pi)/(0.5*peakwsig))
 						else:
-							fraction = 1
-
-						# Generate spikes, possibly more than 1x1 pixel
+							fraction = 1.                       
+						# Generate spikes, 2x2 pixels
 						for y in yrange:
 							for z in zrange:
-								if y > 0 and y < framedimy and z > 0 and z < framedimz:
-									frame[y,z] = frame[y,z] + fraction*intensity/(len(yrange)*len(zrange))
+								if y > 0 and y < framedimy and z > 0 and z < framedimz and abs(dety+frame_add-y) < 1 and abs(detz+frame_add-z) < 1:
+									frame[y-1,z] = frame[y-1,z] + fraction*intensity*(1-abs(dety+frame_add-y))*(1-abs(detz+frame_add-z))
+
 				# 2D Gaussian on detector					
 				if peakshape[0] == 1:
 					frame = ndimage.gaussian_filter(frame,peakshape[1]*0.5)
-					frame = frame[frame_add:framedimy-frame_add,frame_add:framedimz-frame_add]
 				# add background
 				if self.graindata.param['bg'] > 0:
-					frame = frame + self.graindata.param['bg']*n.ones\
-						((self.graindata.param['dety_size'],self.graindata.param['detz_size']))
+					frame = frame + self.graindata.param['bg']*n.ones((framedimy,framedimz))
 				# add noise
 				if self.graindata.param['noise'] != 0:
 					frame = n.random.poisson(frame)
 				# apply psf
 				if self.graindata.param['psf'] != 0:
 					frame = ndimage.gaussian_filter(frame,self.graindata.param['psf']*0.5)
-				# convert to integers and flip to same orientation as experimental frames
+				# resize, convert to integers and flip to same orientation as experimental frames
+				frame = frame[frame_add:framedimy-frame_add,frame_add:framedimz-frame_add]
 				frame = n.transpose(n.flipud(n.int16(frame)))
 				# Output frames 
 				if '.edf' in self.graindata.param['output']:
@@ -124,3 +125,5 @@ class make_image:
 		e=tifimage.tifimage()
 		e.data=frame
 		e.write('%s%s' %(self.graindata.frameinfo[framenumber].name,'.tif'))
+
+
