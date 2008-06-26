@@ -242,7 +242,7 @@ class find_refl:
             A = self.grain[grainno].refs
             setno = 0
             filename = '%s/%s_gr%0.4d_set%0.4d.ref' \
-                %(self.param['direc'],self.param['stem'],self.param['grain_list'][grainno],setno)
+                %(self.param['direc'],self.param['prefix'],self.param['grain_list'][grainno],setno)
             f = open(filename,'w')
             format = "%d "*6 + "%f "*14 + "%d "*1 + "\n"
 #            print nrefl, ncol
@@ -290,7 +290,7 @@ class find_refl:
         Write gvector (gve) file, for format see
         http://fable.wiki.sourceforge.net/imaged11+-+file+formats
         
-        Henning Osholm Sorense, RisoeDTU, 2008.
+        Henning Osholm Sorensen, RisoeDTU, 2008.
         python translation: Jette Oddershede, Risoe DTU, March 31 2008
         """
 
@@ -308,7 +308,7 @@ class find_refl:
             return
 
 
-        filename = '%s/%s.gve' %(self.param['direc'],self.param['stem'])
+        filename = '%s/%s.gve' %(self.param['direc'],self.param['prefix'])
         f = open(filename,'w')
         lattice = sg.sg(sgno=self.param['sgno']).name[0]
         format = "%f "*6 + "%s "*1 +"\n"
@@ -318,13 +318,15 @@ class find_refl:
         f.write(out)
         out = "# wavelength = %s\n" %(self.param['wavelength'])
         f.write(out)
-        out = "# wedge = 0\n"
+        out = "# wedge = %f\n" %self.param['wedge']
         f.write(out)
         out = "# ds h k l\n" 
         f.write(out)
 		
 
 
+        A = self.grain[0].refs
+        A = A[n.argsort(A,0)[:,A_id['tth']],:] # sort rows according to tth, descending
         format = "%f "*1 + "%d "*3 +"\n"
         for i in range(A.shape[0]):
             out = format %((2*n.sin(.5*A[i,A_id['tth']])/self.param['wavelength']),
@@ -334,20 +336,23 @@ class find_refl:
                             )
             f.write(out)
 
-        out = "# xr yr zr dety detz ds eta omega\n" 
+        out = "# xr yr zr xc yc ds eta omega\n" 
         f.write(out)
-        format = "%f "*8 + "\n"
+        format = "%f "*8 + "%i"*1+"\n"
+        for grainno in range(1,self.param['no_grains']):
+            A = n.concatenate((A,self.grain[grainno].refs))
 			
         nrefl = A.shape[0]
         for i in range(nrefl):
             out = format %(A[i,A_id['gv1']]/(2*n.pi),
                            A[i,A_id['gv2']]/(2*n.pi),
                            A[i,A_id['gv3']]/(2*n.pi),
-                           A[i,A_id['dety']],
                            A[i,A_id['detz']],
+                           self.param['dety_size']-A[i,A_id['dety']],
                            (2*n.sin(.5*A[i,A_id['tth']])/self.param['wavelength']),
                            A[i,A_id['eta']]*180/n.pi,
-                           A[i,A_id['omega']]*180/n.pi
+                           A[i,A_id['omega']]*180/n.pi,
+						   A[i,A_id['spot_id']]
                            )
             f.write(out)
 		
@@ -360,7 +365,7 @@ class find_refl:
 # 
 # python translation: Jette Oddershede, Risoe DTU, June 4 2008
 #
-        filename = '%s/%s.flt' %(self.param['direc'],self.param['stem'])
+        filename = '%s/%s.flt' %(self.param['direc'],self.param['prefix'])
         f = open(filename,'w')
         out = '#  sc  fc  omega  Number_of_pixels  avg_intensity  s_raw  f_raw  sigs  sigf  covsf  sigo  covso  covfo  sum_intensity  sum_intensity^2  IMax_int  IMax_s  IMax_f  IMax_o  Min_s  Max_s  Min_f  Max_f  Min_o  Max_o  dety  detz  onfirst  onlast  spot3d_id \n'
         f.write(out)
