@@ -242,7 +242,7 @@ class find_refl:
             A = self.grain[grainno].refs
             setno = 0
             filename = '%s/%s_gr%0.4d_set%0.4d.ref' \
-                %(self.param['direc'],self.param['prefix'],self.param['grain_list'][grainno],setno)
+                %(self.param['direc'],self.param['stem'],self.param['grain_list'][grainno],setno)
             f = open(filename,'w')
             format = "%d "*6 + "%f "*14 + "%d "*1 + "\n"
 #            print nrefl, ncol
@@ -308,7 +308,7 @@ class find_refl:
             return
 
 
-        filename = '%s/%s.gve' %(self.param['direc'],self.param['prefix'])
+        filename = '%s/%s.gve' %(self.param['direc'],self.param['stem'])
         f = open(filename,'w')
         lattice = sg.sg(sgno=self.param['sgno']).name[0]
         format = "%f "*6 + "%s "*1 +"\n"
@@ -365,7 +365,7 @@ class find_refl:
 # 
 # python translation: Jette Oddershede, Risoe DTU, June 4 2008
 #
-        filename = '%s/%s.flt' %(self.param['direc'],self.param['prefix'])
+        filename = '%s/%s.flt' %(self.param['direc'],self.param['stem'])
         f = open(filename,'w')
         out = '#  sc  fc  omega  Number_of_pixels  avg_intensity  s_raw  f_raw  sigs  sigf  covsf  sigo  covso  covfo  sum_intensity  sum_intensity^2  IMax_int  IMax_s  IMax_f  IMax_o  Min_s  Max_s  Min_f  Max_f  Min_o  Max_o  dety  detz  onfirst  onlast  spot3d_id \n'
         f.write(out)
