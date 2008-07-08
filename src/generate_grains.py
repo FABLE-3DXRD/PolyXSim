@@ -130,7 +130,7 @@ def grain_size(no_grains,grain_size,grain_min_max,sample_vol=None):
 	if sample_vol != None:
 		fraction = grain_vol/sample_vol
 		print 'The generated grains cover the following fraction of the sample volume: %6f' %fraction
-	print 'SIZE: ',size
+	print 'SIZE: ',size 
 	return size
 	
 
@@ -140,24 +140,28 @@ def generate_grains(param):
 		U = generate_U(param['no_grains'])
 		for i in range(param['no_grains']):
 			param['U_grains_%s' %(param['grain_list'][i])] = U[i]
+        param['gen_U'] = 0
 			
 # Generate pos if gen_pos on
 	if param['gen_pos'][0] != 0: 
 		pos = generate_pos(param['no_grains'],param['gen_pos'][1],sample_xyz=param['sample_xyz'],sample_cyl=param['sample_cyl'])
 		for i in range(param['no_grains']):
 			param['pos_grains_%s' %(param['grain_list'][i])] = pos[i]
+        param['gen_pos'][0] = 0
 
 # Generate eps if gen_eps on
 	if param['gen_eps'][0] != 0: 
 		eps = generate_eps(param['no_grains'],param['gen_eps'][1:5])
 		for i in range(param['no_grains']):
 			param['eps_grains_%s' %(param['grain_list'][i])] = eps[i]
+        param['gen_eps'][0] = 0
 			
 # Generate size if gen_size on
 	if param['gen_size'][0] != 0: 
 		size = grain_size(param['no_grains'],param['gen_size'][1],param['gen_size'][2:4],sample_vol=param['sample_vol'])
 		for i in range(param['no_grains']):
 			param['size_grains_%s' %(param['grain_list'][i])] = size[i]
+        param['gen_size'][0] = 0
 	
 	
 	
@@ -246,96 +250,41 @@ def write_res(param):
     filename = '%s/%s.res' %(param['direc'],param['stem'])
     f = open(filename,'w')
 			
-    out = "### Instrumental\n" 
-    out = out + "beamflux %e\n" %param['beamflux']
-    out = out + "beampol_factor %i\n" %param['beampol_factor']
-    out = out + "beampol_direct %i\n" %param['beampol_direct']
-    out = out + "wavelength %f\n" %param['wavelength']
-    out = out + "distance %f\n" %param['distance']
-    out = out + "dety_center %f\n" %param['dety_center']
-    out = out + "detz_center %f\n" %param['detz_center']
-    out = out + "dety_size %f\n" %param['dety_size']
-    out = out + "detz_size %f\n" %param['detz_size']
-    out = out + "y_size %f\n" %param['y_size']
-    out = out + "z_size %f\n" %param['z_size']
-    out = out + "tilt_x %f\n" %param['tilt_x']
-    out = out + "tilt_y %f\n" %param['tilt_y']
-    out = out + "tilt_z %f\n" %param['tilt_z']
-    out = out + "omega_start %f\n" %param['omega_start']
-    out = out + "omega_end %f\n" %param['omega_end']
-    out = out + "omega_step %f\n" %param['omega_step']
-    out = out + "omega_sign %i\n" %param['omega_sign']
-    out = out + "theta_min %f\n" %param['theta_min']
-    out = out + "theta_max %f\n" %param['theta_max']
-    out = out + "o11 %i\n" %param['o11']
-    out = out + "o12 %i\n" %param['o12']
-    out = out + "o21 %i\n" %param['o21']
-    out = out + "o22 %i\n" %param['o22']
+    #initialise and sort keys alphabetically
+    out = "" 
+    keys = param.keys()
+    keys.sort()
 
-    out = out + "\n### Grains \n" 
-    out = out + "no_grains %i\n\n" %param['no_grains']
-    out = out + "gen_U 0\n" 
-    format = "%s"*1 + "%f "*9 + "\n"
-    for i in range(param['no_grains']):
-        label = 'U_grains_%s ' %(i+1)	
-        U = param['U_grains_%s' %(param['grain_list'][i])]
-        out = out + format %(label,U[0,0],U[0,1],U[0,2],U[1,0],U[1,1],U[1,2],U[2,1],U[2,1],U[2,2])
-    out = out + "\n" 
-    out = out + "gen_pos 0 %i\n" %param['gen_pos'][1] 
-    format = "%s"*1 + "%f "*3 + "\n"
-    for i in range(param['no_grains']):
-        label = 'pos_grains_%s ' %(i+1)	
-        pos = param['pos_grains_%s' %(param['grain_list'][i])]
-        out = out + format %(label,pos[0],pos[1],pos[2])
-    out = out + "\n" 
-    out = out + "gen_eps 0 %f %f %f %f\n" %(param['gen_eps'][1],param['gen_eps'][2],param['gen_eps'][3],param['gen_eps'][4])
-    format = "%s"*1 + "%f "*6 + "\n"
-    for i in range(param['no_grains']):
-        label = 'eps_grains_%s ' %(i+1)	
-        eps = param['eps_grains_%s' %(param['grain_list'][i])]
-        out = out + format %(label,eps[0],eps[1],eps[2],eps[3],eps[4],eps[5])
-    out = out + "\n" 
-    out = out + "gen_size 0 %f %f %f\n" %(param['gen_size'][1],param['gen_size'][2],param['gen_size'][3])
-    format = "%s"*1 + "%f "*1 + "\n"
-    for i in range(param['no_grains']):
-        label = 'size_grains_%s ' %(i+1)	
-        size = param['size_grains_%s' %(param['grain_list'][i])]
-        out = out + format %(label,size)
-
-    out = out + "\n#### Structure \n" 
-    format = "%s"*1 + "%f "*6 + "\n"
-    out = out + format %('unit_cell ',param['unit_cell'][0],param['unit_cell'][1],param['unit_cell'][2],param['unit_cell'][3],param['unit_cell'][4],param['unit_cell'][5])
-    out = out + "sgno %i\n" %param['sgno']
-    if param['structure_file'] != None:	
-        out = out + "structure_file %s\n" %("'"+param['structure_file']+"'")
-
-    out = out + "\n#### Files \n" 
-    out = out + "direc %s\n" %("'"+param['direc']+"'")
-    out = out + "stem 'test'\n" 
-    out = out + "output "
-    if param['output'] != None:
-        if type(param['output']) == str:
-            out = out + "%s " %("'"+param['output']+"' ")
-        else:
-            for i in range(len(param['output'])):
-                out = out + "%s " %("'"+param['output'][i]+"' ")
-	
-    out = out + "\n\n#### Images \n" 
-    out = out + "make_image %i\n" %(param['make_image'])
-    out = out + "noise %i\n" %(param['noise'])
-    out = out + "psf %i\n" %(param['psf'])
-    out = out + "bg %i\n" %(param['bg'])
-    out = out + "peakshape %i %i " %(param['peakshape'][0],param['peakshape'][1])
-    if len(param['peakshape']) == 3:
-        out = out + ' %f ' %param['peakshape'][2]
-    out = out + "\nmosaicity %f\n" %(param['mosaicity'])
-    out = out + "odf_type %i\n" %(param['odf_type'])
-    out = out + "odf_scale %f\n" %(param['odf_scale'])
-    if param['odf_file'] != None:
-        out = out + "odf_file %s\n" %("'"+param['odf_file']+"'")
-    
-
-    
+    for item in keys:
+        # rule out None entries
+        if param[item] != None:
+            # treat all strings, remember quotation marks
+            if type(param[item]) == str:
+                out += "%s '%s'\n" %(item,param[item])
+            # treat all lists, special case for strings
+            elif type(param[item]) == list:
+                out += '%s' %item
+                for i in range(len(param[item])):
+                    if type(param[item][i]) == str:
+                        out += " '%s'" %param[item][i]
+                    else:
+                        out += ' %s' %param[item][i]
+                out += '\n'  
+            # treat all arrays, loop over one or two dimensions
+            elif type(param[item]) == n.ndarray: 
+                out += '%s' %item
+                dim = len(n.shape(param[item]))
+                if dim == 1:
+                    for i in range(len(param[item])):
+                        out += ' %s' %param[item][i]
+                elif dim == 2:
+                    for i in range(len(param[item])):
+                        for j in range(len(param[item][i])):
+                            out += ' %s' %param[item][i][j]
+                out += '\n'    
+            # remaining entries; integers and floats
+            else:
+                out += "%s %s\n" %(item,param[item])
 
     f.write(out)
     f.close()   

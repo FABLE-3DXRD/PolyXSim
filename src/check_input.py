@@ -126,7 +126,7 @@ class parse_input:
 # assert that the correct number of arguments are given
         for key in self.param:
             val = self.param[key] 
-            if val != None and key != 'output':
+            if val != None and key != 'output' and key != 'grain_list':
                 if key == 'peakshape':
                     assert len(val) <= 3, 'Wrong number of arguments for %s' %key
                 elif key == 'sample_cyl' or key == 'gen_pos':
