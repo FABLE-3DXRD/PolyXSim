@@ -50,6 +50,10 @@ class parse_input:
             'noise' : 0,
             'psf': 0,
             'make_image': 1,
+            'o11': 1
+            'o12': 0
+            'o21': 0
+            'o22': 1
             'bg': 0,
             'peakshape': [0,0],
             'spatial' : None,
