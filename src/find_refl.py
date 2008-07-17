@@ -23,7 +23,9 @@ class find_refl:
         self.S = n.array([[1, 0, 0],[0, 1, 0],[0, 0, 1]])
         
         # Detector tilt correction matrix
-        self.R = tools.detect_tilt(self.param['tilt_x'],self.param['tilt_y'],self.param['tilt_z'])
+        self.R = tools.detect_tilt(self.param['tilt_x'],
+                                   self.param['tilt_y'],
+                                   self.param['tilt_z'])
 
         # Spatial distortion
         if self.param['spatial'] != None:
@@ -67,26 +69,22 @@ class find_refl:
             # For all reflections in Ahkl that fulfill omega_start < omega < omega_end.
             # All angles in Grain are in degrees
             for hkl in self.hkl:
-                Gtmp = n.dot(B,hkl[0:3])
-                Gtmp = n.dot(U,Gtmp)
-                Gw =   n.dot(self.S,Gtmp)
-                #Gw = self.S*U*self.B*hkl
-                #print G
-                Glen = n.sqrt(n.dot(Gw,Gw))
-                tth = 2*n.arcsin(Glen/(2*abs(self.K)))
+                Gc = n.dot(B,hkl[0:3])
+                Gw =   n.dot(self.S,n.dot(U,Gc))
+                tth = tools.tth2(Gw,self.param['wavelength'])
                 costth = n.cos(tth)
-
-                Omega = tools.find_omega_wedge(Gw,tth,self.param['wedge'])
+                (Omega, Eta) = tools.find_omega_wedge(Gw,
+                                                      tth,
+                                                      self.param['wedge'])
                 if len(Omega) > 0:
-                    for omega in Omega:
+                    for solution in range(len(Omega)):
+                        omega = Omega[solution]
+                        eta = Eta[solution]
                         if  (self.param['omega_start']*n.pi/180) < omega and\
                                 omega < (self.param['omega_end']*n.pi/180):
                             # form Omega rotation matrix
                             Om = tools.OMEGA(omega)
                             Gt = n.dot(Om,Gw)
-                            eta = n.arctan2(-Gt[1],Gt[2])
-                            if eta < 0.0:  # We want eta to be [0,2pi] not [-pi,pi]
-                                eta = eta +2*n.pi 
   
                             # Calc crystal position at present omega
                             [tx,ty]= n.dot(Om[:2,:2],gr_pos[:2])
@@ -172,8 +170,10 @@ class find_refl:
             if len(A) > 0:
                 # sort rows according to omega
                 A = A[n.argsort(A,0)[:,A_id['omega']],:]
+                
                 # Renumber the reflections  
                 A[:,A_id['ref_id']] = n.arange(nrefl)
+
                 # Renumber the spot_id
                 A[:,A_id['spot_id']] = n.arange(n.min(A[:,A_id['spot_id']]),
                                             n.max(A[:,A_id['spot_id']])+1)
