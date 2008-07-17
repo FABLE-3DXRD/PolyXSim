@@ -337,7 +337,7 @@ class parse_input:
 
         for no in filerange:
             self.frameinfo.append(variables.frameinfo_cont(no))
-            self.frameinfo[no].name = '%s/%s_frame%0.4d' \
+            self.frameinfo[no].name = '%s/%s%0.4d' \
                 %(self.param['direc'],self.param['stem'],no)
             self.frameinfo[no].omega = omegalist[no];
             self.frameinfo[no].nrefl = 0 # Initialize number of reflections on frame
