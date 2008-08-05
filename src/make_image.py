@@ -1,6 +1,7 @@
 import numpy as n
 import sys
-from xfab import tools
+from xfab import tools,detector
+
 import variables
 from fabio import edfimage,tifimage
 import time
@@ -92,7 +93,19 @@ class make_image:
 					frame = ndimage.gaussian_filter(frame,self.graindata.param['psf']*0.5)
 				# resize, convert to integers and flip to same orientation as experimental frames
 				frame = frame[frame_add:framedimy-frame_add,frame_add:framedimz-frame_add]
-				frame = n.transpose(n.flipud(n.int16(frame)))
+
+	                        # limit values above 16 bit to be 16bit
+				frame = n.clip(frame,0,2**16-1)
+                                # convert to integers
+				frame = n.uint16(frame)
+
+		                #flip detector orientation according to input: o11, o12, o21, o22
+				frame = detector.trans_orientation(frame,
+								   self.graindata.param['o11'],
+								   self.graindata.param['o12'],
+								   self.graindata.param['o21'],
+								   self.graindata.param['o22'],
+								   'inverse')
 				# Output frames 
 				if '.edf' in self.graindata.param['output']:
 					self.write_edf(i,frame)
