@@ -12,13 +12,13 @@ tilt_x    0.0        # detector tilt counterclockwise around lab x axis in rad
 tilt_y    0.0        # detector tilt counterclockwise around lab y axis in rad 
 tilt_z    0.0       # detector tilt counterclockwise around lab z axis in rad 
 omega_start  -90.0   # Minimum Omega in range of interest (in deg)
-omega_end  -80.0      # Maximum Omega in range of interest (in deg)
+omega_end  0.0      # Maximum Omega in range of interest (in deg)
 omega_step  2.0      # Omega step size (in deg)
 omega_sign  1        # Sign of omega rotation
 beampol_factor  1    # Polarisation factor
 beampol_direct  0    # Polarisation direction
 theta_min  0                # Minimum theta angle for reflection generation
-theta_max  .5               # Maximum theta angle for reflection generation
+theta_max  5               # Maximum theta angle for reflection generation
 o11  -1              # Orientation matrix of detector 
 o12   0              # [[o11,o12]
 o21   0              #  [o21,o22]]
