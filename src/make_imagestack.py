@@ -173,11 +173,24 @@ class make_image:
 							# To match the coordinate system of the spline file
 							# SPLINE(i,j): i = detz; j = (dety_size-1)-dety
 							# Well at least if the spline file is for frelon2k
-							x = detz 
-							y = self.graindata.param['dety_size']-1-dety
+							(x,y) = detector.detyz2xy([dety,detz],
+										  self.graindata.param['o11'],
+										  self.graindata.param['o12'],
+										  self.graindata.param['o21'],
+										  self.graindata.param['o22'],
+										  self.graindata.param['dety_size'],
+										  self.graindata.param['detz_size'])
+							# Do the spatial distortion
 							(xd,yd) = self.spatial.distort(x,y)
-							dety = self.graindata.param['dety_size']-1-yd
-							detz = x
+
+							# transform coordinates back to dety,detz
+							(dety,detz) = detector.xy2detyz([xd,yd],
+											  self.graindata.param['o11'],
+											  self.graindata.param['o12'],
+											  self.graindata.param['o21'],
+											  self.graindata.param['o22'],
+											  self.graindata.param['dety_size'],
+											  self.graindata.param['detz_size'])
 								   
 						if dety > -0.5 and dety <= self.graindata.param['dety_size']-0.5 and\
 							    detz > -0.5 and detz <= self.graindata.param['detz_size']-0.5:
