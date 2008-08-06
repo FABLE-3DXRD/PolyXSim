@@ -1,6 +1,7 @@
 import numpy as n
 from xfab import tools
 from xfab import sg
+from xfab import detector
 import variables
 
 
@@ -300,6 +301,15 @@ def write_par(param):
     """
     filename = '%s/%s_detector.par' %(param['direc'],param['stem'])
     f = open(filename,'w')
+
+    #Calc beam center in ImageD11 coordinate system 
+    (z_center, y_center) = detector.detyz2xy([param['dety_center'],param['detz_center']],
+					     param['o11'],
+					     param['o12'],
+					     param['o21'],
+					     param['o22'],
+					     param['dety_size'],
+					     param['detz_size'])
 			
     out = "cell__a %s\n" %param['unit_cell'][0]
     out = out + "cell__b %s\n" %param['unit_cell'][1]
@@ -323,10 +333,10 @@ def write_par(param):
     out = out + "tilt_y %f\n" %param['tilt_y']
     out = out + "tilt_z %f\n" %param['tilt_z']
     out = out + "wavelength %f\n" %param['wavelength']
-    out = out + "wedge 0.0\n" 
-    out = out + "y_center %f\n" %(param['dety_size']-1-param['dety_center'])
+    out = out + "wedge 0.0\n"
+    out = out + "y_center %f\n" %y_center
     out = out + "y_size %f\n" %(param['y_size']*1000.)
-    out = out + "z_center %f\n" %param['detz_center']
+    out = out + "z_center %f\n" %z_center
     out = out + "z_size %f\n" %(param['z_size']*1000.)
     f.write(out)
     f.close()   
