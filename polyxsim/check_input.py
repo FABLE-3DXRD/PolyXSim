@@ -306,7 +306,9 @@ class parse_input:
         if self.param['make_image'] != 0:
             if self.param['output'] == None:
                 self.param['output'] = '.edf'
-            if ('.edf' not in self.param['output'] and '.tif' not in self.param['output']):
+            if ('.edf' not in self.param['output']) and \
+                    ('.tif' not in self.param['output']) and \
+                    ('.tif16bit' not in self.param['output']):
                 self.param['output'].append('.edf')
      
         # Does output directory exist?
