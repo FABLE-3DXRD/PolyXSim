@@ -8,6 +8,8 @@ import time
 from scipy import ndimage
 from scipy.stats import norm
 
+from PIL import Image
+
 A_id = variables.refarray().A_id
 
 class make_image:
@@ -112,6 +114,8 @@ class make_image:
 					self.write_edf(i,frame)
 				if '.tif' in self.graindata.param['output']:
 					self.write_tif(i,frame)
+				if '.tif16bit' in self.graindata.param['output']:
+					self.write_tif16bit(i,frame)
 				print '\rDone frame %i took %8f s' %(i+1,time.clock()-t1),
 				sys.stdout.flush()
 				
@@ -139,5 +143,10 @@ class make_image:
 		e=tifimage.tifimage()
 		e.data=frame
 		e.write('%s%s' %(self.graindata.frameinfo[framenumber].name,'.tif'))
+	def write_tif16bit(self,framenumber,frame):
+		size = frame.shape[:2][::-1]
+		pilimage = Image.frombuffer('I',size,frame.tostring(),"raw",'I;16',0,1)
+		pilimage.save('%s%s' %(self.graindata.frameinfo[framenumber].name,'.tif'))
+
 
 
