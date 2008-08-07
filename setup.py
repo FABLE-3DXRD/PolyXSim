@@ -10,6 +10,6 @@ setup(
   maintainer_email='henning.sorensen@risoe.dk',
   url='http://fable.wiki.sourceforge.net',
   packages=['polyxsim'],
-  package_dir={"polyxsim": "src"},
+  package_dir={"polyxsim": "polyxsim"},
   scripts=["scripts/PolyXSim.py"]
 )
