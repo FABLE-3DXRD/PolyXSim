@@ -59,7 +59,7 @@ stem 'HEWL'
 
 ### Images
 make_image 1       # generate images if different from 0, default generate
-format '.edf'
+output '.edf'
 noise 1            # put on noise if different from 0, default no noise
 psf 1              # spread of Gaussian point spread function (detector)
                    # corresponds roughly to the number of affected pixels on either side		   
