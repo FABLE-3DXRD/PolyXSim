@@ -60,6 +60,7 @@ class make_image:
 		#show()
             elif self.graindata.param['odf_type'] == 2:
                 file = self.graindata.param['odf_file']
+                print 'Read ODF from file_ %s' %file
 		file = open(file,'r')
 		(r1_range, r2_range, r3_range) = file.readline()[9:].split()
 		r1_range = int(r1_range)
@@ -123,6 +124,7 @@ class make_image:
 		    # loop over reflections for each grain
 		    for nref in range(len(self.graindata.grain[grainno].refs)):
 			    # exploit that the reflection list is sorted according to omega
+			    print 'Doing reflection: %i' %nref
 			    if self.graindata.param['odf_type'] == 3:
 				    intensity = 1
 			    else:
@@ -140,7 +142,7 @@ class make_image:
 						Glen = n.sqrt(n.dot(Gw,Gw))
 						tth = 2*n.arcsin(Glen/(2*abs(self.graindata.K)))
 						costth = n.cos(tth)
-						Omega = tools.find_omega_wedge(Gw,tth,self.graindata.param['wedge'])
+						(Omega, eta) = tools.find_omega_wedge(Gw,tth,self.graindata.param['wedge'])
 						try:
 							minpos = n.argmin(n.abs(Omega*(180.0/n.pi)-self.graindata.grain[grainno].refs[nref,A_id['omega']]))
 						except:
