@@ -133,26 +133,35 @@ class find_refl:
                                 detyd = dety
                                 detzd = detz
 
-                            #Polarization factor (Kahn et al, J. Appl. Cryst. (1982) 15, 330-337.)
-                            rho = n.pi/2.0 + eta + self.param['beampol_direct']*n.pi/180.0 
-                            P = 0.5 * (1 + costth*costth +\
-                                        self.param['beampol_factor']*n.cos(2*rho)*n.sin(tth)**2)
+                            if self.param['beampol_apply'] == 1:
+                                #Polarization factor (Kahn, J. Appl. Cryst. (1982) 15, 330-337.)
+                                rho = n.pi/2.0 + eta + self.param['beampol_direct']*n.pi/180.0 
+                                P = 0.5 * (1 + costth*costth +\
+                                         self.param['beampol_factor']*n.cos(2*rho)*n.sin(tth)**2)
+                            else:
+                                P = 1.0
 
                             #Lorentz factor
-                            if eta != 0:
-                                L=1/(n.sin(tth)*abs(n.sin(eta)))
+                            if self.param['lorentz_apply'] == 1:
+                                if eta != 0:
+                                    L=1/(n.sin(tth)*abs(n.sin(eta)))
+                                else:
+                                    L=n.inf;
                             else:
-                                L=n.inf;
+                                L = 1.0
  
                             overlaps = 0 # set the number overlaps to zero
-
-                            intensity = int_intensity(hkl[3],
-                                                 L,
-                                                 P,
-                                                 self.param['beamflux'],
-                                                 self.param['wavelength'],
-                                                 V,
-                                                 grain_vol)
+                            
+                            if self.param['intensity_const'] != 1: 
+                                intensity = int_intensity(hkl[3],
+                                                          L,
+                                                          P,
+                                                          self.param['beamflux'],
+                                                          self.param['wavelength'],
+                                                          V,
+                                                          grain_vol)
+                            else:
+                                intensity = hkl[3]
 
                             A.append([self.param['grain_list'][grainno],
                                       nrefl,spot_id,

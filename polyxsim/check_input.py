@@ -43,8 +43,10 @@ class parse_input:
             'tilt_y'     : 0,
             'tilt_z'     : 0,
             'wedge': 0.0,
+            'beampol_apply' : 1,
             'beampol_factor' : 1,
             'beampol_angle' : 0.0,
+            'lorentz_apply' : 1,
             'start_frame': 0,
             'omega_sign': 1,
             'noise' : 0,
@@ -76,7 +78,9 @@ class parse_input:
             'unit_cell' : None,
             'structure_file': None,
             'odf_file': None, 
-            'output': None
+            'output': None,
+            'structure_factors': 1,
+            'intensity_const': 0
             }
 
         

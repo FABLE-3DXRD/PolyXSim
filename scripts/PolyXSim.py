@@ -62,8 +62,12 @@ if  myinput.param['structure_file'] != None:
     print 'UNIT CELL', myinput.param['unit_cell']
     logging.info('Generating miller indices')
     hkl = reflections.gen_miller(myinput.param)
-    logging.info('Structure factor calculation')
-    hkl = reflections.calc_intensity(hkl,xtal_structure)
+    if myinput.param['structure_factors'] != 0:
+        logging.info('Structure factor calculation')
+        hkl = reflections.calc_intensity(hkl,xtal_structure)
+    else:
+        hkl = reflections.add_intensity(hkl,myinput.param)
+        logging.info('No structure factor calculation')
 else:
     hkl = reflections.gen_miller(myinput.param)
     hkl = reflections.add_intensity(hkl,myinput.param)

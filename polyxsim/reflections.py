@@ -54,8 +54,8 @@ def add_intensity(hkl,param):
 	"""
 	Calculate the reflection intensities
         """
-	if 'int' in param:
-		int = param['int']
+	if 'structure_int' in param:
+		int = param['structure_int']
 	else:
 		int = 2**15
 
