@@ -23,6 +23,7 @@ pos = [0.0, 0.0 , 0.0]
 
 hkl = [1,1,1]
 
+unit_cell = [4.04975, 4.04975, 4.04975, 90, 90, 90]
 B = tools.FormB(unit_cell)
 Gc = n.dot(B,hkl)
 Gw = n.dot(U,Gc)
@@ -32,17 +33,55 @@ Gw = n.dot(U,Gc)
 wavelength_0 = 0.4859292
 wavelength = wavelength_0 
 tth = tools.tth2(Gw,wavelength)
-(Omega, Eta) = tools.find_omega_wedge(Gw,tth,'wedge')
+(Omega, Eta) = tools.find_omega_wedge(Gw,tth,wedge)
 Om = tools.OMEGA(Omega[1])
 Gt = n.dot(Om,Gw)
 
-detector.det_coor(Gt,n.cos(tth),wavelength,distance,y_size,z_size,dety_center,detz_center,n.identity(3),0,0,0)
+(dety,detz) = detector.det_coor(Gt,n.cos(tth),wavelength,distance,y_size,z_size,dety_center,detz_center,n.identity(3),0,0,0)
 
-wavelength = wavelength_0*(1.0+.1e-1)
+wavelength = wavelength_0*(1.0+1e-3)
+#wavelength = wavelength_0*(1.0+.1e-1)
 tth = tools.tth2(Gw,wavelength)
-(Omega, Eta) = tools.find_omega_wedge(Gw,tth,'wedge')
+(Omega, Eta) = tools.find_omega_wedge(Gw,tth,wedge)
 Om = tools.OMEGA(Omega[1])
 Gt = n.dot(Om,Gw)
 
-detector.det_coor(Gt,n.cos(tth),wavelength,distance,y_size,z_size,dety_center,detz_center,n.identity(3),0,0,0)
+(ddety,ddetz) = detector.det_coor(Gt,n.cos(tth),wavelength,distance,y_size,z_size,dety_center,detz_center,n.identity(3),0,0,0)
 
+### CHANGE UNIT_CELL
+unit_cell = n.array([4.04975, 4.04975, 4.04975, 90, 90, 90])
+unit_cell[:3] =  unit_cell[:3]*(1.0+1.0e-3)
+B = tools.FormB(unit_cell)
+Gc = n.dot(B,hkl)
+Gw = n.dot(U,Gc)
+
+wavelength = wavelength_0
+tth = tools.tth2(Gw,wavelength)
+(Omega, Eta) = tools.find_omega_wedge(Gw,tth,wedge)
+Om = tools.OMEGA(Omega[1])
+Gt = n.dot(Om,Gw)
+
+(dddety,dddetz) = detector.det_coor(Gt,n.cos(tth),wavelength,distance,y_size,z_size,dety_center,detz_center,n.identity(3),0,0,0)
+
+
+
+#### Playing with an algo for convolute the radial spread of the reflections
+from polyxsim import pixel_trace
+from scipy.stats import norm
+
+pixels =  pixel_trace.pixel_trace([996,995,1005,1007])
+pixels2 = n.array([[0,0,0,0.0]])
+
+path_total = pixels[:,2].sum()
+
+t_old = norm.cdf(ZZZZ)
+frac = n.zeros(len(pixels))
+for i in range(len(pixels)):
+    t_new = norm.cdf(pixel[i,2])
+    frac[i] = t_new-t_old
+    t_old = t_new
+
+pixels2 = n.concatenate(([[0,0,0.0]],pixels))
+cums = pixels2[:,2].cumsum()
+cdfcums = norm.cdf(cums-cums[-1]/2.0)
+frac =  cdfcums[1:]-cdfcums[:-1]
