@@ -353,11 +353,18 @@ class find_refl:
 			
         nrefl = A.shape[0]
         for i in range(nrefl):
+            (sc, fc) = detector.detyz2xy([A[i,A_id['dety']],A[i,A_id['detz']]],
+                                         self.param['o11'],
+                                         self.param['o12'],
+                                         self.param['o21'],
+                                         self.param['o22'],
+                                         self.param['dety_size'],
+                                         self.param['detz_size'])
             out = format %(A[i,A_id['gv1']]/(2*n.pi),
                            A[i,A_id['gv2']]/(2*n.pi),
                            A[i,A_id['gv3']]/(2*n.pi),
-                           A[i,A_id['detz']],
-                           self.param['dety_size']-A[i,A_id['dety']],
+                           sc,#A[i,A_id['detz']],
+                           fc,#self.param['dety_size']-A[i,A_id['dety']],
                            (2*n.sin(.5*A[i,A_id['tth']])/self.param['wavelength']),
                            A[i,A_id['eta']]*180/n.pi,
                            A[i,A_id['omega']]*180/n.pi,
