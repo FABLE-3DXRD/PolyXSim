@@ -72,6 +72,8 @@ class parse_input:
             'stem': 'test',
             'odf_type' : 1,
             'odf_scale' : 0.02,
+            'odf_cut' : None,
+            'odf_sub_sample': 1,
             'mosaicity' : 0.2,
             'theta_min' : 0.0,
             'theta_max' : None,
@@ -323,6 +325,9 @@ class parse_input:
         omega_step = self.param['omega_step']
         omega_start  = self.param['omega_start']
         omega_end  = self.param['omega_end']
+
+        if n.abs((omega_end-omega_start)%omega_step) > 1e-9: raise ValueError(), 'The omega range does not match an integer number of omega steps' 
+
         omega_sign = self.param['omega_sign']
         start_frame = self.param['start_frame']
         omegalist = omega_sign*n.arange(omega_start,omega_end+omega_step,omega_step)

@@ -70,16 +70,42 @@ class make_image:
 		oneD_odf = n.fromstring(file.readline(),sep=' ')
 		elements = r1_range*r2_range*r3_range
 		self.odf = oneD_odf[:elements].reshape(r1_range,r2_range,r3_range)
+		if self.graindata.param['odf_sub_sample'] > 1:
+			sub =self.graindata.param['odf_sub_sample']
+			print 'subscale =',sub
+			r1_range_sub = r1_range * self.graindata.param['odf_sub_sample']
+			r2_range_sub = r2_range * self.graindata.param['odf_sub_sample']
+			r3_range_sub = r3_range * self.graindata.param['odf_sub_sample']
+			odf_fine = n.zeros((r1_range_sub,r2_range_sub,r3_range_sub))
+			for i in range(r1_range):
+				for j in range(r2_range):
+					for k in range(r3_range):
+						odf_fine[i*sub:(i+1)*sub,
+							 j*sub:(j+1)*sub,
+							 k*sub:(k+1)*sub] = self.odf[i,j,k]
+			self.odf = odf_fine.copy()/(sub*sub*sub)
+			r1_range = r1_range_sub 
+			r2_range = r2_range_sub 
+			r3_range = r3_range_sub
+			odf_scale = odf_scale/sub
+			print 'odf_scale', odf_scale
 
                 #[r1_range, r2_range, r3_range] = self.odf.shape
                 odf_center = [(r1_range)/2, r2_range/2, r3_range/2]
+		
+		print odf_center
+		#self.odf[:,:,:] = 0.05
+		print self.odf.shape
 
 		#from pylab import *
 		#imshow(self.odf[:,:,odf_center[2]])
 		#show()
             self.Uodf = n.zeros(r1_range*r2_range*r3_range*9).\
 		reshape(r1_range,r2_range,r3_range,3,3)
-
+	    if self.graindata.param['odf_cut'] != None:
+		    self.odf_cut = self.odf.max()*self.graindata.param['odf_cut']
+	    else:
+		    self.odf_cut = 0.0
             for i in range(self.odf.shape[0]):
                 for j in range(self.odf.shape[1]):
                     for k in range(self.odf.shape[2]):
@@ -106,6 +132,7 @@ class make_image:
 
 	def make_image(self):
             from scipy import sparse
+	    from scipy import ndimage
 
 	    #make stack of empty images as a dictionary of sparse matrices
 	    print 'Build sparse image stack'
@@ -137,6 +164,7 @@ class make_image:
 			    for i in range(self.odf.shape[0]):
 				    for j in range(self.odf.shape[1]):
 					    for k in range(self.odf.shape[2]):
+                                              if self.odf[i,j,k] > self.odf_cut:
                                                 Gtmp = n.dot(self.Uodf[i,j,k],Gc)
 						Gw =   n.dot(SU,Gtmp)
 						Glen = n.sqrt(n.dot(Gw,Gw))
@@ -149,6 +177,8 @@ class make_image:
 							minpos = n.argmin(n.abs(Omega*(180.0/n.pi)-self.graindata.grain[grainno].refs[nref,A_id['omega']]))
 						except:
 							print Omega
+						if len(Omega) == 0:
+							continue
 						omega = Omega[minpos]
 						# if omega not in rotation range continue to next step
 						if (self.graindata.param['omega_start']*n.pi/180) > omega or\

@@ -30,7 +30,7 @@ def open_structure(param):
 		struct = structure.build_atomlist()
 		struct.PDBread(pdbfile=file)
 	else:
-		raise Error, 'Unknown structure file format'
+		raise IOError, 'Unknown structure file format'
 	param['sgno'] = sg.sg(sgname=struct.atomlist.sgname).no
 	param['unit_cell'] =  struct.atomlist.cell
 	return struct
