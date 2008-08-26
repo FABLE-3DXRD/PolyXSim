@@ -1,0 +1,106 @@
+
+#######################################################################
+#
+#                 Cambridge Crystallographic Data Centre
+#                                CCDC 
+#
+#######################################################################
+#
+# If this CIF has been generated directly or indirectly from an entry in the 
+# Cambridge Structural Database, then it will include bibliographic, chemical, 
+# crystal, experimental, refinement or atomic coordinate data resulting from 
+# the CCDC's data processing and validation procedures. Files generated from 
+# CSD entries are Copyright 2006 Cambridge Crystallographic Data Centre. They 
+# may be used in bona fide research applications only, and may not be copied or 
+# further disseminated in any form, whether machine-readable or not, except for 
+# the purposes of generating routine backup copies on your local computer 
+# system.
+# 
+# Files arising from any other source may also contain material that is the 
+# copyright of third parties, including the originator, and you should check 
+# with the originator concerning the permitted uses of the information 
+# contained in this CIF.
+#
+# For further information on the CCDC and the free tools enCIFer and Mercury
+# for validating and visualising CIF files, please visit www.ccdc.cam.ac.uk
+#
+#######################################################################
+
+data_monomer
+_symmetry_cell_setting           orthorhombic
+_symmetry_space_group_name_H-M   'P b c a'
+_symmetry_Int_Tables_number      61
+loop_
+_symmetry_equiv_pos_site_id
+_symmetry_equiv_pos_as_xyz
+1 x,y,z
+2 1/2-x,-y,1/2+z
+3 -x,1/2+y,1/2-z
+4 1/2+x,1/2-y,-z
+5 -x,-y,-z
+6 1/2+x,y,1/2-z
+7 x,1/2-y,1/2+z
+8 1/2-x,1/2+y,z
+_cell_length_a                   10.790(2)
+_cell_length_b                   8.7000(17)
+_cell_length_c                   31.340(6)
+_cell_angle_alpha                90
+_cell_angle_beta                 90
+_cell_angle_gamma                90
+_cell_volume                     2941.98
+
+loop_
+    _atom_type_symbol
+    _atom_type_description
+    'C' 'C' 
+    'H' 'H' 
+    'O' 'O' 
+
+
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+O1 O 0.23969 -0.013221 0.54289
+C8 C 0.37573 -0.187413 0.580511
+H8 H 0.326892 -0.281329 0.584433
+C10 C 0.383552 -0.168255 0.503232
+C9 C 0.322492 -0.106742 0.542065
+C14 C 0.370164 -0.194979 0.422338
+C19 C 0.45924 -0.307621 0.414947
+H19 H 0.503189 -0.349081 0.437732
+C13 C 0.336539 -0.139309 0.464633
+H13 H 0.270167 -0.071114 0.46478
+C11 C 0.488623 -0.268178 0.517553
+H11A H 0.564273 -0.241497 0.502562
+H11B H 0.470116 -0.375643 0.512319
+C4 C 0.39259 -0.195897 0.660746
+C15 C 0.307693 -0.136168 0.38735
+H15 H 0.247569 -0.061033 0.391479
+C7 C 0.366566 -0.09861 0.621857
+H7A H 0.424984 -0.013909 0.621099
+H7B H 0.283969 -0.055466 0.624272
+C12 C 0.502044 -0.237767 0.565123
+H12A H 0.528138 -0.330289 0.579873
+H12B H 0.562914 -0.157795 0.570212
+C18 C 0.482655 -0.358048 0.374025
+H18 H 0.542042 -0.433723 0.369419
+C16 C 0.332647 -0.186496 0.34659
+H16 H 0.290306 -0.144457 0.323528
+C3 C 0.303329 -0.290846 0.67777
+H3 H 0.224817 -0.293576 0.66555
+C5 C 0.506843 -0.194476 0.679889
+H5 H 0.568705 -0.131931 0.668686
+C17 C 0.419092 -0.297531 0.340058
+H17 H 0.435164 -0.332495 0.312568
+C6 C 0.532529 -0.282482 0.715031
+H6 H 0.610208 -0.27757 0.727817
+C2 C 0.328687 -0.38191 0.71267
+H2 H 0.267783 -0.446404 0.723641
+C1 C 0.443396 -0.377446 0.73117
+H1 H 0.460653 -0.438975 0.754698
+
+#END

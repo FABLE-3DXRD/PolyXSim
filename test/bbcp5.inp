@@ -1,0 +1,72 @@
+### Instrumental
+beamflux 1e12
+# Experimental setup
+wavelength  0.4859292
+distance 202.748505698
+# Frelon2K non-binned specs below
+dety_center  1023.5
+detz_center  1023.5
+y_size 0.050   # Pixel size y (mm)
+z_size 0.050   # Pixel size z (mm)
+dety_size 2048.0    # detector y size (pixels)
+detz_size 2048.0    # detector z size (pixels)
+tilt_x 0.0
+tilt_y 0.0
+tilt_z 0.0
+wedge 0.0
+
+
+
+omega_start  0.0     # Minimum Omega in range of interest (in deg)
+omega_end  180.0      # Maximum Omega in range of interest (in deg)
+omega_step  0.30      # Omega step size (in deg)
+omega_sign  1        # Sign of omega rotation
+beampol_factor  1    # Polarisation factor
+beampol_direct  0    # Polarisation direction
+#theta_min  0         # Minimum theta angle for reflection generation
+#theta_max  15        # Maximum theta angle for reflection generation
+o11   1              # Orientation matrix of detector 
+o12   0              # [[o11,o12]
+o21   0              #  [o21,o22]]
+o22  -1              # 
+### Grains
+no_grains  10
+
+gen_U 1        # generate grain orientations
+gen_pos 1 0    # generate grain positions
+gen_eps 1 0 0 0 0 # generate strain tensors [mean (diag) spread (diag) mean (off-diag) spread (off-diag)]
+gen_size 1 -0.075 0 1
+sample_xyz 0.3 0.3 0.3  # sample size in mm
+#sample_cyl 0.17 0.3    # cylinder dimension, radius and length, of sample in mm
+
+#U_grains_1   -0.5288    0.7846    0.3238 -0.5178    0.0040   -0.8555   -0.6725   -0.6200    0.4041
+
+ 
+#size_grains_1 0.075
+
+
+
+### Structural
+#unit_cell  4.04975 4.04975 4.04975 90 90 90
+#sgname 225
+structure_file 'monomer_in_Pbca.cif'
+
+
+
+### Files
+direc  '.'
+stem 'bbcp_mono_'
+output '.flt' '.edf' '.gve' '.ubi' '.par'  
+
+### Images
+make_image 1       # generate images if different from 0, default generate
+noise 0            # put on noise if different from 0, default no noise
+psf 0              # spread of Gaussian point spread function (detector)
+                   # corresponds roughly to the number of affected pixels on either side		   
+peakshape 1 2 0.5  # type, spread (in pixels from the central pixel), (spread in omega for type=1)
+                   # type=0 spike, type=1 2D Gaussian, type = 2 based on ODF.
+odf_type 2
+odf_file 'odf5_9_10.odf'
+odf_scale 0.1
+mosaicity .2
+bg 0               # background counts				
