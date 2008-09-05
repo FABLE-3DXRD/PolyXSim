@@ -303,18 +303,18 @@ class find_refl:
         python translation: Jette Oddershede, Risoe DTU, March 31 2008
         """
 
-        A = self.grain[0].refs
+#         A = self.grain[0].refs
 
-        for grainno in range(1,self.param['no_grains']):
-            A = n.concatenate((A,self.grain[grainno].refs))
+#         for grainno in range(1,self.param['no_grains']):
+#             A = n.concatenate((A,self.grain[grainno].refs))
 
 
-        # sort rows according to tth, descending
-        if len(A) > 0: 
-            A = A[n.argsort(A,0)[:,A_id['tth']],:]
-        else:
-            logging.warning('No reflections simulated, hence no gve file is made')
-            return
+#         # sort rows according to tth, descending
+#         if len(A) > 0: 
+#             A = A[n.argsort(A,0)[:,A_id['tth']],:]
+#         else:
+#             logging.warning('No reflections simulated, hence no gve file is made')
+#             return
 
 
         filename = '%s/%s.gve' %(self.param['direc'],self.param['stem'])
@@ -334,20 +334,44 @@ class find_refl:
 		
 
 
-        A = self.grain[0].refs
-        A = A[n.argsort(A,0)[:,A_id['tth']],:] # sort rows according to tth, descending
+#         A = self.grain[0].refs
+#         A = A[n.argsort(A,0)[:,A_id['tth']],:] # sort rows according to tth, descending
+#         format = "%f "*1 + "%d "*3 +"\n"
+#         for i in range(A.shape[0]):
+#             out = format %((2*n.sin(.5*A[i,A_id['tth']])/self.param['wavelength']),
+#                            A[i,A_id['h']],
+#                            A[i,A_id['k']],
+#                            A[i,A_id['l']]
+#                             )
+#             f.write(out)
+
+        thkl = self.hkl.copy()
+        ds = n.zeros((thkl.shape[0],1))
+
+        for i in range(thkl.shape[0]):
+            ds[i] = 2*tools.sintl(self.param['unit_cell'],thkl[i,0:3])
+        
+        #Add ds values to the thkl array    
+	thkl = n.concatenate((thkl,ds),1)
+        
+        # sort rows according to ds, descending
+        thkl = thkl[n.argsort(thkl,0)[:,4],:]
+
+        # Output format
         format = "%f "*1 + "%d "*3 +"\n"
-        for i in range(A.shape[0]):
-            out = format %((2*n.sin(.5*A[i,A_id['tth']])/self.param['wavelength']),
-                           A[i,A_id['h']],
-                           A[i,A_id['k']],
-                           A[i,A_id['l']]
-                            )
+
+        for i in range(thkl.shape[0]):
+            out = format %(thkl[i,4],
+                           thkl[i,0],
+                           thkl[i,1],
+                           thkl[i,2]
+                           )
             f.write(out)
 
         out = "# xr yr zr xc yc ds eta omega\n" 
         f.write(out)
         format = "%f "*8 + "%i"*1+"\n"
+        A = self.grain[0].refs
         for grainno in range(1,self.param['no_grains']):
             A = n.concatenate((A,self.grain[grainno].refs))
 			
@@ -368,7 +392,7 @@ class find_refl:
                            (2*n.sin(.5*A[i,A_id['tth']])/self.param['wavelength']),
                            A[i,A_id['eta']]*180/n.pi,
                            A[i,A_id['omega']]*180/n.pi,
-						   A[i,A_id['spot_id']]
+                           A[i,A_id['spot_id']]
                            )
             f.write(out)
 		
