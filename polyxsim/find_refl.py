@@ -170,7 +170,7 @@ class find_refl:
                                       dety,detz,
                                       detyd,detzd,
                                       Gw[0],Gw[1],Gw[2],
-                                      L,P,hkl[3],intensity])
+                                      L,P,hkl[3],intensity,overlaps])
                             nrefl = nrefl+1
                             spot_id = spot_id+1
 
@@ -186,7 +186,8 @@ class find_refl:
                 # Renumber the spot_id
                 A[:,A_id['spot_id']] = n.arange(n.min(A[:,A_id['spot_id']]),
                                             n.max(A[:,A_id['spot_id']])+1)
- 
+            else:
+                A = n.zeros((0,len(A_id)))
             # save reflection info in grain container
             self.grain[grainno].refs = A 
             print '\rDone %3i grain(s) of %3i' %(grainno+1,self.param['no_grains']),
@@ -286,8 +287,7 @@ class find_refl:
                                    A[i,A_id['P']],
                                    A[i,A_id['F2']],
                                    A[i,A_id['Int']],
-                                   A[i,0]
- #                                 A[i,A_id['overlaps']]
+                                   A[i,A_id['overlaps']]
                            )
                     f.write(out)
         
@@ -302,20 +302,6 @@ class find_refl:
         Henning Osholm Sorensen, RisoeDTU, 2008.
         python translation: Jette Oddershede, Risoe DTU, March 31 2008
         """
-
-#         A = self.grain[0].refs
-
-#         for grainno in range(1,self.param['no_grains']):
-#             A = n.concatenate((A,self.grain[grainno].refs))
-
-
-#         # sort rows according to tth, descending
-#         if len(A) > 0: 
-#             A = A[n.argsort(A,0)[:,A_id['tth']],:]
-#         else:
-#             logging.warning('No reflections simulated, hence no gve file is made')
-#             return
-
 
         filename = '%s/%s.gve' %(self.param['direc'],self.param['stem'])
         f = open(filename,'w')
@@ -332,19 +318,6 @@ class find_refl:
         out = "# ds h k l\n" 
         f.write(out)
 		
-
-
-#         A = self.grain[0].refs
-#         A = A[n.argsort(A,0)[:,A_id['tth']],:] # sort rows according to tth, descending
-#         format = "%f "*1 + "%d "*3 +"\n"
-#         for i in range(A.shape[0]):
-#             out = format %((2*n.sin(.5*A[i,A_id['tth']])/self.param['wavelength']),
-#                            A[i,A_id['h']],
-#                            A[i,A_id['k']],
-#                            A[i,A_id['l']]
-#                             )
-#             f.write(out)
-
         thkl = self.hkl.copy()
         ds = n.zeros((thkl.shape[0],1))
 
@@ -352,7 +325,7 @@ class find_refl:
             ds[i] = 2*tools.sintl(self.param['unit_cell'],thkl[i,0:3])
         
         #Add ds values to the thkl array    
-	thkl = n.concatenate((thkl,ds),1)
+        thkl = n.concatenate((thkl,ds),1)
         
         # sort rows according to ds, descending
         thkl = thkl[n.argsort(thkl,0)[:,4],:]
