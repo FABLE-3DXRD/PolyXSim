@@ -60,7 +60,6 @@ generate_grains.save_grains(myinput.param)
 generate_grains.write_res(myinput.param)
 logging.info('Write res file')
 
-print myinput.param
 # Generate reflections
 hkl = []
 for phase in myinput.param['phase_list']:

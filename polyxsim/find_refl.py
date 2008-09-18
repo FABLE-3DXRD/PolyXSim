@@ -52,7 +52,7 @@ class find_refl:
             else:
                 phase = self.param['phase_grains_%s' %(self.param['grain_list'][grainno])]
             unit_cell = self.param['unit_cell_phase_%i' %phase]
-            print unit_cell
+
             self.grain.append(variables.grain_cont(U))
             gr_pos = n.array(self.param['pos_grains_%s' %(self.param['grain_list'][grainno])])
             gr_eps = n.array(self.param['eps_grains_%s' %(self.param['grain_list'][grainno])])
@@ -402,7 +402,6 @@ class find_refl:
         A = A[n.argsort(A,0)[:,A_id['omega']],:] # sort rows according to omega
         format = "%f "*3 + "%i "*1 +"%f "*12 + "%i "*2   +"%f "*1 + "%i "*4 +"%f "*4 + "%i "*3 +"\n"
 
-        print A.shape[0]
         for i in range(A.shape[0]):
             (sc, fc) = detector.detyz2xy([A[i,A_id['dety']],A[i,A_id['detz']]],
                                          self.param['o11'],

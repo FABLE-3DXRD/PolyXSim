@@ -5,6 +5,7 @@
 #
 
 from string import split
+from copy import copy
 import sys, os 
 import variables
 from xfab import tools
@@ -225,13 +226,16 @@ class parse_input:
                     'in crystallographic part - structure_phase_X or unit_cell_phase_X.'
             self.param['gen_size'][0] = 1
         else:
-            if self.param['gen_size'][0] != 0:
-                print 'IIIIIIIIIIIIIIIIIIIIIIII'
-                for phase in  phase_list:
-                    self.param['gen_size_phase_%i' %phase] = self.param['gen_size']
-                    print phase,self.param['gen_size_phase_%i' %phase]
+            if len(phase_list) > 0:
+                for phase in phase_list:
+                    self.param['gen_size_phase_%i' %phase] = copy(self.param['gen_size'])
+            else:
+                phase = 0 
+                self.param['gen_size_phase_%i' %phase] = copy(self.param['gen_size'])
+                
+        if self.param['gen_phase'][0] != 0:
+            assert len(self.param['gen_phase'][1:]) == no_phases*2, 'Missing info for  -  gen_phase'
 
-        print phase_list,self.param['gen_phase']
 # Init no of grains belonging to phase X if not generated
         if self.param['gen_phase'][0] != 1:
             for phase in phase_list:
@@ -241,7 +245,6 @@ class parse_input:
                 phase = self.param['gen_phase'][i*2+1]
                 no_grains_phase = int(self.param['gen_phase'][i*2+2])
                 self.param['no_grains_phase_%i' %phase] = no_grains_phase
-                print self.param['no_grains_phase_%i' %phase]
 
 # read U, pos, eps and size for all grains		
         grain_list_U = []
@@ -266,11 +269,17 @@ class parse_input:
                     self.param['no_grains_phase_%i' %self.param[item]] += 1
 
 #assert that the number of grains in all match 
+
         sum_of_grains = 0
-        for phase in phase_list:
-            sum_of_grains += self.param['no_grains_phase_%i' %phase]
-        assert sum_of_grains == no_grains, \
-            'Input number of grains does not agree with number of phase_grains_ keywords'
+        print 'no of phases', self.param['no_phases']
+        if self.param['no_phases'] > 1:
+            for phase in phase_list:
+                sum_of_grains += self.param['no_grains_phase_%i' %phase]
+            assert sum_of_grains == no_grains, \
+                'Input number of grains (%i) does not agree ' %no_grains +\
+                'with number of phase_grains_ keywords (%i)' %sum_of_grains
+        else:
+            self.param['no_grains_phase_0'] = no_grains
 
 # assert that input U, pos, eps size are correct in format
 # (same number of grains and same specifiers or else not input) 
@@ -337,8 +346,6 @@ class parse_input:
                 self.param['grain_list'] = grain_list_phase
             else:
                 self.param['grain_list'] = range(no_grains)
-            print self.param['grain_list']
-
 
 
 # assert that all information needed to generate grains is present	
@@ -351,6 +358,8 @@ class parse_input:
         assert len(grain_list_size) != 0 or self.param['gen_size'][0] != 0,\
             'Information on grain size generation missing'
 			
+
+
 
 
 #assert that not both sample_xyz and sample_cyl are given
@@ -388,19 +397,20 @@ class parse_input:
             self.param['sample_vol'] = None
 
 
-        if self.param['sample_vol'] != None:
+        if self.param['sample_vol'] != None and self.param['gen_size'][0] != 0:
             diam_limit = (6*self.param['sample_vol']/\
                          (n.exp(.5)*n.pi*self.param['no_grains']))**(1/3.)
             mean_diam = 0
             vol = []
             for phase in phase_list:
+
                 weight = self.param['no_grains_phase_%i' %phase]/self.param['no_grains']
                 vol.append(abs(self.param['gen_size_phase_%i' %phase][1])**3*n.pi/6.* self.param['no_grains_phase_%i' %phase])
                 mean_diam += abs(self.param['gen_size_phase_%i' %phase][1])*weight
 
             for i in range(self.param['no_phases']):
                 self.param['vol_frac_phase_%i' %phase_list[i]] = vol[i]/n.sum(vol)
-                print phase_list[i],self.param['vol_frac_phase_%i' %phase_list[i]]
+            
 
             assert mean_diam <= diam_limit, \
                 'The sample volume is too small to contain the '+\
@@ -422,7 +432,6 @@ class parse_input:
 
 #If no structure file is given - unit_cell should be               
         if len(phase_list) == 0:
-            print self.param['structure_file']
             # This is a monophase simulation probably using the "old" keywords
             if self.param['structure_file'] == None:
                 print 'NO structure file'
@@ -430,31 +439,33 @@ class parse_input:
                     'Missing input: structure_file or unit_cell' 
                 
                 # rename keyword
-                self.param['unit_cell_phase_1'] == self.param['unit_cell']
+                self.param['unit_cell_phase_0'] == self.param['unit_cell']
                 # and delete old one
                 del self.param['unit_cell']
                 assert self.param['sgno'] != None or self.param['sgname'] != None , \
                     'Missing input: no space group information, please input either sgno or sgname' 
                 from xfab import sg
                 if self.param['sgno'] == None:
-                    self.param['sgno_phase_1'] = sg.sg(sgname = self.param['sgname']).no
+                    self.param['sgno_phase_0'] = sg.sg(sgname = self.param['sgname']).no
                     # rename keyword
-                    self.param['sgname_phase_1'] = self.param['sgname']
+                    self.param['sgname_phase_0'] = self.param['sgname']
                     # and delete old one
                     del self.param['sgname']
                 else:
-                    self.param['sgname_phase_1'] = sg.sg(sgno = self.param['sgno']).name
+                    self.param['sgname_phase_0'] = sg.sg(sgno = self.param['sgno']).name
                     # rename keyword
-                    self.param['sgno_phase_1'] = self.param['sgno']
+                    self.param['sgno_phase_0'] = self.param['sgno']
                     # and delete old one
                     del self.param['sgno']
             else:
                 # rename keyword
-                self.param['structure_phase_1'] = self.param['structure_file']
+                self.param['structure_phase_0'] = self.param['structure_file']
                 # and delete old one
                 del self.param['structure_file']
-            phase_list = [1]
+            phase_list = [0]
         self.param['phase_list'] = phase_list
+
+
 
     def initialize(self):
         # Frame generation
@@ -535,7 +546,6 @@ if __name__=='__main__':
 
     myinput = parse_input(input_file = filename)
     myinput.read()
-    print myinput.param
     myinput.check() 
     if myinput.missing == True:
         print 'MISSING ITEMS'

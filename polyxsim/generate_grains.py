@@ -131,7 +131,6 @@ def grain_size(no_grains,grain_size,grain_min_max,sample_vol=None):
 	if sample_vol != None:
 		fraction = grain_vol/sample_vol
 		print 'The generated grains cover the following fraction of the sample volume: %6f' %fraction
-	print 'SIZE: ',size 
 	return size
 	
 
@@ -155,13 +154,11 @@ def generate_grains(param):
 	if param['gen_phase'][0] != 0:
 		#Making random list of grain numbers
 		rand_grain_order = n.argsort(n.random.randn(param['no_grains']))
-		print 'rand_grain_order' , rand_grain_order
+
 		no_picked_grains = 0
 		for i in range(param['no_phases']):
 			phase = param['gen_phase'][i*2+1]
 			no_grains_phase = int(param['gen_phase'][i*2+2])
-			print rand_grain_order, no_picked_grains, no_grains_phase
-			print n.array(param['grain_list'])[rand_grain_order[no_picked_grains:no_picked_grains+no_grains_phase]]
 			param['no_grains_phase_%i' %phase] = no_grains_phase
 			param['grain_list_phase_%i' %phase] = \
 			    n.array(param['grain_list'])[rand_grain_order[no_picked_grains:no_picked_grains+no_grains_phase]]
@@ -181,21 +178,15 @@ def generate_grains(param):
 
 
 # Generate size if gen_size on
-	print 'PHASELIST', param['phase_list']
-
 	for phase in param['phase_list']:
-		print 'JJJJ', phase,param['gen_size_phase_%i' %phase]
 		if param['gen_size_phase_%i' %phase][0] != 0: 
 			size = grain_size(param['no_grains_phase_%i' %phase],
 					  param['gen_size_phase_%i' %phase][1],
 					  param['gen_size_phase_%i' %phase][2:4],
 					  param['sample_vol']*param['vol_frac_phase_%i' %phase])
-			print '*GENERATE SIZES*'
-			print size
 			for i in range(param['no_grains_phase_%i' %phase]):
 				param['size_grains_%s' %(param['grain_list_phase_%i' %phase][i])] = size[i]
-				print param['grain_list_phase_%i' %phase][i],param['size_grains_%s' %(param['grain_list_phase_%i' %phase][i])]
-		param['gen_size_phase_%i' %phase][0] = 0
+			param['gen_size_phase_%i' %phase][0] = 0
 	
 	
 	
@@ -208,7 +199,6 @@ def save_grains(param):
 # Jette Oddershede, Risoe DTU, March 31 2008
 #
 
-    print param
     filename = '%s/%s_%0.4dgrains.txt' %(param['direc'],param['stem'],param['no_grains'])
     f = open(filename,'w')
 #    format = "%d "*1 + "%f "*1 + "%e"*1 + "%f"*18 + "\n"
@@ -260,7 +250,10 @@ def write_ubi(param):
     for i in range(param['no_grains']):
         U = param['U_grains_%s' %(param['grain_list'][i])]
         gr_eps = n.array(param['eps_grains_%s' %(param['grain_list'][i])])
-	phase = param['phase_grains_%s' %(param['grain_list'][i])]
+	if param['no_phases'] == 1:
+            phase = param['phase_list'][0]
+	else:
+            phase = param['phase_grains_%s' %(param['grain_list'][i])]
 	# Calculate the B-matrix based on the strain tensor for each grain
         B = tools.epsilon2B(gr_eps,param['unit_cell_phase_%i' %phase])/(2*n.pi) 
         UBI = n.linalg.inv(n.dot(U,B))

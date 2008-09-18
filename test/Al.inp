@@ -1,0 +1,53 @@
+U_grains_1 0.969877681655 0.227604340034 -0.0867960081204 0.238183265881 -0.960769123304 0.142096529021 -0.0510491379192 -0.158489608818 -0.986040074954
+beamflux 1e+12
+beampol_angle 0.0
+beampol_direct 0
+beampol_factor 1
+bg 0
+dety_center 751.5
+dety_size 1536.0
+detz_center 521.5
+detz_size 1024.0
+direc 'Al_all-tilts_5deg'
+distance 8.0
+eps_grains_1 0.0 0.0 0.0 0.0 0.0 0.0
+gen_U 0
+gen_eps 0 0 0 0 0
+gen_pos 0 0
+gen_size 0 -0.05 0.01 0.2
+grain_list 1
+make_image 1
+mosaicity 0.2
+no_grains 1
+noise 0
+o11 -1
+o12 0
+o21 0
+o22 -1
+odf_scale 0.02
+odf_type 1
+omega_end 180.0
+omega_sign 1
+omega_start 0.0
+omega_step 0.5
+output '.flt' '.gve' '.ubi' '.par' '.edf'
+peakshape 1 2 0.0
+pos_grains_1 0.153 -0.122 0.0
+psf 0
+sample_vol 0.008
+sample_xyz 0.2 0.2 0.2
+sgno 225
+size_grains_1 0.05
+start_frame 0
+stem 'Al_all-tilts_5deg'
+structure_file 'Al.cif'
+theta_max 13.4273673182
+theta_min 0.0
+tilt_x 0.0872664625997
+tilt_y 0.0872664625997
+tilt_z 0.0872664625997
+unit_cell 4.04975 4.04975 4.04975 90.0 90.0 90.0
+wavelength 0.24796
+wedge 0.0
+y_size 0.0043
+z_size 0.0043

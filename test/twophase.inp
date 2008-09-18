@@ -15,11 +15,11 @@ gen_pos 1 0
 gen_size 1 -0.05 0.01 0.2
 #gen_size_phase_1 1 -0.05 0.01 0.2 
 #gen_size_phase_2 1 -0.15 0.01 0.2 
-gen_phase 1    1 2    2 3
+gen_phase 1 1 2 2 3 3 4
 make_image 1
 mosaicity 0.2
-no_grains 5
-no_phases 2 
+no_grains 9
+no_phases 3 
 noise 0
 o11 -1
 o12 0
@@ -40,6 +40,7 @@ start_frame 0
 stem 'Al_no_tilts'
 structure_phase_1 'Al.cif'
 structure_phase_2 'Al2.cif'
+structure_phase_3 'Al3.cif'
 theta_max 13.4273673182
 theta_min 0.0
 tilt_x 0.0
