@@ -150,19 +150,52 @@ def generate_grains(param):
 			param['pos_grains_%s' %(param['grain_list'][i])] = pos[i]
         param['gen_pos'][0] = 0
 
+	
+# If pick out grain for phase
+	if param['gen_phase'][0] != 0:
+		#Making random list of grain numbers
+		rand_grain_order = n.argsort(n.random.randn(param['no_grains']))
+		print 'rand_grain_order' , rand_grain_order
+		no_picked_grains = 0
+		for i in range(param['no_phases']):
+			phase = param['gen_phase'][i*2+1]
+			no_grains_phase = int(param['gen_phase'][i*2+2])
+			print rand_grain_order, no_picked_grains, no_grains_phase
+			print n.array(param['grain_list'])[rand_grain_order[no_picked_grains:no_picked_grains+no_grains_phase]]
+			param['no_grains_phase_%i' %phase] = no_grains_phase
+			param['grain_list_phase_%i' %phase] = \
+			    n.array(param['grain_list'])[rand_grain_order[no_picked_grains:no_picked_grains+no_grains_phase]]
+			no_picked_grains += no_grains_phase
+			for grain in param['grain_list_phase_%i' %phase]:
+				param['phase_grains_%i' %grain] = phase
+
+
+	param['gen_phase'][0] = 0  # Done
+
 # Generate eps if gen_eps on
 	if param['gen_eps'][0] != 0: 
 		eps = generate_eps(param['no_grains'],param['gen_eps'][1:5])
 		for i in range(param['no_grains']):
 			param['eps_grains_%s' %(param['grain_list'][i])] = eps[i]
         param['gen_eps'][0] = 0
-			
+
+
 # Generate size if gen_size on
-	if param['gen_size'][0] != 0: 
-		size = grain_size(param['no_grains'],param['gen_size'][1],param['gen_size'][2:4],sample_vol=param['sample_vol'])
-		for i in range(param['no_grains']):
-			param['size_grains_%s' %(param['grain_list'][i])] = size[i]
-        param['gen_size'][0] = 0
+	print 'PHASELIST', param['phase_list']
+
+	for phase in param['phase_list']:
+		print 'JJJJ', phase,param['gen_size_phase_%i' %phase]
+		if param['gen_size_phase_%i' %phase][0] != 0: 
+			size = grain_size(param['no_grains_phase_%i' %phase],
+					  param['gen_size_phase_%i' %phase][1],
+					  param['gen_size_phase_%i' %phase][2:4],
+					  param['sample_vol']*param['vol_frac_phase_%i' %phase])
+			print '*GENERATE SIZES*'
+			print size
+			for i in range(param['no_grains_phase_%i' %phase]):
+				param['size_grains_%s' %(param['grain_list_phase_%i' %phase][i])] = size[i]
+				print param['grain_list_phase_%i' %phase][i],param['size_grains_%s' %(param['grain_list_phase_%i' %phase][i])]
+		param['gen_size_phase_%i' %phase][0] = 0
 	
 	
 	
@@ -175,6 +208,7 @@ def save_grains(param):
 # Jette Oddershede, Risoe DTU, March 31 2008
 #
 
+    print param
     filename = '%s/%s_%0.4dgrains.txt' %(param['direc'],param['stem'],param['no_grains'])
     f = open(filename,'w')
 #    format = "%d "*1 + "%f "*1 + "%e"*1 + "%f"*18 + "\n"
@@ -226,7 +260,9 @@ def write_ubi(param):
     for i in range(param['no_grains']):
         U = param['U_grains_%s' %(param['grain_list'][i])]
         gr_eps = n.array(param['eps_grains_%s' %(param['grain_list'][i])])
-        B = tools.epsilon2B(gr_eps,param['unit_cell'])/(2*n.pi)  # Calculate the B-matrix based on the strain tensor for each grain
+	phase = param['phase_grains_%s' %(param['grain_list'][i])]
+	# Calculate the B-matrix based on the strain tensor for each grain
+        B = tools.epsilon2B(gr_eps,param['unit_cell_phase_%i' %phase])/(2*n.pi) 
         UBI = n.linalg.inv(n.dot(U,B))
         for j in range(3):
             out = format %(UBI[j,0],UBI[j,1],UBI[j,2])
@@ -299,8 +335,10 @@ def write_par(param):
 
     Jette Oddershede, Risoe DTU, June 17 2008
     """
-    filename = '%s/%s_detector.par' %(param['direc'],param['stem'])
-    f = open(filename,'w')
+
+
+
+    #Prepare detector part of p.par output
 
     #Calc beam center in ImageD11 coordinate system 
     (z_center, y_center) = detector.detyz2xy([param['dety_center'],param['detz_center']],
@@ -311,35 +349,49 @@ def write_par(param):
 					     param['dety_size'],
 					     param['detz_size'])
 			
-    out = "cell__a %s\n" %param['unit_cell'][0]
-    out = out + "cell__b %s\n" %param['unit_cell'][1]
-    out = out + "cell__c %s\n" %param['unit_cell'][2]
-    out = out + "cell_alpha %s\n" %param['unit_cell'][3]
-    out = out + "cell_beta %s\n" %param['unit_cell'][4]
-    out = out + "cell_gamma %s\n" %param['unit_cell'][5]	
-    out = out + "cell_lattice_[P,A,B,C,I,F,R] %s\n" %sg.sg(sgno=param['sgno']).name[0]
-    out = out + "chi 0.0\n" 
-    out = out + "distance %f\n" %(param['distance']*1000.) 
-    out = out + "fit_tolerance 0.5\n" 
-    out = out + "o11 %i\n" %param['o11']
-    out = out + "o12 %i\n" %param['o12']
-    out = out + "o21 %i\n" %param['o21']
-    out = out + "o22 %i\n" %param['o22']
-    out = out + "omegasign %f\n" %param['omega_sign']
-    out = out + "t_x 0\n" 
-    out = out + "t_y 0\n" 
-    out = out + "t_z 0\n" 
-    out = out + "tilt_x %f\n" %param['tilt_x']
-    out = out + "tilt_y %f\n" %param['tilt_y']
-    out = out + "tilt_z %f\n" %param['tilt_z']
-    out = out + "wavelength %f\n" %param['wavelength']
-    out = out + "wedge 0.0\n"
-    out = out + "y_center %f\n" %y_center
-    out = out + "y_size %f\n" %(param['y_size']*1000.)
-    out = out + "z_center %f\n" %z_center
-    out = out + "z_size %f\n" %(param['z_size']*1000.)
-    f.write(out)
-    f.close()   
+
+    dout = "chi 0.0\n" 
+    dout = dout + "distance %f\n" %(param['distance']*1000.) 
+    dout = dout + "fit_tolerance 0.5\n" 
+    dout = dout + "o11 %i\n" %param['o11']
+    dout = dout + "o12 %i\n" %param['o12']
+    dout = dout + "o21 %i\n" %param['o21']
+    dout = dout + "o22 %i\n" %param['o22']
+    dout = dout + "omegasign %f\n" %param['omega_sign']
+    dout = dout + "t_x 0\n" 
+    dout = dout + "t_y 0\n" 
+    dout = dout + "t_z 0\n" 
+    dout = dout + "tilt_x %f\n" %param['tilt_x']
+    dout = dout + "tilt_y %f\n" %param['tilt_y']
+    dout = dout + "tilt_z %f\n" %param['tilt_z']
+    dout = dout + "wavelength %f\n" %param['wavelength']
+    dout = dout + "wedge 0.0\n"
+    dout = dout + "y_center %f\n" %y_center
+    dout = dout + "y_size %f\n" %(param['y_size']*1000.)
+    dout = dout + "z_center %f\n" %z_center
+    dout = dout + "z_size %f\n" %(param['z_size']*1000.)
+
+
+
+    for phase in param['phase_list']:
+	    if param['no_phases'] > 1:
+                filename = '%s/%s_phase_%i.par' %(param['direc'],param['stem'],phase)
+            else:
+                filename = '%s/%s.par' %(param['direc'],param['stem'])
+	    f = open(filename,'w')
+	    
+	    unit_cell = param['unit_cell_phase_%i' %phase]
+	    out = "cell__a %s\n" %unit_cell[0]
+	    out = out + "cell__b %s\n" %unit_cell[1]
+	    out = out + "cell__c %s\n" %unit_cell[2]
+	    out = out + "cell_alpha %s\n" %unit_cell[3]
+	    out = out + "cell_beta %s\n" %unit_cell[4]
+	    out = out + "cell_gamma %s\n" %unit_cell[5]	
+	    out = out + "cell_lattice_[P,A,B,C,I,F,R] %s\n" %param['sgname_phase_%i' %phase][0]
+	    out = out + dout
+
+	    f.write(out)
+	    f.close()   
 
 
 

@@ -55,28 +55,34 @@ if myinput.missing == True:                   # if problem exit
 logging.info('Initialize parameters etc\n')
 myinput.initialize()                            # if ok initialize
 
-
-# Generate reflections
-if  myinput.param['structure_file'] != None:
-    xtal_structure = reflections.open_structure(myinput.param)
-    print 'UNIT CELL', myinput.param['unit_cell']
-    logging.info('Generating miller indices')
-    hkl = reflections.gen_miller(myinput.param)
-    if myinput.param['structure_factors'] != 0:
-        logging.info('Structure factor calculation')
-        hkl = reflections.calc_intensity(hkl,xtal_structure)
-    else:
-        hkl = reflections.add_intensity(hkl,myinput.param)
-        logging.info('No structure factor calculation')
-else:
-    hkl = reflections.gen_miller(myinput.param)
-    hkl = reflections.add_intensity(hkl,myinput.param)
-
-#print myinput.param
 generate_grains.generate_grains(myinput.param)
 generate_grains.save_grains(myinput.param)
-logging.info('Write res file')
 generate_grains.write_res(myinput.param)
+logging.info('Write res file')
+
+print myinput.param
+# Generate reflections
+hkl = []
+for phase in myinput.param['phase_list']:
+    if  ('structure_phase_%i' %phase) in myinput.param:
+        xtal_structure = reflections.open_structure(myinput.param,phase)
+        print 'UNIT CELL', myinput.param['unit_cell_phase_%i' %phase]
+        logging.info('Generating miller indices')
+        hkl_tmp = reflections.gen_miller(myinput.param,phase)
+        if myinput.param['structure_factors'] != 0:
+            logging.info('Structure factor calculation')
+            hkl.append(reflections.calc_intensity(hkl_tmp,xtal_structure))
+        else:
+            hkl.append(reflections.add_intensity(hkl,myinput.param))
+            logging.info('No structure factor calculation')
+    else:
+        hkl_tmp = reflections.gen_miller(myinput.param,phase)
+        hkl.append(reflections.add_intensity(hkl_tmp,myinput.param))
+
+#print myinput.param
+
+logging.info('Write res file')
+
 if '.ubi' in myinput.param['output']:
     logging.info('Write UBI file')
     generate_grains.write_ubi(myinput.param)

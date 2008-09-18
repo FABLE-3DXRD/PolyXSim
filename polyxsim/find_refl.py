@@ -47,15 +47,20 @@ class find_refl:
         for grainno in range(self.param['no_grains']):
             A = []
             U = self.param['U_grains_%s' %(self.param['grain_list'][grainno])]
-
+            if len(self.param['phase_list']) == 1:
+                phase = self.param['phase_list'][0]
+            else:
+                phase = self.param['phase_grains_%s' %(self.param['grain_list'][grainno])]
+            unit_cell = self.param['unit_cell_phase_%i' %phase]
+            print unit_cell
             self.grain.append(variables.grain_cont(U))
             gr_pos = n.array(self.param['pos_grains_%s' %(self.param['grain_list'][grainno])])
             gr_eps = n.array(self.param['eps_grains_%s' %(self.param['grain_list'][grainno])])
             # Calculate the B-matrix based on the strain tensor for each grain
-            B = tools.epsilon2B(gr_eps,self.param['unit_cell']) 
+            B = tools.epsilon2B(gr_eps,unit_cell) 
             # add B matrix to grain container
             self.grain[grainno].B = B
-            V = tools.CellVolume(self.param['unit_cell'])
+            V = tools.CellVolume(unit_cell)
             grain_vol = n.pi/6 * self.param['size_grains_%s' %self.param['grain_list'][grainno]]**3 
 
 #            print 'GRAIN NO: ',self.param['grain_list'][grainno]
@@ -68,7 +73,7 @@ class find_refl:
             # totalnr, grainno, refno, hkl, omega, 2theta, eta, dety, detz
             # For all reflections in Ahkl that fulfill omega_start < omega < omega_end.
             # All angles in Grain are in degrees
-            for hkl in self.hkl:
+            for hkl in self.hkl[self.param['phase_list'].index(phase)]:
                 Gc = n.dot(B,hkl[0:3])
                 Gw =   n.dot(self.S,n.dot(U,Gc))
                 tth = tools.tth2(Gw,self.param['wavelength'])
@@ -303,73 +308,81 @@ class find_refl:
         python translation: Jette Oddershede, Risoe DTU, March 31 2008
         """
 
-        filename = '%s/%s.gve' %(self.param['direc'],self.param['stem'])
-        f = open(filename,'w')
-        lattice = sg.sg(sgno=self.param['sgno']).name[0]
-        format = "%f "*6 + "%s "*1 +"\n"
-        out = format %(self.param['unit_cell'][0],self.param['unit_cell'][1],
-                       self.param['unit_cell'][2],self.param['unit_cell'][3],
-                       self.param['unit_cell'][4],self.param['unit_cell'][5], lattice)
-        f.write(out)
-        out = "# wavelength = %s\n" %(self.param['wavelength'])
-        f.write(out)
-        out = "# wedge = %f\n" %self.param['wedge']
-        f.write(out)
-        out = "# ds h k l\n" 
-        f.write(out)
-		
-        thkl = self.hkl.copy()
-        ds = n.zeros((thkl.shape[0],1))
-
-        for i in range(thkl.shape[0]):
-            ds[i] = 2*tools.sintl(self.param['unit_cell'],thkl[i,0:3])
-        
-        #Add ds values to the thkl array    
-        thkl = n.concatenate((thkl,ds),1)
-        
-        # sort rows according to ds, descending
-        thkl = thkl[n.argsort(thkl,0)[:,4],:]
-
-        # Output format
-        format = "%f "*1 + "%d "*3 +"\n"
-
-        for i in range(thkl.shape[0]):
-            out = format %(thkl[i,4],
-                           thkl[i,0],
-                           thkl[i,1],
-                           thkl[i,2]
-                           )
-            f.write(out)
-
-        out = "# xr yr zr xc yc ds eta omega\n" 
-        f.write(out)
-        format = "%f "*8 + "%i"*1+"\n"
         A = self.grain[0].refs
         for grainno in range(1,self.param['no_grains']):
             A = n.concatenate((A,self.grain[grainno].refs))
 			
         nrefl = A.shape[0]
-        for i in range(nrefl):
-            (sc, fc) = detector.detyz2xy([A[i,A_id['dety']],A[i,A_id['detz']]],
-                                         self.param['o11'],
-                                         self.param['o12'],
-                                         self.param['o21'],
-                                         self.param['o22'],
-                                         self.param['dety_size'],
-                                         self.param['detz_size'])
-            out = format %(A[i,A_id['gv1']]/(2*n.pi),
-                           A[i,A_id['gv2']]/(2*n.pi),
-                           A[i,A_id['gv3']]/(2*n.pi),
-                           sc,#A[i,A_id['detz']],
-                           fc,#self.param['dety_size']-A[i,A_id['dety']],
-                           (2*n.sin(.5*A[i,A_id['tth']])/self.param['wavelength']),
-                           A[i,A_id['eta']]*180/n.pi,
-                           A[i,A_id['omega']]*180/n.pi,
-                           A[i,A_id['spot_id']]
-                           )
+
+        for phase in self.param['phase_list']:
+            if self.param['no_phases'] > 1:
+                filename = '%s/%s_phase_%i.gve' %(self.param['direc'],self.param['stem'],phase)
+            else:
+                filename = '%s/%s.gve' %(self.param['direc'],self.param['stem'])
+            f = open(filename,'w')
+            lattice = self.param['sgname_phase_%i' %phase]
+            format = "%f "*6 + "%s "*1 +"\n"
+            unit_cell = self.param['unit_cell_phase_%i' %phase]
+            out = format %(unit_cell[0],unit_cell[1],unit_cell[2],
+                           unit_cell[3],unit_cell[4],unit_cell[5],
+                           lattice)
+            f.write(out)
+            out = "# wavelength = %s\n" %(self.param['wavelength'])
+            f.write(out)
+            out = "# wedge = %f\n" %self.param['wedge']
+            f.write(out)
+            out = "# ds h k l\n" 
             f.write(out)
 		
-        f.close()   
+            thkl = self.hkl[self.param['phase_list'].index(phase)].copy()
+            ds = n.zeros((thkl.shape[0],1))
+
+            for i in range(thkl.shape[0]):
+                ds[i] = 2*tools.sintl(unit_cell,thkl[i,0:3])
+        
+            #Add ds values to the thkl array    
+            thkl = n.concatenate((thkl,ds),1)
+        
+            # sort rows according to ds, descending
+            thkl = thkl[n.argsort(thkl,0)[:,4],:]
+
+            # Output format
+            format = "%f "*1 + "%d "*3 +"\n"
+
+            for i in range(thkl.shape[0]):
+                out = format %(thkl[i,4],
+                               thkl[i,0],
+                               thkl[i,1],
+                               thkl[i,2]
+                               )
+                f.write(out)
+
+            out = "# xr yr zr xc yc ds eta omega\n" 
+            f.write(out)
+            format = "%f "*8 + "%i"*1+"\n"
+
+
+            for i in range(nrefl):
+                (sc, fc) = detector.detyz2xy([A[i,A_id['dety']],A[i,A_id['detz']]],
+                                             self.param['o11'],
+                                             self.param['o12'],
+                                             self.param['o21'],
+                                             self.param['o22'],
+                                             self.param['dety_size'],
+                                             self.param['detz_size'])
+                out = format %(A[i,A_id['gv1']]/(2*n.pi),
+                               A[i,A_id['gv2']]/(2*n.pi),
+                               A[i,A_id['gv3']]/(2*n.pi),
+                               sc,#A[i,A_id['detz']],
+                               fc,#self.param['dety_size']-A[i,A_id['dety']],
+                               (2*n.sin(.5*A[i,A_id['tth']])/self.param['wavelength']),
+                               A[i,A_id['eta']]*180/n.pi,
+                               A[i,A_id['omega']]*180/n.pi,
+                               A[i,A_id['spot_id']]
+                               )
+                f.write(out)
+		
+            f.close()   
             
     
     def write_flt(self):

@@ -1,7 +1,7 @@
 import numpy as n
 from xfab import tools,structure,sg
 
-def gen_miller(param):
+def gen_miller(param,phase):
 	"""
 	Generate set of miller indices.
 	Henning Osholm Sorensen, Risoe DTU,
@@ -10,29 +10,30 @@ def gen_miller(param):
         sintlmin = n.sin(param['theta_min']*n.pi/180)/param['wavelength']
         sintlmax = n.sin(param['theta_max']*n.pi/180)/param['wavelength']
 
-	hkl  = tools.genhkl(param['unit_cell'],
-				 sg.sg(sgno=param['sgno']).syscond,
+	hkl  = tools.genhkl(param['unit_cell_phase_%i' %phase],
+				 sg.sg(sgno=param['sgno_phase_%i' %phase]).syscond,
 				 sintlmin,
 				 sintlmax)
 
 	return hkl
 		
-def open_structure(param):
-	file = param['structure_file']
-	if param['structure_file'][-3:] == 'cif':
-		if 'structure_datablock' in param:
-			datablock = param['structure_datablock']
+def open_structure(param,phase):
+	file = param['structure_phase_%i' %phase]
+	if file[-3:] == 'cif':
+		if ('structure_datablock_phase_%i' %phase) in param:
+			datablock = param['structure_datablock_phase_%i' %phase]
 		else:
 			datablock = None
 		struct = structure.build_atomlist()
 		struct.CIFread(ciffile=file,cifblkname=datablock)
-	elif param['structure_file'][-3:] == 'pdb':
+	elif file[-3:] == 'pdb':
 		struct = structure.build_atomlist()
 		struct.PDBread(pdbfile=file)
 	else:
 		raise IOError, 'Unknown structure file format'
-	param['sgno'] = sg.sg(sgname=struct.atomlist.sgname).no
-	param['unit_cell'] =  struct.atomlist.cell
+	param['sgno_phase_%i' %phase] = sg.sg(sgname=struct.atomlist.sgname).no
+	param['sgname_phase_%i' %phase] = struct.atomlist.sgname
+	param['unit_cell_phase_%i' %phase] =  struct.atomlist.cell
 	return struct
 
 def calc_intensity(hkl,struct):

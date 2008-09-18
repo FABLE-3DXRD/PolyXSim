@@ -1,0 +1,51 @@
+beamflux 1e+12
+beampol_angle 0.0
+beampol_direct 0
+beampol_factor 1
+bg 0
+dety_center 751.5
+dety_size 1536.0
+detz_center 521.5
+detz_size 1024.0
+direc 'twophase'
+distance 8.0
+gen_U 1
+gen_eps 1 0 0 0 0
+gen_pos 1 0
+gen_size 1 -0.05 0.01 0.2
+#gen_size_phase_1 1 -0.05 0.01 0.2 
+#gen_size_phase_2 1 -0.15 0.01 0.2 
+gen_phase 1    1 2    2 3
+make_image 1
+mosaicity 0.2
+no_grains 5
+no_phases 2 
+noise 0
+o11 -1
+o12 0
+o21 0
+o22 -1
+odf_scale 0.02
+odf_type 1
+omega_end 180.0
+omega_sign 1
+omega_start 0.0
+omega_step 0.5
+output '.flt' '.gve' '.ubi' '.par' '.edf'
+peakshape 1 2 0.0
+psf 0
+sample_vol 0.008
+sample_xyz 0.2 0.2 0.2
+start_frame 0
+stem 'Al_no_tilts'
+structure_phase_1 'Al.cif'
+structure_phase_2 'Al2.cif'
+theta_max 13.4273673182
+theta_min 0.0
+tilt_x 0.0
+tilt_y 0.0
+tilt_z 0.0
+wavelength 0.24796
+wedge 0.0
+y_size 0.0043
+z_size 0.0043

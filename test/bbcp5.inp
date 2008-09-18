@@ -49,7 +49,7 @@ sample_xyz 0.3 0.3 0.3  # sample size in mm
 ### Structural
 #unit_cell  4.04975 4.04975 4.04975 90 90 90
 #sgname 225
-structure_file 'monomer_in_Pbca.cif'
+structure_file 'bbcp5_mon.cif'
 
 
 
