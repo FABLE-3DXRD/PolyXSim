@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # Modules to import 
-import sys
+import sys,os
 from polyxsim import check_input
 from polyxsim import find_refl
 from polyxsim import generate_grains
@@ -20,14 +20,23 @@ parser.add_option("-i", "--input", action="store",
 parser.add_option("-d", "--debug", action="store_true",
                   dest="debug",default =False,
                   help="Run in debug mode")
+parser.add_option("-k","--killfile", action="store",
+                  dest="killfile", default=None, type="string",
+                  help="Name of file to create halt PolyXSim")
+
 options , args = parser.parse_args()
 
 if options.filename == None:
     parser.print_help()
     print "\nNo input file supplied [-i filename]\n"
     sys.exit()
-
 print '\n'
+if options.killfile is not None and os.path.exists(options.killfile):
+    print "The purpose of the killfile option is to create that file"
+    print "only when you want peaksearcher to stop"
+    print "If the file already exists when you start PolyXsim, it is"
+    print "stopped imidiately"
+    raise ValueError("Your killfile "+options.killfile+" already exists")
 
 
 # Is the input file available?
@@ -46,6 +55,7 @@ myinput.read()                                # read input file
 
 logging.info('Checking input\n')
 myinput.check()                               # check validity of input
+check_input.interrupt(options.killfile)
 
 
 if myinput.missing == True:                   # if problem exit
@@ -54,11 +64,15 @@ if myinput.missing == True:                   # if problem exit
 
 logging.info('Initialize parameters etc\n')
 myinput.initialize()                            # if ok initialize
+check_input.interrupt(options.killfile)
 
 generate_grains.generate_grains(myinput.param)
+check_input.interrupt(options.killfile)
 generate_grains.save_grains(myinput.param)
+check_input.interrupt(options.killfile)
 generate_grains.write_res(myinput.param)
 logging.info('Write res file')
+check_input.interrupt(options.killfile)
 
 # Generate reflections
 hkl = []
@@ -70,7 +84,7 @@ for phase in myinput.param['phase_list']:
         hkl_tmp = reflections.gen_miller(myinput.param,phase)
         if myinput.param['structure_factors'] != 0:
             logging.info('Structure factor calculation')
-            hkl.append(reflections.calc_intensity(hkl_tmp,xtal_structure))
+            hkl.append(reflections.calc_intensity(hkl_tmp,xtal_structure,options))
         else:
             hkl.append(reflections.add_intensity(hkl,myinput.param))
             logging.info('No structure factor calculation')
@@ -78,6 +92,10 @@ for phase in myinput.param['phase_list']:
         hkl_tmp = reflections.gen_miller(myinput.param,phase)
         hkl.append(reflections.add_intensity(hkl_tmp,myinput.param))
 
+    check_input.interrupt(options.killfile)
+#    if options.killfile is not None and os.path.exists(options.killfile):
+#        raise KeyboardInterrupt()
+ 
 #print myinput.param
 
 logging.info('Write res file')
@@ -88,11 +106,12 @@ if '.ubi' in myinput.param['output']:
 if '.par' in myinput.param['output']:
     logging.info('Write detector.par file')
     generate_grains.write_par(myinput.param)
+check_input.interrupt(options.killfile)
 
 
 
 # Determine the reflection parameters for grains
-graindata = find_refl.find_refl(myinput.param,hkl)
+graindata = find_refl.find_refl(myinput.param,hkl,options)
 graindata.frameinfo = myinput.frameinfo
 logging.info('Determine reflections positions')
 graindata.run()
@@ -107,12 +126,12 @@ if '.flt' in myinput.param['output']:
 
 if myinput.param['make_image'] == 1:
     if  myinput.param['peakshape'][0] == 2:
-	image = make_imagestack.make_image(graindata)
+	image = make_imagestack.make_image(graindata,options)
 	image.setup_odf()
 	image.make_image()
 	image.correct_image()
     else:
-	image = make_image.make_image(graindata)
+	image = make_image.make_image(graindata,options)
 	image.make_image()
 
 

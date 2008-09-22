@@ -15,6 +15,11 @@ import logging
 
 logging.basicConfig(level=logging.DEBUG,format='%(levelname)s %(message)s')
 
+def interrupt(killfile):
+    if killfile is not None and os.path.exists(killfile):
+        raise KeyboardInterrupt()
+
+
 class parse_input:
     def __init__(self,input_file = None):
         self.filename = input_file

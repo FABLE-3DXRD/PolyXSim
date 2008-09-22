@@ -4,7 +4,7 @@ from xfab import tools
 from xfab import detector
 from fabio import edfimage,tifimage
 
-import variables
+import variables,check_input
 import generate_grains
 import time 
 import sys
@@ -12,8 +12,9 @@ import sys
 A_id = variables.refarray().A_id
 
 class make_image:
-	def __init__(self,graindata):
+	def __init__(self,graindata,options):
             self.graindata = graindata
+	    self.killfile = options.killfile
 
         def setup_odf(self):
 		
@@ -165,6 +166,8 @@ class make_image:
 				    for j in range(self.odf.shape[1]):
 					    for k in range(self.odf.shape[2]):
                                               if self.odf[i,j,k] > self.odf_cut:
+                                                check_input.interrupt(self.killfile)
+
                                                 Gtmp = n.dot(self.Uodf[i,j,k],Gc)
 						Gw =   n.dot(SU,Gtmp)
 						Glen = n.sqrt(n.dot(Gw,Gw))

@@ -1,5 +1,6 @@
 import numpy as n
 from xfab import tools,structure,sg
+import check_input
 
 def gen_miller(param,phase):
 	"""
@@ -36,12 +37,13 @@ def open_structure(param,phase):
 	param['unit_cell_phase_%i' %phase] =  struct.atomlist.cell
 	return struct
 
-def calc_intensity(hkl,struct):
+def calc_intensity(hkl,struct,options):
 	"""
 	Calculate the reflection intensities
         """
 	int = n.zeros((len(hkl),1))
 	for i in range(len(hkl)):
+		check_input.interrupt(options.killfile)
 		(Fr, Fi) = structure.StructureFactor(hkl[i],
 						     struct.atomlist.cell,
 						     struct.atomlist.sgname,

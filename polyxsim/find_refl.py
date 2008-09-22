@@ -3,7 +3,7 @@ from xfab import tools
 from xfab import sg
 from xfab import detector
 from xfab.structure import int_intensity
-import variables
+import variables,check_input
 import sys
 from ImageD11 import blobcorrector
 import logging
@@ -13,7 +13,8 @@ A_id = variables.refarray().A_id
 
 
 class find_refl:
-    def __init__(self,param,hkl):
+    def __init__(self,param,hkl,options):
+        self.killfile = options.killfile
         self.param = param
         self.hkl = hkl
         self.grain = []
@@ -74,6 +75,7 @@ class find_refl:
             # For all reflections in Ahkl that fulfill omega_start < omega < omega_end.
             # All angles in Grain are in degrees
             for hkl in self.hkl[self.param['phase_list'].index(phase)]:
+                check_input.interrupt(self.killfile)
                 Gc = n.dot(B,hkl[0:3])
                 Gw =   n.dot(self.S,n.dot(U,Gc))
                 tth = tools.tth2(Gw,self.param['wavelength'])

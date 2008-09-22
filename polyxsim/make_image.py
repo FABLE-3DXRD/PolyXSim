@@ -2,7 +2,7 @@ import numpy as n
 import sys
 from xfab import tools,detector
 
-import variables
+import variables,check_input
 from fabio import edfimage,tifimage
 import time
 from scipy import ndimage
@@ -13,8 +13,9 @@ from PIL import Image
 A_id = variables.refarray().A_id
 
 class make_image:
-	def __init__(self,graindata):
+	def __init__(self,graindata,options):
 		self.graindata = graindata
+		self.killfile = options.killfile
 
 	def make_image(self):
 		"""
@@ -44,6 +45,7 @@ class make_image:
 			print 'Generating ', no_frames, 'frames'
 	
 			for i in range(no_frames):
+				check_input.interrupt(self.killfile)
 				t1 = time.clock()
 				nrefl = 0
 				frame = n.zeros((framedimy,framedimz))
