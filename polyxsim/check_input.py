@@ -153,7 +153,7 @@ class parse_input:
                     assert len(val) == 3, 'Wrong number of arguments for %s' %key
                 elif 'gen_size' in key:
                     assert len(val) == 4, 'Wrong number of arguments for %s' %key
-                elif key == 'gen_eps':
+                elif 'gen_eps' in key:
                     assert len(val) == 5, 'Wrong number of arguments for %s' %key
                 elif key == 'gen_phase':
                     assert len(val) > 0, 'Wrong number of arguments for %s' %key
@@ -164,8 +164,8 @@ class parse_input:
                     # reshape U-matrices
                     self.param[key] = n.array(self.param[key])
                     self.param[key].shape = (3,3)
-                else:
-                    assert type(val) != list, 'Wrong number of arguments for %s' %key
+#                else:
+#                    assert type(val) != list, 'Wrong number of arguments for %s' %key
 
 # Check no of phases
         no_phases = self.param['no_phases']
@@ -175,6 +175,7 @@ class parse_input:
         phase_list_sgno = []
         phase_list_sgname = []
         phase_list_gen_size = []
+        phase_list_gen_eps = []
         phase_list = []
 
         for item in self.param:
@@ -189,6 +190,8 @@ class parse_input:
                     phase_list_sgname.append(eval(split(item,'_phase_')[1]))
                 elif 'gen_size' in item:
                     phase_list_gen_size.append(eval(split(item,'_phase_')[1]))
+                elif 'gen_eps' in item:
+                    phase_list_gen_eps.append(eval(split(item,'_phase_')[1]))
                     
 
         phase_list_structure.sort()
@@ -196,6 +199,7 @@ class parse_input:
         phase_list_sgno.sort()
         phase_list_sgname.sort()
         phase_list_gen_size.sort()
+        phase_list_gen_eps.sort()
                        
         if len(phase_list_structure) != 0:
             assert len(phase_list_structure) == no_phases, \
@@ -237,6 +241,22 @@ class parse_input:
             else:
                 phase = 0 
                 self.param['gen_size_phase_%i' %phase] = copy(self.param['gen_size'])
+                
+        if len(phase_list_gen_eps) != 0:
+            assert len(phase_list_gen_eps) == no_phases, \
+                'Input number of structural phases does not agree with number\n' +\
+                'of gen_size_phase_ keywords given'
+            assert phase_list_gen_eps == phase_list, \
+                    'The phase numbers given to gen_size_phase does not match those\n' +\
+                    'in crystallographic part - structure_phase_X or unit_cell_phase_X.'
+            self.param['gen_eps'][0] = 1
+        else:
+            if len(phase_list) > 0:
+                for phase in phase_list:
+                    self.param['gen_eps_phase_%i' %phase] = copy(self.param['gen_eps'])
+            else:
+                phase = 0 
+                self.param['gen_eps_phase_%i' %phase] = copy(self.param['gen_eps'])
                 
         if self.param['gen_phase'][0] != 0:
             assert len(self.param['gen_phase'][1:]) == no_phases*2, 'Missing info for  -  gen_phase'

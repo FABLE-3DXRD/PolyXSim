@@ -170,11 +170,14 @@ def generate_grains(param):
 	param['gen_phase'][0] = 0  # Done
 
 # Generate eps if gen_eps on
-	if param['gen_eps'][0] != 0: 
-		eps = generate_eps(param['no_grains'],param['gen_eps'][1:5])
-		for i in range(param['no_grains']):
-			param['eps_grains_%s' %(param['grain_list'][i])] = eps[i]
-        param['gen_eps'][0] = 0
+	for phase in param['phase_list']:
+		if param['gen_eps_phase_%i' %phase][0] != 0: 
+			eps = generate_eps(param['no_grains_phase_%i' %phase],param['gen_eps_phase_%i' %phase][1:5])
+			for i in range(param['no_grains_phase_%i' %phase]):
+				param['eps_grains_%s' %(param['grain_list_phase_%i' %phase][i])] = eps[i]
+			param['gen_eps_phase_%i' %phase][0] = 0
+	if 'gen_eps' in param:
+		del param['gen_eps']
 
 
 # Generate size if gen_size on
@@ -187,7 +190,8 @@ def generate_grains(param):
 			for i in range(param['no_grains_phase_%i' %phase]):
 				param['size_grains_%s' %(param['grain_list_phase_%i' %phase][i])] = size[i]
 			param['gen_size_phase_%i' %phase][0] = 0
-	
+	if 'gen_size' in param:
+		del param['gen_size']
 	
 	
 def save_grains(param):
