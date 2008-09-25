@@ -120,6 +120,9 @@ graindata.save()
 if '.gve' in myinput.param['output']:
     logging.info('Write g-vector file')
     graindata.write_gve()
+if '.ini' in myinput.param['output']:
+    logging.info('Write GrainSpotter ini file')
+    graindata.write_gs_ini()
 if '.flt' in myinput.param['output']:
     logging.info('Write filtered peaks file')
     graindata.write_flt()

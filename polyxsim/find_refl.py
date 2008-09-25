@@ -386,6 +386,48 @@ class find_refl:
 		
             f.close()   
             
+
+    def write_gs_ini(self):
+        """
+        Write gvector (gve) file, for format see
+        http://fable.wiki.sourceforge.net/imaged11+-+file+formats
+        
+        Henning Osholm Sorensen, RisoeDTU, 2008.
+         """
+
+        for phase in self.param['phase_list']:
+            out = '! input file for GrainSpotter made by PolyXSim\n'
+
+            if self.param['no_phases'] > 1:
+                filename = '%s/%s_phase_%i.ini' %(self.param['direc'],self.param['stem'],phase)
+                out = out + 'filespecs %s/%s_phase_%i.gve %s/%s_phase_%i.log\n' %(self.param['direc'],
+                                                                                  self.param['stem'],
+                                                                                  phase,
+                                                                                  self.param['direc'],
+                                                                                  self.param['stem'],
+                                                                                  phase)
+            else:
+                filename = '%s/%s.ini' %(self.param['direc'],self.param['stem'])
+                out = out + 'filespecs %s/%s.gve %s/%s.log\n' %(self.param['direc'],
+                                                                self.param['stem'], 
+                                                                self.param['direc'],
+                                                                self.param['stem'])
+                                                                
+            out = out + 'spacegroup %i\n' %self.param['sgno_phase_%i' %phase]
+            out = out + 'etarange %f %f\n'%(0.0, 360.0)
+            out = out + 'domega %f\n' %self.param['omega_step']
+            out = out + 'omegarange %f %f\n'   %(self.param['omega_start'],self.param['omega_end'])
+            out = out + 'cuts %i %f\n' %(8,0.6)
+            out = out + 'eulerstep %f\n' %(5.0)
+            out = out + 'uncertainties %f %f %f\n' %(.05, 0.5, 1.0)
+            out = out + 'nsigmas %f\n' %(2.0)
+            out = out + 'Nhkls_in_indexing %i\n' %(8)
+            out = out + 'tthrange %f %f\n' %(2*self.param['theta_min'],2*self.param['theta_max'])
+            out = out + 'minfracg %f\n'%(1.0)
+
+            f = open(filename,'w')
+            f.write(out)
+
     
     def write_flt(self):
 #  Write filtered peaks (flt) file, for format see
