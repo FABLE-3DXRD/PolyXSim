@@ -3,7 +3,7 @@ from xfab import tools
 from xfab import sg
 from xfab import detector
 from xfab.structure import int_intensity
-import variables,check_input
+import variables,check_input,file_io
 import sys
 from ImageD11 import blobcorrector
 import logging
@@ -250,55 +250,11 @@ class find_refl:
         print co
 
     def save(self,grainno=None):
-        if grainno == None:
-            savegrains = range(len(self.grain))
-        else:
-            savegrains = grainno
-
-        for grainno in savegrains:
-            A = self.grain[grainno].refs
-            setno = 0
-            filename = '%s/%s_gr%0.4d_set%0.4d.ref' \
-                %(self.param['direc'],self.param['stem'],self.param['grain_list'][grainno],setno)
-            f = open(filename,'w')
-            format = "%d "*6 + "%f "*14 + "%d "*1 + "\n"
-#            print nrefl, ncol
-            out = "#"
-            A_col = dict([[v,k] for k,v in A_id.items()])
-            for col in A_col:
-                out = out + ' %s' %A_col[col]
-            out = out +"\n"
-
-            f.write(out)
-            # Only write reflections to file if some present
-            if len(A) > 0:
-                ( nrefl, ncol ) = A.shape
-                for i in range(nrefl):
-                    out = format %(A[i,A_id['grain_id']],
-                                   A[i,A_id['ref_id']],
-                                   A[i,A_id['spot_id']],   
-                                   A[i,A_id['h']],
-                                   A[i,A_id['k']],
-                                   A[i,A_id['l']],
-                                   A[i,A_id['tth']]*180/n.pi,
-                                   A[i,A_id['omega']]*180/n.pi,
-                                   A[i,A_id['eta']]*180/n.pi,
-                                   A[i,A_id['dety']],
-                                   A[i,A_id['detz']],
-                                   A[i,A_id['detyd']],
-                                   A[i,A_id['detzd']],
-                                   A[i,A_id['gv1']],
-                                   A[i,A_id['gv2']],
-                                   A[i,A_id['gv3']],
-                                   A[i,A_id['L']],
-                                   A[i,A_id['P']],
-                                   A[i,A_id['F2']],
-                                   A[i,A_id['Int']],
-                                   A[i,A_id['overlaps']]
-                           )
-                    f.write(out)
+        """
+        write PolyXSim ref file 
         
-            f.close()   
+        """
+        file_io.write_ref(self.param,self.grain,grainno)
             
     
     def write_gve(self):
@@ -309,196 +265,19 @@ class find_refl:
         Henning Osholm Sorensen, RisoeDTU, 2008.
         python translation: Jette Oddershede, Risoe DTU, March 31 2008
         """
-
-        A = self.grain[0].refs
-        for grainno in range(1,self.param['no_grains']):
-            A = n.concatenate((A,self.grain[grainno].refs))
-			
-        nrefl = A.shape[0]
-
-        for phase in self.param['phase_list']:
-            if self.param['no_phases'] > 1:
-                filename = '%s/%s_phase_%i.gve' %(self.param['direc'],self.param['stem'],phase)
-            else:
-                filename = '%s/%s.gve' %(self.param['direc'],self.param['stem'])
-            f = open(filename,'w')
-            lattice = self.param['sgname_phase_%i' %phase]
-            format = "%f "*6 + "%s "*1 +"\n"
-            unit_cell = self.param['unit_cell_phase_%i' %phase]
-            out = format %(unit_cell[0],unit_cell[1],unit_cell[2],
-                           unit_cell[3],unit_cell[4],unit_cell[5],
-                           lattice)
-            f.write(out)
-            out = "# wavelength = %s\n" %(self.param['wavelength'])
-            f.write(out)
-            out = "# wedge = %f\n" %self.param['wedge']
-            f.write(out)
-            out = "# ds h k l\n" 
-            f.write(out)
-		
-            thkl = self.hkl[self.param['phase_list'].index(phase)].copy()
-            ds = n.zeros((thkl.shape[0],1))
-
-            for i in range(thkl.shape[0]):
-                ds[i] = 2*tools.sintl(unit_cell,thkl[i,0:3])
-        
-            #Add ds values to the thkl array    
-            thkl = n.concatenate((thkl,ds),1)
-        
-            # sort rows according to ds, descending
-            thkl = thkl[n.argsort(thkl,0)[:,4],:]
-
-            # Output format
-            format = "%f "*1 + "%d "*3 +"\n"
-
-            for i in range(thkl.shape[0]):
-                out = format %(thkl[i,4],
-                               thkl[i,0],
-                               thkl[i,1],
-                               thkl[i,2]
-                               )
-                f.write(out)
-
-            out = "# xr yr zr xc yc ds eta omega\n" 
-            f.write(out)
-            format = "%f "*8 + "%i"*1+"\n"
+        file_io.write_gve(self.param,self.grain,self.hkl)
 
 
-            for i in range(nrefl):
-                (sc, fc) = detector.detyz2xy([A[i,A_id['dety']],A[i,A_id['detz']]],
-                                             self.param['o11'],
-                                             self.param['o12'],
-                                             self.param['o21'],
-                                             self.param['o22'],
-                                             self.param['dety_size'],
-                                             self.param['detz_size'])
-                out = format %(A[i,A_id['gv1']]/(2*n.pi),
-                               A[i,A_id['gv2']]/(2*n.pi),
-                               A[i,A_id['gv3']]/(2*n.pi),
-                               sc,#A[i,A_id['detz']],
-                               fc,#self.param['dety_size']-A[i,A_id['dety']],
-                               (2*n.sin(.5*A[i,A_id['tth']])/self.param['wavelength']),
-                               A[i,A_id['eta']]*180/n.pi,
-                               A[i,A_id['omega']]*180/n.pi,
-                               A[i,A_id['spot_id']]
-                               )
-                f.write(out)
-		
-            f.close()   
-            
-
-    def write_gs_ini(self):
+    def write_ini(self):
         """
-        Write gvector (gve) file, for format see
-        http://fable.wiki.sourceforge.net/imaged11+-+file+formats
-        
-        Henning Osholm Sorensen, RisoeDTU, 2008.
-         """
+        write input file for GrainSpotter
+        """
+        file_io.write_ini(self.param,self.hkl)
 
-        for phase in self.param['phase_list']:
-            out = '! input file for GrainSpotter made by PolyXSim\n'
-
-            if self.param['no_phases'] > 1:
-                filename = '%s/%s_phase_%i.ini' %(self.param['direc'],self.param['stem'],phase)
-                out = out + 'filespecs %s/%s_phase_%i.gve %s/%s_phase_%i.log\n' %(self.param['direc'],
-                                                                                  self.param['stem'],
-                                                                                  phase,
-                                                                                  self.param['direc'],
-                                                                                  self.param['stem'],
-                                                                                  phase)
-            else:
-                filename = '%s/%s.ini' %(self.param['direc'],self.param['stem'])
-                out = out + 'filespecs %s/%s.gve %s/%s.log\n' %(self.param['direc'],
-                                                                self.param['stem'], 
-                                                                self.param['direc'],
-                                                                self.param['stem'])
-                                                                
-            out = out + 'spacegroup %i\n' %self.param['sgno_phase_%i' %phase]
-            out = out + 'etarange %f %f\n'%(0.0, 360.0)
-            out = out + 'domega %f\n' %self.param['omega_step']
-            out = out + 'omegarange %f %f\n'   %(self.param['omega_start'],self.param['omega_end'])
-            out = out + 'cuts %i %f\n' %(8,0.6)
-            out = out + 'eulerstep %f\n' %(5.0)
-            out = out + 'uncertainties %f %f %f\n' %(.05, 0.5, 1.0)
-            out = out + 'nsigmas %f\n' %(2.0)
-            out = out + 'Nhkls_in_indexing %i\n' %(8)
-            out = out + 'tthrange %f %f\n' %(2*self.param['theta_min'],2*self.param['theta_max'])
-            out = out + 'minfracg %f\n'%(1.0)
-
-            f = open(filename,'w')
-            f.write(out)
-
-    
     def write_flt(self):
-#  Write filtered peaks (flt) file, for format see
-# http://fable.wiki.sourceforge.net/imaged11+-+file+formats
-# 
-# python translation: Jette Oddershede, Risoe DTU, June 4 2008
-#
-        filename = '%s/%s.flt' %(self.param['direc'],self.param['stem'])
-        f = open(filename,'w')
-        out = '#  sc  fc  omega  Number_of_pixels  avg_intensity  s_raw  f_raw  sigs  sigf  covsf  sigo  covso  covfo  sum_intensity  sum_intensity^2  IMax_int  IMax_s  IMax_f  IMax_o  Min_s  Max_s  Min_f  Max_f  Min_o  Max_o  dety  detz  onfirst  onlast  spot3d_id \n'
-        f.write(out)
-		
-        A = self.grain[0].refs
-        for grainno in range(1,self.param['no_grains']):
-            A = n.concatenate((A,self.grain[grainno].refs))
-        A = A[n.argsort(A,0)[:,A_id['omega']],:] # sort rows according to omega
-        format = "%f "*3 + "%i "*1 +"%f "*12 + "%i "*2   +"%f "*1 + "%i "*4 +"%f "*4 + "%i "*3 +"\n"
-
-        for i in range(A.shape[0]):
-            (sc, fc) = detector.detyz2xy([A[i,A_id['dety']],A[i,A_id['detz']]],
-                                         self.param['o11'],
-                                         self.param['o12'],
-                                         self.param['o21'],
-                                         self.param['o22'],
-                                         self.param['dety_size'],
-                                         self.param['detz_size'])
-            if self.param['spatial'] == None:
-                sr = sc
-                fr = fc
-            else:
-                (sr, fr) = detector.detyz2xy([A[i,A_id['detyd']],A[i,A_id['detzd']]],
-                                             self.param['o11'],
-                                             self.param['o12'],
-                                             self.param['o21'],
-                                             self.param['o22'],
-                                             self.param['dety_size'],
-                                             self.param['detz_size'])
-
-            out = format %(sc, # A[i,A_id['detz']],
-                           fc, #self.param['dety_size']-A[i,A_id['dety']],
-                           A[i,A_id['omega']]*180/n.pi,
-                           25,
-                           A[i,A_id['Int']]/25,
-                           sr, #A[i,A_id['detz']],
-                           fr, #self.param['dety_size']-A[i,A_id['dety']],
-                           1,
-                           1,
-                           0,
-                           1,
-                           0,
-                           0,
-                           A[i,A_id['Int']],
-                           A[i,A_id['Int']]**2,
-                           A[i,A_id['Int']]/10,
-                           sc, #int(A[i,A_id['detz']]),
-                           fc, #int(self.param['dety_size']-A[i,A_id['dety']]),
-                           A[i,A_id['omega']]*180/n.pi,
-                           sc-2, #int(A[i,A_id['detz']])-2,
-                           sc+2, #int(A[i,A_id['detz']])+2,
-                           fc-2, #int(self.param['dety_size']-A[i,A_id['dety']])-2,
-                           fc+2, #int(self.param['dety_size']-A[i,A_id['dety']])+2,
-                           A[i,A_id['omega']]*180/n.pi,
-                           0,
-                           A[i,A_id['dety']]-self.param['dety_size'],
-                           A[i,A_id['detz']],
-                           0,
-                           0,
-                           A[i,A_id['spot_id']]
-                          )
-            f.write(out)
-
-		
-        f.close()   
-            
+        """
+         Write filtered peaks (flt) file, for format see
+         http://fable.wiki.sourceforge.net/imaged11+-+file+formats
+                 
+        """
+        file_io.write_flt(self.param,self.grain)
