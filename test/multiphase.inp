@@ -7,7 +7,7 @@ dety_center 751.5
 dety_size 1536.0
 detz_center 521.5
 detz_size 1024.0
-direc 'twophase'
+direc 'multiphase'
 distance 8.0
 gen_U 1
 #gen_eps 1 0 0 0 0
@@ -41,7 +41,7 @@ psf 0
 sample_vol 0.008
 sample_xyz 0.2 0.2 0.2
 start_frame 0
-stem 'Al_no_tilts'
+stem 'multiphase'
 structure_phase_1 'Al.cif'
 structure_phase_2 'Al2.cif'
 structure_phase_3 'Al3.cif'
