@@ -4,7 +4,7 @@ import sys
 
 setup(
   name='PolyXSim',
-  version='0.0.1',
+  version='0.9.0',
   description='Image viewer for file series of diffraction images',
   license='GPL', maintainer='Henning Osholm Soerensen',
   maintainer_email='henning.sorensen@risoe.dk',
