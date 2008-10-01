@@ -3,6 +3,7 @@
 # Modules to import 
 import sys,os
 from polyxsim import check_input
+from polyxsim import file_io
 from polyxsim import find_refl
 from polyxsim import generate_grains
 from polyxsim import make_image
@@ -68,10 +69,11 @@ check_input.interrupt(options.killfile)
 
 generate_grains.generate_grains(myinput.param)
 check_input.interrupt(options.killfile)
-generate_grains.save_grains(myinput.param)
+logging.info('Write grains file')
+file_io.write_grains(myinput.param)
 check_input.interrupt(options.killfile)
-generate_grains.write_res(myinput.param)
 logging.info('Write res file')
+file_io.write_res(myinput.param)
 check_input.interrupt(options.killfile)
 
 # Generate reflections
@@ -96,16 +98,13 @@ for phase in myinput.param['phase_list']:
 #    if options.killfile is not None and os.path.exists(options.killfile):
 #        raise KeyboardInterrupt()
  
-#print myinput.param
-
-logging.info('Write res file')
 
 if '.ubi' in myinput.param['output']:
     logging.info('Write UBI file')
-    generate_grains.write_ubi(myinput.param)
+    file_io.write_ubi(myinput.param)
 if '.par' in myinput.param['output']:
     logging.info('Write detector.par file')
-    generate_grains.write_par(myinput.param)
+    file_io.write_par(myinput.param)
 check_input.interrupt(options.killfile)
 
 

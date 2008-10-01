@@ -274,6 +274,7 @@ class find_refl:
         """
         file_io.write_ini(self.param,self.hkl)
 
+        
     def write_flt(self):
         """
          Write filtered peaks (flt) file, for format see
