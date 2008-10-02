@@ -154,7 +154,10 @@ class parse_input:
                 elif 'gen_size' in key:
                     assert len(val) == 4, 'Wrong number of arguments for %s' %key
                 elif 'gen_eps' in key:
-                    assert len(val) == 5, 'Wrong number of arguments for %s' %key
+                    if type(val) == type(1):
+                        assert val == 0, 'Wrong number of arguments for %s' %key
+                    else:
+                        assert len(val) == 5, 'Wrong number of arguments for %s' %key
                 elif key == 'gen_phase':
                     assert len(val) > 0, 'Wrong number of arguments for %s' %key
                 elif key == 'unit_cell' or 'eps_grains' in key:
@@ -464,7 +467,7 @@ class parse_input:
                     'Missing input: structure_file or unit_cell' 
                 
                 # rename keyword
-                self.param['unit_cell_phase_0'] == self.param['unit_cell']
+                self.param['unit_cell_phase_0'] = self.param['unit_cell']
                 # and delete old one
                 del self.param['unit_cell']
                 assert self.param['sgno'] != None or self.param['sgname'] != None , \
