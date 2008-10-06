@@ -164,8 +164,6 @@ def write_gve(param,grain,hkl):
     dout = dout + "# tilt_x %f\n" %param['tilt_x']
     dout = dout + "# tilt_y %f\n" %param['tilt_y']
     dout = dout + "# tilt_z %f\n" %param['tilt_z']
-    dout = dout + "# wavelength %f\n" %param['wavelength']
-    dout = dout + "# wedge 0.0\n"
     dout = dout + "# y_center %f\n" %y_center
     dout = dout + "# y_size %f\n" %(param['y_size']*1000.)
     dout = dout + "# z_center %f\n" %z_center
@@ -185,6 +183,7 @@ def write_gve(param,grain,hkl):
                        lattice)
         out = out + "# wavelength = %s\n" %(param['wavelength'])
         out = out + "# wedge = %f\n" %param['wedge']
+        out = out + "# axis = 0.000 0.0000 0.0000\n" 
 	    # insert detector.par as comment
         out = out + "# cell__a %s\n" %unit_cell[0]
         out = out + "# cell__b %s\n" %unit_cell[1]
