@@ -37,7 +37,7 @@ def open_structure(param,phase):
 	param['unit_cell_phase_%i' %phase] =  struct.atomlist.cell
 	return struct
 
-def calc_intensity(hkl,struct,options):
+def calc_intensity(hkl,struct,options=None):
 	"""
 	Calculate the reflection intensities
         """
