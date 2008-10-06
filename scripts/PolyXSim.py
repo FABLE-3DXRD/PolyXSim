@@ -86,7 +86,7 @@ for phase in myinput.param['phase_list']:
         hkl_tmp = reflections.gen_miller(myinput.param,phase)
         if myinput.param['structure_factors'] != 0:
             logging.info('Structure factor calculation')
-            hkl.append(reflections.calc_intensity(hkl_tmp,xtal_structure,options))
+            hkl.append(reflections.calc_intensity(hkl_tmp,xtal_structure,options.killfile))
         else:
             hkl.append(reflections.add_intensity(hkl,myinput.param))
             logging.info('No structure factor calculation')

@@ -37,13 +37,13 @@ def open_structure(param,phase):
 	param['unit_cell_phase_%i' %phase] =  struct.atomlist.cell
 	return struct
 
-def calc_intensity(hkl,struct,options=None):
+def calc_intensity(hkl,struct,killfile=None):
 	"""
 	Calculate the reflection intensities
         """
 	int = n.zeros((len(hkl),1))
 	for i in range(len(hkl)):
-		check_input.interrupt(options.killfile)
+		check_input.interrupt(killfile)
 		(Fr, Fi) = structure.StructureFactor(hkl[i],
 						     struct.atomlist.cell,
 						     struct.atomlist.sgname,
