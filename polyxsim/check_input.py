@@ -387,6 +387,41 @@ class parse_input:
             'Information on grain size generation missing'
 			
 
+#If no structure file is given - unit_cell should be               
+        if len(phase_list) == 0:
+            # This is a monophase simulation probably using the "old" keywords
+            if self.param['structure_file'] == None:
+                print 'NO structure file'
+                assert self.param['unit_cell'] != None, \
+                    'Missing input: structure_file or unit_cell' 
+                
+                # rename keyword
+                self.param['unit_cell_phase_0'] = self.param['unit_cell']
+                # and delete old one
+                del self.param['unit_cell']
+                assert self.param['sgno'] != None or self.param['sgname'] != None , \
+                    'Missing input: no space group information, please input either sgno or sgname' 
+                from xfab import sg
+                if self.param['sgno'] == None:
+                    self.param['sgno_phase_0'] = sg.sg(sgname = self.param['sgname']).no
+                    # rename keyword
+                    self.param['sgname_phase_0'] = self.param['sgname']
+                    # and delete old one
+                    del self.param['sgname']
+                else:
+                    self.param['sgname_phase_0'] = sg.sg(sgno = self.param['sgno']).name
+                    # rename keyword
+                    self.param['sgno_phase_0'] = self.param['sgno']
+                    # and delete old one
+                    del self.param['sgno']
+            else:
+                # rename keyword
+                self.param['structure_phase_0'] = self.param['structure_file']
+                # and delete old one
+                del self.param['structure_file']
+            phase_list = [0]
+        self.param['phase_list'] = phase_list
+
 
 
 
@@ -457,41 +492,6 @@ class parse_input:
         if self.param['peakshape'][0] == 2:
             if self.param['odf_type'] == 2:
                 assert self.param['odf_file'] != None, 'No filename given for ODF'
-
-#If no structure file is given - unit_cell should be               
-        if len(phase_list) == 0:
-            # This is a monophase simulation probably using the "old" keywords
-            if self.param['structure_file'] == None:
-                print 'NO structure file'
-                assert self.param['unit_cell'] != None, \
-                    'Missing input: structure_file or unit_cell' 
-                
-                # rename keyword
-                self.param['unit_cell_phase_0'] = self.param['unit_cell']
-                # and delete old one
-                del self.param['unit_cell']
-                assert self.param['sgno'] != None or self.param['sgname'] != None , \
-                    'Missing input: no space group information, please input either sgno or sgname' 
-                from xfab import sg
-                if self.param['sgno'] == None:
-                    self.param['sgno_phase_0'] = sg.sg(sgname = self.param['sgname']).no
-                    # rename keyword
-                    self.param['sgname_phase_0'] = self.param['sgname']
-                    # and delete old one
-                    del self.param['sgname']
-                else:
-                    self.param['sgname_phase_0'] = sg.sg(sgno = self.param['sgno']).name
-                    # rename keyword
-                    self.param['sgno_phase_0'] = self.param['sgno']
-                    # and delete old one
-                    del self.param['sgno']
-            else:
-                # rename keyword
-                self.param['structure_phase_0'] = self.param['structure_file']
-                # and delete old one
-                del self.param['structure_file']
-            phase_list = [0]
-        self.param['phase_list'] = phase_list
 
 
 
