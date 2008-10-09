@@ -222,7 +222,7 @@ def write_gve(param,grain,hkl):
             
         R_tilt = tools.detect_tilt(param['tilt_x'],param['tilt_y'],param['tilt_z'])
 
-        out = "# xr yr zr xc yc ds eta omega xl yl zl\n" 
+        out = "# xr yr zr xc yc ds eta omega spot3d_id xl yl zl\n" 
         f.write(out)
         format = "%f "*8 + "%i "*1+ "%f "*3+"\n"
 
