@@ -360,7 +360,7 @@ def write_par(param):
     dout = dout + "tilt_y %f\n" %param['tilt_y']
     dout = dout + "tilt_z %f\n" %param['tilt_z']
     dout = dout + "wavelength %f\n" %param['wavelength']
-    dout = dout + "wedge 0.0\n"
+    dout = dout + "wedge %f\n" %param['wedge']
     dout = dout + "y_center %f\n" %y_center
     dout = dout + "y_size %f\n" %(param['y_size']*1000.)
     dout = dout + "z_center %f\n" %z_center
