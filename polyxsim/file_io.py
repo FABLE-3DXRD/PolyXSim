@@ -57,7 +57,7 @@ def write_flt(param,grain):
                        0,
                        0,
                        A[i,A_id['Int']],
-                       A[i,A_id['Int']]**2,
+                       (A[i,A_id['Int']]/25)**2, #best estimate of sum_i I_i^2
                        A[i,A_id['Int']]/10,
                        sc,
                        fc,

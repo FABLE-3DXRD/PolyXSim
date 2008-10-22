@@ -3,7 +3,7 @@ import numpy as n
 from xfab import tools
 from xfab import detector
 from fabio import edfimage,tifimage
-
+from scipy import ndimage
 import variables,check_input
 import generate_grains
 import time 
@@ -12,11 +12,11 @@ import sys
 A_id = variables.refarray().A_id
 
 class make_image:
-	def __init__(self,graindata,options):
-            self.graindata = graindata
-	    self.killfile = options.killfile
+    def __init__(self,graindata,options):
+        self.graindata = graindata
+        self.killfile = options.killfile
 
-        def setup_odf(self):
+    def setup_odf(self):
 		
             odf_scale = self.graindata.param['odf_scale'] 
             if self.graindata.param['odf_type'] == 1:
@@ -29,12 +29,11 @@ class make_image:
                 r3_range = r1_max*2 + 1
                 mapsize = r1_range*n.ones(3)
                 odf_center = r1_max*n.ones(3)
-
-		print 'size of ODF map', mapsize
+                print 'size of ODF map', mapsize
                 self.odf = generate_grains.gen_odf(sigma,odf_center,mapsize)
-		#from pylab import *
-		#imshow(self.odf[:,:,odf_center[2]])
-		#show()
+                #from pylab import *
+                #imshow(self.odf[:,:,odf_center[2]])
+                #show()
             elif self.graindata.param['odf_type'] == 3:
                 odf_spread = self.graindata.param['mosaicity']/4
                 odf_spread_grid = odf_spread/odf_scale
@@ -44,69 +43,67 @@ class make_image:
                 r1_range = r1_max*2 + 1
                 r2_range = r2_max*2 + 1
                 r3_range = r3_max*2 + 1
-		print 'size of ODF map', r1_range*n.ones(3)
+                print 'size of ODF map', r1_range*n.ones(3)
                 odf_center = r1_max*n.ones(3)
-		self.odf= n.zeros((r1_range,r2_range,r3_range))
-		# Makes spheric ODF for debug purpuses
+                self.odf= n.zeros((r1_range,r2_range,r3_range))
+                # Makes spheric ODF for debug purpuses
                 for i in range(self.odf.shape[0]):
                     for j in range(self.odf.shape[1]):
                         for k in range(self.odf.shape[2]):
                             r = [i-(r1_max), j-(r2_max), k-(r3_max)]
                             if n.linalg.norm(r) > r1_max:
                                  self.odf[i,j,k] = 0
-			    else:
+                            else:
                                  self.odf[i,j,k] = 1
-		#from pylab import *
-		#imshow(self.odf[:,:,r3_max],interpolation=None)
-		#show()
+                #from pylab import *
+                #imshow(self.odf[:,:,r3_max],interpolation=None)
+                #show()
             elif self.graindata.param['odf_type'] == 2:
                 file = self.graindata.param['odf_file']
                 print 'Read ODF from file_ %s' %file
-		file = open(file,'r')
-		(r1_range, r2_range, r3_range) = file.readline()[9:].split()
-		r1_range = int(r1_range)
-		r2_range = int(r2_range)
-		r3_range = int(r3_range)
-		odf_scale = float(file.readline()[10:])
-		oneD_odf = n.fromstring(file.readline(),sep=' ')
-		elements = r1_range*r2_range*r3_range
-		self.odf = oneD_odf[:elements].reshape(r1_range,r2_range,r3_range)
-		if self.graindata.param['odf_sub_sample'] > 1:
-			sub =self.graindata.param['odf_sub_sample']
-			print 'subscale =',sub
-			r1_range_sub = r1_range * self.graindata.param['odf_sub_sample']
-			r2_range_sub = r2_range * self.graindata.param['odf_sub_sample']
-			r3_range_sub = r3_range * self.graindata.param['odf_sub_sample']
-			odf_fine = n.zeros((r1_range_sub,r2_range_sub,r3_range_sub))
-			for i in range(r1_range):
-				for j in range(r2_range):
-					for k in range(r3_range):
-						odf_fine[i*sub:(i+1)*sub,
-							 j*sub:(j+1)*sub,
-							 k*sub:(k+1)*sub] = self.odf[i,j,k]
-			self.odf = odf_fine.copy()/(sub*sub*sub)
-			r1_range = r1_range_sub 
-			r2_range = r2_range_sub 
-			r3_range = r3_range_sub
-			odf_scale = odf_scale/sub
-			print 'odf_scale', odf_scale
+                file = open(file,'r')
+                (r1_range, r2_range, r3_range) = file.readline()[9:].split()
+                r1_range = int(r1_range)
+                r2_range = int(r2_range)
+                r3_range = int(r3_range)
+                odf_scale = float(file.readline()[10:])
+                oneD_odf = n.fromstring(file.readline(),sep=' ')
+                elements = r1_range*r2_range*r3_range
+                self.odf = oneD_odf[:elements].reshape(r1_range,r2_range,r3_range)
+                if self.graindata.param['odf_sub_sample'] > 1:
+                    sub =self.graindata.param['odf_sub_sample']
+                    print 'subscale =',sub
+                    r1_range_sub = r1_range * self.graindata.param['odf_sub_sample']
+                    r2_range_sub = r2_range * self.graindata.param['odf_sub_sample']
+                    r3_range_sub = r3_range * self.graindata.param['odf_sub_sample']
+                    odf_fine = n.zeros((r1_range_sub,r2_range_sub,r3_range_sub))
+                    for i in range(r1_range):
+                        for j in range(r2_range):
+                            for k in range(r3_range):
+                                odf_fine[i*sub:(i+1)*sub,
+                                         j*sub:(j+1)*sub,
+                                         k*sub:(k+1)*sub] = self.odf[i,j,k]
+                    self.odf = odf_fine.copy()/(sub*sub*sub)
+                    r1_range = r1_range_sub 
+                    r2_range = r2_range_sub 
+                    r3_range = r3_range_sub
+                    odf_scale = odf_scale/sub
+                    print 'odf_scale', odf_scale
 
                 #[r1_range, r2_range, r3_range] = self.odf.shape
                 odf_center = [(r1_range)/2, r2_range/2, r3_range/2]
-		
-		print odf_center
-		#self.odf[:,:,:] = 0.05
-		print self.odf.shape
-
-		#from pylab import *
-		#imshow(self.odf[:,:,odf_center[2]])
-		#show()
+                print odf_center
+                #self.odf[:,:,:] = 0.05
+                print self.odf.shape
+                #from pylab import *
+                #imshow(self.odf[:,:,odf_center[2]])
+                #show()
             self.Uodf = n.zeros(r1_range*r2_range*r3_range*9).\
-		reshape(r1_range,r2_range,r3_range,3,3)
-	    if self.graindata.param['odf_cut'] != None:
-		    self.odf_cut = self.odf.max()*self.graindata.param['odf_cut']
-	    else:
-		    self.odf_cut = 0.0
+                reshape(r1_range,r2_range,r3_range,3,3)
+            if self.graindata.param['odf_cut'] != None:
+                self.odf_cut = self.odf.max()*self.graindata.param['odf_cut']
+            else:
+                self.odf_cut = 0.0
             for i in range(self.odf.shape[0]):
                 for j in range(self.odf.shape[1]):
                     for k in range(self.odf.shape[2]):
@@ -114,131 +111,135 @@ class make_image:
                             n.array([i-odf_center[0],
                                      j-odf_center[1],
                                      k-odf_center[2]])
-
                         self.Uodf[i,j,k,:,:] = tools.rod2U(r)
 	    
-	    if self.graindata.param['odf_type'] !=  2:
-		    file = open(self.graindata.param['stem']+'.odf','w')
-		    file.write('ODF size: %i %i %i\n' %(r1_range,r2_range,r3_range))
-		    file.write('ODF scale: %f\n' %(odf_scale))
-		    for i in range(int(r1_range)):
-			    self.odf[i,:,:].tofile(file,sep=' ',format='%f')
-			    file.write(' ')
-		    file.close()
+            if self.graindata.param['odf_type'] !=  2:
+                file = open(self.graindata.param['stem']+'.odf','w')
+                file.write('ODF size: %i %i %i\n' %(r1_range,r2_range,r3_range))
+                file.write('ODF scale: %f\n' %(odf_scale))
+                for i in range(int(r1_range)):
+                    self.odf[i,:,:].tofile(file,sep=' ',format='%f')
+                    file.write(' ')
+                file.close()
 	    
-	    return self.Uodf
+            return self.Uodf
 
 
 
 
-	def make_image(self):
-            from scipy import sparse
-	    from scipy import ndimage
+    def make_image(self):
+        from scipy import sparse
+        from scipy import ndimage
 
+        # wedge NB! wedge is in degrees
+        wy = self.graindata.param['wedge']*n.pi/180.
+        self.Phi_y = n.array([[ n.cos(wy), 0, n.sin(wy)],
+                              [0         , 1, 0        ],
+                              [-n.sin(wy), 0, n.cos(wy)]])
 	    #make stack of empty images as a dictionary of sparse matrices
-	    print 'Build sparse image stack'
-            stacksize = len(self.graindata.frameinfo)
-	    self.frames = {}
-	    for i in range(stacksize):
-		    self.frames[i]=sparse.lil_matrix((int(self.graindata.param['dety_size']),
-						      int(self.graindata.param['detz_size'])))
+        print 'Build sparse image stack'
+        stacksize = len(self.graindata.frameinfo)
+        self.frames = {}
+        for i in range(stacksize):
+            self.frames[i]=sparse.lil_matrix((int(self.graindata.param['dety_size']),
+                                              int(self.graindata.param['detz_size'])))
 
-            # loop over grains
-	    for grainno in range(self.graindata.param['no_grains']):
-		    gr_pos = n.array(self.graindata.param['pos_grains_%s' \
-				     %(self.graindata.param['grain_list'][grainno])])
-		    B = self.graindata.grain[grainno].B
-		    SU = n.dot(self.graindata.S,self.graindata.grain[grainno].U)
+        # loop over grains
+        for grainno in range(self.graindata.param['no_grains']):
+            gr_pos = n.array(self.graindata.param['pos_grains_%s' \
+                    %(self.graindata.param['grain_list'][grainno])])
+            B = self.graindata.grain[grainno].B
+            SU = n.dot(self.graindata.S,self.graindata.grain[grainno].U)
 		    # loop over reflections for each grain
-		    for nref in range(len(self.graindata.grain[grainno].refs)):
+            for nref in range(len(self.graindata.grain[grainno].refs)):
 			    # exploit that the reflection list is sorted according to omega
-			    print 'Doing reflection: %i' %nref
-			    if self.graindata.param['odf_type'] == 3:
-				    intensity = 1
-			    else:
-				    intensity = self.graindata.grain[grainno].refs[nref,A_id['Int']]
+                print 'Doing reflection: %i' %nref
+                if self.graindata.param['odf_type'] == 3:
+                    intensity = 1
+                else:
+                    intensity = self.graindata.grain[grainno].refs[nref,A_id['Int']]
         
-			    hkl = n.array([self.graindata.grain[grainno].refs[nref,A_id['h']],
+                hkl = n.array([self.graindata.grain[grainno].refs[nref,A_id['h']],
 					   self.graindata.grain[grainno].refs[nref,A_id['k']],
 					   self.graindata.grain[grainno].refs[nref,A_id['l']]])
-			    Gc  = n.dot(B,hkl)
-			    for i in range(self.odf.shape[0]):
-				    for j in range(self.odf.shape[1]):
-					    for k in range(self.odf.shape[2]):
-                                              if self.odf[i,j,k] > self.odf_cut:
-                                                check_input.interrupt(self.killfile)
-
-                                                Gtmp = n.dot(self.Uodf[i,j,k],Gc)
-						Gw =   n.dot(SU,Gtmp)
-						Glen = n.sqrt(n.dot(Gw,Gw))
-						tth = 2*n.arcsin(Glen/(2*abs(self.graindata.K)))
-						costth = n.cos(tth)
-						(Omega, eta) = tools.find_omega_wedge(Gw,
-										      tth,
-										      self.graindata.param['wedge'])
-						try:
-							minpos = n.argmin(n.abs(Omega*(180.0/n.pi)-self.graindata.grain[grainno].refs[nref,A_id['omega']]))
-						except:
-							print Omega
-						if len(Omega) == 0:
-							continue
-						omega = Omega[minpos]
-						# if omega not in rotation range continue to next step
-						if (self.graindata.param['omega_start']*n.pi/180) > omega or\
-						       omega > (self.graindata.param['omega_end']*n.pi/180):
-							continue
-						Om = tools.OMEGA(omega)
-						Gt = n.dot(Om,Gw)
+                Gc  = n.dot(B,hkl)
+                for i in range(self.odf.shape[0]):
+                    for j in range(self.odf.shape[1]):
+                        for k in range(self.odf.shape[2]):
+                            check_input.interrupt(self.killfile)
+                            if self.odf[i,j,k] > self.odf_cut:
+                                Gtmp = n.dot(self.Uodf[i,j,k],Gc)
+                                Gw =  n.dot(SU,Gtmp)
+                                Gw = n.dot(n.transpose(self.Phi_y),Gw) #new line added by Jette after wedge consistency check
+                                Glen = n.sqrt(n.dot(Gw,Gw))
+                                tth = 2*n.arcsin(Glen/(2*abs(self.graindata.K)))
+                                costth = n.cos(tth)
+                                (Omega, eta) = tools.find_omega_wedge(Gw,tth,-wy)
+                                try:
+                                    minpos = n.argmin(n.abs(Omega*(180.0/n.pi)-self.graindata.grain[grainno].refs[nref,A_id['omega']]))
+                                except:
+                                    print Omega
+                                if len(Omega) == 0:
+                                    continue
+                                omega = Omega[minpos]
+                                # if omega not in rotation range continue to next step
+                                if (self.graindata.param['omega_start']*n.pi/180) > omega or\
+                                    omega > (self.graindata.param['omega_end']*n.pi/180):
+                                    continue
+                                #Om = tools.OMEGA(omega)
+                                Om = n.dot(self.Phi_y,tools.OMEGA(omega)) #new line added by Jette after wedge consistency check
+                                Gt = n.dot(Om,Gw)
 						
-	                                        # Calc crystal position at present omega
-						[tx,ty]= n.dot(Om[:2,:2],gr_pos[:2])
-						tz = gr_pos[2]
+                                # Calc crystal position at present omega
+                                #[tx,ty]= n.dot(Om[:2,:2],gr_pos[:2])
+                                #tz = gr_pos[2]
+                                [tx,ty,tz]= n.dot(self.Phi_y,n.dot(Om,n.dot(n.transpose(self.Phi_y),gr_pos))) #new line added by Jette after wedge consistency check
 
-						(dety, detz) = detector.det_coor(Gt, 
-										 costth,
-										 self.graindata.param['wavelength'],
-										 self.graindata.param['distance'],
-										 self.graindata.param['y_size'],
-										 self.graindata.param['z_size'],
-										 self.graindata.param['dety_center'],
-										 self.graindata.param['detz_center'],
-										 self.graindata.R,
-										 tx,ty,tz)
+                                (dety, detz) = detector.det_coor(Gt, 
+                                                                 costth,
+                                                                 self.graindata.param['wavelength'],
+                                                                 self.graindata.param['distance'],
+                                                                 self.graindata.param['y_size'],
+                                                                 self.graindata.param['z_size'],
+                                                                 self.graindata.param['dety_center'],
+                                                                 self.graindata.param['detz_center'],
+                                                                 self.graindata.R,
+                                                                 tx,ty,tz)
 
 
-						if self.graindata.param['spatial'] != None :
-							# To match the coordinate system of the spline file
-							# SPLINE(i,j): i = detz; j = (dety_size-1)-dety
-							# Well at least if the spline file is for frelon2k
-							(x,y) = detector.detyz2xy([dety,detz],
-										  self.graindata.param['o11'],
-										  self.graindata.param['o12'],
-										  self.graindata.param['o21'],
-										  self.graindata.param['o22'],
-										  self.graindata.param['dety_size'],
-										  self.graindata.param['detz_size'])
-							# Do the spatial distortion
-							(xd,yd) = self.spatial.distort(x,y)
+                                if self.graindata.param['spatial'] != None :
+                                    # To match the coordinate system of the spline file
+                                    # SPLINE(i,j): i = detz; j = (dety_size-1)-dety
+                                    # Well at least if the spline file is for frelon2k
+                                    (x,y) = detector.detyz2xy([dety,detz],
+                                                              self.graindata.param['o11'],
+                                                              self.graindata.param['o12'],
+                                                              self.graindata.param['o21'],
+                                                              self.graindata.param['o22'],
+                                                              self.graindata.param['dety_size'],
+                                                              self.graindata.param['detz_size'])
+                                    # Do the spatial distortion
+                                    (xd,yd) = self.spatial.distort(x,y)
 
-							# transform coordinates back to dety,detz
-							(dety,detz) = detector.xy2detyz([xd,yd],
-											  self.graindata.param['o11'],
-											  self.graindata.param['o12'],
-											  self.graindata.param['o21'],
-											  self.graindata.param['o22'],
-											  self.graindata.param['dety_size'],
-											  self.graindata.param['detz_size'])
+                                    # transform coordinates back to dety,detz
+                                    (dety,detz) = detector.xy2detyz([xd,yd],
+                                                                    self.graindata.param['o11'],
+                                                                    self.graindata.param['o12'],
+                                                                    self.graindata.param['o21'],
+                                                                    self.graindata.param['o22'],
+                                                                    self.graindata.param['dety_size'],
+                                                                    self.graindata.param['detz_size'])
 								   
-						if dety > -0.5 and dety <= self.graindata.param['dety_size']-0.5 and\
-							    detz > -0.5 and detz <= self.graindata.param['detz_size']-0.5:
-						      dety = int(round(dety))
-   						      detz = int(round(detz))
-						      frame_no = n.floor((omega*180/n.pi-self.graindata.param['omega_start'])/\
-									 self.graindata.param['omega_step'])
-						      self.frames[frame_no][dety,detz] =  self.frames[frame_no][dety,detz]+ intensity*self.odf[i,j,k]
+                                if dety > -0.5 and dety <= self.graindata.param['dety_size']-0.5 and\
+                                    detz > -0.5 and detz <= self.graindata.param['detz_size']-0.5:
+                                    dety = int(round(dety))
+                                    detz = int(round(detz))
+                                    frame_no = int(n.floor((omega*180/n.pi-self.graindata.param['omega_start'])/\
+                                                self.graindata.param['omega_step']))
+                                    self.frames[frame_no][dety,detz] =  self.frames[frame_no][dety,detz]+ intensity*self.odf[i,j,k]
 
-	def correct_image(self):
-              for frame_no in self.frames:
+    def correct_image(self):
+        for frame_no in self.frames:
 		      t1 = time.clock()
 
 		      frame = self.frames[frame_no].toarray()
@@ -270,7 +271,7 @@ class make_image:
 		      print '\rDone frame %i took %8f s' %(frame_no+1,time.clock()-t1),
 		      sys.stdout.flush()
 				
-	def write_edf(self,framenumber,frame):
+    def write_edf(self,framenumber,frame):
 		e=edfimage.edfimage()
 		e.data=frame
 		e.dim2,e.dim1=frame.shape
@@ -290,7 +291,7 @@ class make_image:
 			%(self.graindata.param['direc'],self.graindata.param['stem'],self.graindata.param['no_grains'])
 		e.write('%s%s' %(self.graindata.frameinfo[framenumber].name,'.edf'))
 				
-	def write_tif(self,framenumber,frame):
+    def write_tif(self,framenumber,frame):
 		e=tifimage.tifimage()
 		e.data=frame
 		e.write('%s%s' %(self.graindata.frameinfo[framenumber].name,'.tif'))

@@ -28,10 +28,11 @@ class find_refl:
                                    self.param['tilt_y'],
                                    self.param['tilt_z'])
 
-        # wedge
-        self.Phi_y = n.array([[ n.cos(self.param['wedge']), 0, n.sin(self.param['wedge'])],
-                              [0                          , 1, 0                         ],
-                              [-n.sin(self.param['wedge']), 0, n.cos(self.param['wedge'])]])
+        # wedge NB! wedge is in degrees
+        self.wy = self.param['wedge']*n.pi/180.
+        self.Phi_y = n.array([[ n.cos(self.wy), 0, n.sin(self.wy)],
+                              [0         , 1, 0        ],
+                              [-n.sin(self.wy), 0, n.cos(self.wy)]])
                                    
         # Spatial distortion
         if self.param['spatial'] != None:
@@ -86,9 +87,7 @@ class find_refl:
                 Gw = n.dot(n.transpose(self.Phi_y),Gw) #new line added by Jette after wedge consistency check
                 tth = tools.tth2(Gw,self.param['wavelength'])
                 costth = n.cos(tth)
-                (Omega, Eta) = tools.find_omega_wedge(Gw,
-                                                      tth,
-                                                      -self.param['wedge'])
+                (Omega, Eta) = tools.find_omega_wedge(Gw,tth,-self.wy)
                 if len(Omega) > 0:
                     for solution in range(len(Omega)):
                         omega = Omega[solution]
