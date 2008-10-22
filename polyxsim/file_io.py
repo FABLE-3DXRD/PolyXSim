@@ -183,7 +183,7 @@ def write_gve(param,grain,hkl):
                        lattice)
         out = out + "# wavelength = %s\n" %(param['wavelength'])
         out = out + "# wedge = %f\n" %param['wedge']
-        out = out + "# axis = 0.000 0.0000 0.0000\n" 
+        out = out + "# axis = 0.000 0.0000 1.0000\n" 
 	    # insert detector.par as comment
         out = out + "# cell__a %s\n" %unit_cell[0]
         out = out + "# cell__b %s\n" %unit_cell[1]
