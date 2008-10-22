@@ -28,6 +28,11 @@ class find_refl:
                                    self.param['tilt_y'],
                                    self.param['tilt_z'])
 
+        # wedge
+        self.Phi_y = n.array([[ n.cos(self.param['wedge']), 0, n.sin(self.param['wedge'])],
+                              [0                          , 1, 0                         ],
+                              [-n.sin(self.param['wedge']), 0, n.cos(self.param['wedge'])]])
+                                   
         # Spatial distortion
         if self.param['spatial'] != None:
             self.spatial = blobcorrector.correctorclass(self.param['spatial'])
@@ -77,12 +82,13 @@ class find_refl:
             for hkl in self.hkl[self.param['phase_list'].index(phase)]:
                 check_input.interrupt(self.killfile)
                 Gc = n.dot(B,hkl[0:3])
-                Gw =   n.dot(self.S,n.dot(U,Gc))
+                Gw = n.dot(self.S,n.dot(U,Gc))
+                Gw = n.dot(n.transpose(self.Phi_y),Gw) #new line added by Jette after wedge consistency check
                 tth = tools.tth2(Gw,self.param['wavelength'])
                 costth = n.cos(tth)
                 (Omega, Eta) = tools.find_omega_wedge(Gw,
                                                       tth,
-                                                      self.param['wedge'])
+                                                      -self.param['wedge'])
                 if len(Omega) > 0:
                     for solution in range(len(Omega)):
                         omega = Omega[solution]
@@ -90,12 +96,14 @@ class find_refl:
                         if  (self.param['omega_start']*n.pi/180) < omega and\
                                 omega < (self.param['omega_end']*n.pi/180):
                             # form Omega rotation matrix
-                            Om = tools.OMEGA(omega)
+                            Om = n.dot(self.Phi_y,tools.OMEGA(omega)) #new line added by Jette after wedge consistency check
+                            #Om = tools.OMEGA(omega)
                             Gt = n.dot(Om,Gw)
   
                             # Calc crystal position at present omega
-                            [tx,ty]= n.dot(Om[:2,:2],gr_pos[:2])
-                            tz = gr_pos[2]
+                            #[tx,ty]= n.dot(Om[:2,:2],gr_pos[:2])
+                            #tz = gr_pos[2]
+                            [tx,ty,tz]= n.dot(self.Phi_y,n.dot(Om,n.dot(n.transpose(self.Phi_y),gr_pos))) #new line added by Jette after wedge consistency check
                             
                             # Calc detector coordinate for peak 
                             (dety, detz) = detector.det_coor(Gt, 
