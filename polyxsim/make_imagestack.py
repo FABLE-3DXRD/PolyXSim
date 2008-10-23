@@ -178,7 +178,7 @@ class make_image:
                                 costth = n.cos(tth)
                                 (Omega, eta) = tools.find_omega_wedge(Gw,tth,-wy)
                                 try:
-                                    minpos = n.argmin(n.abs(Omega*(180.0/n.pi)-self.graindata.grain[grainno].refs[nref,A_id['omega']]))
+                                    minpos = n.argmin(n.abs(Omega-self.graindata.grain[grainno].refs[nref,A_id['omega']]))
                                 except:
                                     print Omega
                                 if len(Omega) == 0:

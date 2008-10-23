@@ -514,12 +514,12 @@ class parse_input:
         omega_start  = self.param['omega_start']
         omega_end  = self.param['omega_end']
 
-        if n.abs((omega_end-omega_start)%omega_step) > 1e-9: 
+        if (n.abs(omega_end-omega_start)+1e-9)%omega_step > 1e-9: 
             raise ValueError(), 'The omega range does not match an integer number of omega steps' 
 
         omega_sign = self.param['omega_sign']
         start_frame = self.param['start_frame']
-        omegalist = omega_sign*n.arange(omega_start,omega_end+omega_step,omega_step)
+        omegalist = omega_sign*n.arange(omega_start,omega_end+omega_step+1e-9,omega_step)
         nframes = int((omega_end-omega_start)/omega_step)
         omegalist.sort()
 #        i=0
