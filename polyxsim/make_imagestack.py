@@ -153,7 +153,9 @@ class make_image:
 		    # loop over reflections for each grain
             for nref in range(len(self.graindata.grain[grainno].refs)):
 			    # exploit that the reflection list is sorted according to omega
-                print 'Doing reflection: %i' %nref
+                print '\rDoing reflection %i of %i for grain %i of %i' %(nref+1,len(self.graindata.grain[grainno].refs),grainno+1,self.graindata.param['no_grains']),
+                sys.stdout.flush()
+                #print 'Doing reflection: %i' %nref
                 if self.graindata.param['odf_type'] == 3:
                     intensity = 1
                 else:
@@ -239,6 +241,8 @@ class make_image:
                                     self.frames[frame_no][dety,detz] =  self.frames[frame_no][dety,detz]+ intensity*self.odf[i,j,k]
 
     def correct_image(self):
+        no_frames = len(self.graindata.frameinfo)
+        print '\nGenerating ', no_frames, 'frames'
         for frame_no in self.frames:
 		      t1 = time.clock()
 

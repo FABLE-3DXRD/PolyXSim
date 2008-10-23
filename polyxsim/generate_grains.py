@@ -202,7 +202,7 @@ def gen_odf(sigma,pos,mapsize):
     odf = n.zeros(mapsize)
     
     for i in range(int(mapsize[0])):
-	for j in range(int(mapsize[1])):
+        for j in range(int(mapsize[1])):
             for k in range(int(mapsize[2])):
                 odf[i,j,k] = -0.5*(((i-pos[0])/sigma[0])**2\
 			          +((j-pos[1])/sigma[1])**2\
