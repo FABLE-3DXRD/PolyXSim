@@ -36,21 +36,21 @@ class parse_input:
                     'z_size'     : 'Missing input: z_size [Pixel size z in mm]',
                     'dety_size'  : 'Missing input: dety_size [detector y size in pixels]',
                     'detz_size'  : 'Missing input: detz_size [detector z size in pixels]',
-                    'omega_start'       : 'Missing input: omega_start [Omega start in degrees]',
-                    'omega_end'       : 'Missing input: omega_end [Omega end in degrees]',
-                    'omega_step'      : 'Missing input: omega_step [Omega step size in degrees]',
+                    'omega_start': 'Missing input: omega_start [Omega start in degrees]',
+                    'omega_end'  : 'Missing input: omega_end [Omega end in degrees]',
+                    'omega_step' : 'Missing input: omega_step [Omega step size in degrees]',
                     'no_grains'  : 'Missing input: no_grains [number of grains]',
                     'direc'      : 'Missing input: direc [directory to save output]',
                                         }
         self.optional_items = {
-            'sgno': None,
+            'sgno'  : None,
             'sgname': None,
-            'tilt_x'     : 0,
-            'tilt_y'     : 0,
-            'tilt_z'     : 0,
+            'tilt_x': 0,
+            'tilt_y': 0,
+            'tilt_z': 0,
             'wedge': 0.0,
             'beampol_apply' : 1,
-            'beampol_factor' : 1,
+            'beampol_factor': 1,
             'beampol_angle' : 0.0,
             'lorentz_apply' : 1,
             'start_frame': 0,
@@ -62,20 +62,20 @@ class parse_input:
             'o12': 0,
             'o21': 0,
             'o22': 1,
-            'bg': 0,
+            'bg' : 0,
             'peakshape': [0,0],
             'spatial' : None,
             'flood' : None,
             'dark' : None,
             'darkoffset' : None,
-            'gen_phase'   : [0],
-            'gen_U'   : 0,
+            'gen_phase': [0],
+            'gen_U' : 0,
             'gen_pos' : [0,0],
             'gen_eps' : [0,0,0,0,0],   
-            'gen_size': [0,0,0,0],
+            'gen_size' : [0,0,0,0],
             'sample_xyz': None,
             'sample_cyl': None,
-            'direc': '.',
+            'direc' : '.',
             'stem': 'test',
             'odf_type' : 1,
             'odf_scale' : 0.02,
@@ -265,15 +265,20 @@ class parse_input:
             assert len(self.param['gen_phase'][1:]) == no_phases*2, 'Missing info for  -  gen_phase'
 
 # Init no of grains belonging to phase X if not generated
+        print 'GENPHASE', self.param['gen_phase'][0]
+        print 'PHASE_list', phase_list
         if self.param['gen_phase'][0] != 1:
-            for phase in phase_list:
-                self.param['no_grains_phase_%i' %phase] = 0
+            if len(phase_list) == 0:
+                self.param['no_grains_phase_0'] = self.param['no_grains']
+            else:
+                for phase in phase_list:
+                    self.param['no_grains_phase_%i' %phase] = 0
         else:
             for i in range(self.param['no_phases']):
                 phase = self.param['gen_phase'][i*2+1]
                 no_grains_phase = int(self.param['gen_phase'][i*2+2])
                 self.param['no_grains_phase_%i' %phase] = no_grains_phase
-
+            
 # read U, pos, eps and size for all grains		
         grain_list_U = []
         grain_list_pos = []
@@ -375,7 +380,7 @@ class parse_input:
             else:
                 self.param['grain_list'] = range(no_grains)
 
-
+        print 'grain_list', self.param['grain_list']
 # assert that all information needed to generate grains is present	
         assert len(grain_list_U) != 0 or self.param['gen_U'] != 0,\
             'Information on U generations missing'
@@ -422,7 +427,9 @@ class parse_input:
             phase_list = [0]
         self.param['phase_list'] = phase_list
 
-
+        # make old inp files work
+        if len(grain_list_phase) == 0 and self.param['no_phases'] == 1:
+            self.param['grain_list_phase_%i' %self.param['phase_list'][0]] = self.param['grain_list']
 
 
 #assert that not both sample_xyz and sample_cyl are given
