@@ -265,8 +265,6 @@ class parse_input:
             assert len(self.param['gen_phase'][1:]) == no_phases*2, 'Missing info for  -  gen_phase'
 
 # Init no of grains belonging to phase X if not generated
-        print 'GENPHASE', self.param['gen_phase'][0]
-        print 'PHASE_list', phase_list
         if self.param['gen_phase'][0] != 1:
             if len(phase_list) == 0:
                 self.param['no_grains_phase_0'] = self.param['no_grains']
@@ -380,7 +378,6 @@ class parse_input:
             else:
                 self.param['grain_list'] = range(no_grains)
 
-        print 'grain_list', self.param['grain_list']
 # assert that all information needed to generate grains is present	
         assert len(grain_list_U) != 0 or self.param['gen_U'] != 0,\
             'Information on U generations missing'
@@ -521,13 +518,15 @@ class parse_input:
         omega_start  = self.param['omega_start']
         omega_end  = self.param['omega_end']
 
-        if (n.abs(omega_end-omega_start)+1e-9)%omega_step > 1e-9: 
+        if (n.abs(omega_end-omega_start)+1e-19)%omega_step > 1e-9: 
             raise ValueError(), 'The omega range does not match an integer number of omega steps' 
 
+        print omega_start,omega_end,omega_step, (n.abs(omega_end-omega_start)+1e-19)%omega_step
         omega_sign = self.param['omega_sign']
         start_frame = self.param['start_frame']
-        omegalist = omega_sign*n.arange(omega_start,omega_end+omega_step+1e-9,omega_step)
+        omegalist = omega_sign*n.arange(omega_start,omega_end+omega_step+1e-19,omega_step)
         nframes = int((omega_end-omega_start)/omega_step)
+        print nframes
         omegalist.sort()
 #        i=0
 #        logging.info("Generating frame data...")
@@ -541,15 +540,18 @@ class parse_input:
             # reverse omega_start/omega_end
             self.param['omega_end'] = omega_start*omega_sign 
             self.param['omega_start'] = omega_end*omega_sign
-
+        print filerange,len(filerange)
+        print omegalist,len(omegalist)
+        
+        i = 0
         for no in filerange:
             self.frameinfo.append(variables.frameinfo_cont(no))
-            self.frameinfo[no].name = '%s/%s%0.4d' \
+            self.frameinfo[i].name = '%s/%s%0.4d' \
                 %(self.param['direc'],self.param['stem'],no)
-            self.frameinfo[no].omega = omegalist[no];
-            self.frameinfo[no].nrefl = 0 # Initialize number of reflections on frame
-            self.frameinfo[no].refs = [] # Initialize number of reflections on frame
-#            i += 1
+            self.frameinfo[i].omega = omegalist[no];
+            self.frameinfo[i].nrefl = 0 # Initialize number of reflections on frame
+            self.frameinfo[i].refs = [] # Initialize number of reflections on frame
+            i += 1
 #        logging.debug("Printing frameinfo...")
             
         if self.param['theta_max'] == None:
