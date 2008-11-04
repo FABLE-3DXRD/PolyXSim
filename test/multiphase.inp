@@ -11,15 +11,15 @@ direc 'multiphase'
 distance 8.0
 gen_U 1
 #gen_eps 1 0 0 0 0
-gen_eps_phase_1 1 0 0. 0 0.
-gen_eps_phase_2 1 0. 0. 0. 0.
-gen_eps_phase_3 1 0 0. 0 0.
+gen_eps_phase_0 1 0 0. 0 0.
+gen_eps_phase_1 1 0. 0. 0. 0.
+gen_eps_phase_2 1 0 0. 0 0.
 
 gen_pos 1 0
 gen_size 1 -0.05 0.01 0.2
 #gen_size_phase_1 1 -0.05 0.01 0.2 
 #gen_size_phase_2 1 -0.15 0.01 0.2 
-gen_phase 1 1 2 2 3 3 4
+gen_phase 1 0 2 1 3 2 4
 make_image 1
 mosaicity 0.2
 no_grains 9
@@ -42,9 +42,9 @@ sample_vol 0.008
 sample_xyz 0.2 0.2 0.2
 start_frame 0
 stem 'multiphase'
-structure_phase_1 'Al.cif'
-structure_phase_2 'Al2.cif'
-structure_phase_3 'Al3.cif'
+structure_phase_0 'Al.cif'
+structure_phase_1 'Al2.cif'
+structure_phase_2 'Al3.cif'
 theta_max 13.4273673182
 theta_min 0.0
 tilt_x 0.0
