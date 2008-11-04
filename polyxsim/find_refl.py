@@ -13,8 +13,8 @@ A_id = variables.refarray().A_id
 
 
 class find_refl:
-    def __init__(self,param,hkl,options):
-        self.killfile = options.killfile
+    def __init__(self,param,hkl,killfile=None):
+        self.killfile = killfile
         self.param = param
         self.hkl = hkl
         self.grain = []

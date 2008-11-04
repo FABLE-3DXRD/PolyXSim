@@ -13,9 +13,9 @@ from PIL import Image
 A_id = variables.refarray().A_id
 
 class make_image:
-	def __init__(self,graindata,options):
+	def __init__(self,graindata,killfile=None):
 		self.graindata = graindata
-		self.killfile = options.killfile
+		self.killfile = killfile
 
 	def make_image(self):
 		"""

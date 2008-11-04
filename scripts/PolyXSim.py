@@ -31,6 +31,7 @@ if options.filename == None:
     parser.print_help()
     print "\nNo input file supplied [-i filename]\n"
     sys.exit()
+print 'options = ',options
 print '\n'
 if options.killfile is not None and os.path.exists(options.killfile):
     print "The purpose of the killfile option is to create that file"
@@ -78,6 +79,7 @@ check_input.interrupt(options.killfile)
 
 # Generate reflections
 hkl = []
+print 'phase_list=',myinput.param['phase_list']
 for phase in myinput.param['phase_list']:
     if  ('structure_phase_%i' %phase) in myinput.param:
         xtal_structure = reflections.open_structure(myinput.param,phase)
@@ -110,7 +112,7 @@ check_input.interrupt(options.killfile)
 
 
 # Determine the reflection parameters for grains
-graindata = find_refl.find_refl(myinput.param,hkl,options)
+graindata = find_refl.find_refl(myinput.param,hkl,options.killfile)
 graindata.frameinfo = myinput.frameinfo
 logging.info('Determine reflections positions')
 graindata.run()
@@ -128,12 +130,12 @@ if '.flt' in myinput.param['output']:
 
 if myinput.param['make_image'] == 1:
     if  myinput.param['peakshape'][0] == 2:
-	image = make_imagestack.make_image(graindata,options)
+	image = make_imagestack.make_image(graindata,options.killfile)
 	image.setup_odf()
 	image.make_image()
 	image.correct_image()
     else:
-	image = make_image.make_image(graindata,options)
+	image = make_image.make_image(graindata,options.killfile)
 	image.make_image()
 
 
