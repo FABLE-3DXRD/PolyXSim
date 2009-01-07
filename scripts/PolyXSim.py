@@ -31,8 +31,8 @@ if options.filename == None:
     parser.print_help()
     print "\nNo input file supplied [-i filename]\n"
     sys.exit()
-print 'options = ',options
-print '\n'
+#print 'options = ',options
+#print '\n'
 if options.killfile is not None and os.path.exists(options.killfile):
     print "The purpose of the killfile option is to create that file"
     print "only when you want peaksearcher to stop"
@@ -79,16 +79,18 @@ check_input.interrupt(options.killfile)
 
 # Generate reflections
 hkl = []
-print 'phase_list=',myinput.param['phase_list']
+
 for phase in myinput.param['phase_list']:
     if  ('structure_phase_%i' %phase) in myinput.param:
         xtal_structure = reflections.open_structure(myinput.param,phase)
-        print 'UNIT CELL', myinput.param['unit_cell_phase_%i' %phase]
+        #print 'UNIT CELL', myinput.param['unit_cell_phase_%i' %phase]
         logging.info('Generating miller indices')
         hkl_tmp = reflections.gen_miller(myinput.param,phase)
         if myinput.param['structure_factors'] != 0:
             logging.info('Structure factor calculation')
-            hkl.append(reflections.calc_intensity(hkl_tmp,xtal_structure,options.killfile))
+            hkl.append(reflections.calc_intensity(hkl_tmp,
+                                                  xtal_structure,
+                                                  options.killfile))
         else:
             hkl.append(reflections.add_intensity(hkl,myinput.param))
             logging.info('No structure factor calculation')

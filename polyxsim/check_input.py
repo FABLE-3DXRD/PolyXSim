@@ -302,7 +302,7 @@ class parse_input:
 #assert that the number of grains in all match 
 
         sum_of_grains = 0
-        print 'no of phases', self.param['no_phases']
+        #print 'no of phases', self.param['no_phases']
         if self.param['no_phases'] > 1:
             for phase in phase_list:
                 sum_of_grains += self.param['no_grains_phase_%i' %phase]
@@ -393,7 +393,7 @@ class parse_input:
         if len(phase_list) == 0:
             # This is a monophase simulation probably using the "old" keywords
             if self.param['structure_file'] == None:
-                print 'NO structure file'
+                #print 'NO structure file'
                 assert self.param['unit_cell'] != None, \
                     'Missing input: structure_file or unit_cell' 
                 
@@ -521,12 +521,12 @@ class parse_input:
         if (n.abs(omega_end-omega_start)+1e-19)%omega_step > 1e-9: 
             raise ValueError(), 'The omega range does not match an integer number of omega steps' 
 
-        print omega_start,omega_end,omega_step, (n.abs(omega_end-omega_start)+1e-19)%omega_step
+        # print omega_start,omega_end,omega_step, (n.abs(omega_end-omega_start)+1e-19)%omega_step
         omega_sign = self.param['omega_sign']
         start_frame = self.param['start_frame']
         omegalist = omega_sign*n.arange(omega_start,omega_end+omega_step+1e-19,omega_step)
         nframes = int((omega_end-omega_start)/omega_step)
-        print nframes
+
         omegalist.sort()
 #        i=0
 #        logging.info("Generating frame data...")
@@ -540,14 +540,14 @@ class parse_input:
             # reverse omega_start/omega_end
             self.param['omega_end'] = omega_start*omega_sign 
             self.param['omega_start'] = omega_end*omega_sign
-        print filerange,len(filerange)
-        print omegalist,len(omegalist)
+        #print filerange,len(filerange)
+        #print omegalist,len(omegalist)
         
         i = 0
         for no in filerange:
             self.frameinfo.append(variables.frameinfo_cont(no))
             self.frameinfo[i].name = '%s/%s%0.4d' \
-                %(self.param['direc'],self.param['stem'],no)
+                %(self.param['direc'],self.param['stem'],filerange[no])
             self.frameinfo[i].omega = omegalist[no];
             self.frameinfo[i].nrefl = 0 # Initialize number of reflections on frame
             self.frameinfo[i].refs = [] # Initialize number of reflections on frame
