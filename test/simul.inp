@@ -26,7 +26,7 @@ o22  -1              #
 ### Grains
 no_grains  3
 
-gen_U 0        # generate grain orientations (1=on, 0=off)
+gen_U 1        # generate grain orientations (1=on, 0=off)
 gen_pos 1 1     # generate grain positions (1=on, 0=off); (1=random, 0=(0,0,0)
 gen_eps 1 0 0 0 0 # generate strain tensors (1=on, 0=off); [mean (diag) spread (diag) mean (off-diag) spread (off-diag)]
 gen_size 1 0.05 0.01 0.25 # generate grain size (1=on, 0=off); [mean, min, max]
@@ -79,7 +79,7 @@ structure_file 'oPPA.cif'
 
 
 ### Files
-direc  '.'
+direc  'simul'
 stem 'monoclinic'
 output '.flt' '.gve' '.ubi' '.par' '.edf' 
 
