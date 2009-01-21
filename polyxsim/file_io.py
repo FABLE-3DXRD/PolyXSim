@@ -68,7 +68,7 @@ def write_flt(param,grain):
                        fc+2,
                        A[i,A_id['omega']]*180/n.pi,
                        0,
-                       A[i,A_id['dety']]-param['dety_size'],
+                       A[i,A_id['dety']],
                        A[i,A_id['detz']],
                        0,
                        0,
