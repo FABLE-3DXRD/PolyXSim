@@ -111,7 +111,7 @@ class make_image:
                             n.array([i-odf_center[0],
                                      j-odf_center[1],
                                      k-odf_center[2]])
-                        self.Uodf[i,j,k,:,:] = tools.rod2U(r)
+                        self.Uodf[i,j,k,:,:] = tools.rod_to_u(r)
 	    
             if self.graindata.param['odf_type'] !=  2:
                 file = open(self.graindata.param['stem']+'.odf','w')
@@ -189,7 +189,7 @@ class make_image:
                                     omega > (self.graindata.param['omega_end']*n.pi/180):
                                     continue
                                 #Om = tools.OMEGA(omega)
-                                Om = n.dot(self.Phi_y,tools.OMEGA(omega)) #new line added by Jette after wedge consistency check
+                                Om = n.dot(self.Phi_y,tools.form_omega_mat(omega)) #new line added by Jette after wedge consistency check
                                 Gt = n.dot(Om,Gw)
 						
                                 # Calc crystal position at present omega
@@ -213,7 +213,7 @@ class make_image:
                                     # To match the coordinate system of the spline file
                                     # SPLINE(i,j): i = detz; j = (dety_size-1)-dety
                                     # Well at least if the spline file is for frelon2k
-                                    (x,y) = detector.detyz2xy([dety,detz],
+                                    (x,y) = detector.detyz_to_xy([dety,detz],
                                                               self.graindata.param['o11'],
                                                               self.graindata.param['o12'],
                                                               self.graindata.param['o21'],
@@ -224,7 +224,7 @@ class make_image:
                                     (xd,yd) = self.spatial.distort(x,y)
 
                                     # transform coordinates back to dety,detz
-                                    (dety,detz) = detector.xy2detyz([xd,yd],
+                                    (dety,detz) = detector.xy_to_detyz([xd,yd],
                                                                     self.graindata.param['o11'],
                                                                     self.graindata.param['o12'],
                                                                     self.graindata.param['o21'],

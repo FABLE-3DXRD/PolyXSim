@@ -64,10 +64,10 @@ class find_refl:
             gr_pos = n.array(self.param['pos_grains_%s' %(self.param['grain_list'][grainno])])
             gr_eps = n.array(self.param['eps_grains_%s' %(self.param['grain_list'][grainno])])
             # Calculate the B-matrix based on the strain tensor for each grain
-            B = tools.epsilon2B(gr_eps,unit_cell) 
+            B = tools.epsilon_to_b(gr_eps,unit_cell) 
             # add B matrix to grain container
             self.grain[grainno].B = B
-            V = tools.CellVolume(unit_cell)
+            V = tools.cell_volume(unit_cell)
             grain_vol = n.pi/6 * self.param['size_grains_%s' %self.param['grain_list'][grainno]]**3 
 
 #            print 'GRAIN NO: ',self.param['grain_list'][grainno]
@@ -95,7 +95,7 @@ class find_refl:
                         if  (self.param['omega_start']*n.pi/180) < omega and\
                                 omega < (self.param['omega_end']*n.pi/180):
                             # form Omega rotation matrix
-                            Om = n.dot(self.Phi_y,tools.OMEGA(omega)) #new line added by Jette after wedge consistency check
+                            Om = n.dot(self.Phi_y,tools.form_omega_mat(omega)) #new line added by Jette after wedge consistency check
                             #Om = tools.OMEGA(omega)
                             Gt = n.dot(Om,Gw)
   
@@ -126,17 +126,17 @@ class find_refl:
 
                             if self.param['spatial'] != None :
                                 # To match the coordinate system of the spline file
-                                (x,y) = detector.detyz2xy([dety,detz],
-                                                          self.param['o11'],
-                                                          self.param['o12'],
-                                                          self.param['o21'],
-                                                          self.param['o22'],
-                                                          self.param['dety_size'],
-                                                          self.param['detz_size'])
+                                (x,y) = detector.detyz_to_xy([dety,detz],
+                                                             self.param['o11'],
+                                                             self.param['o12'],
+                                                             self.param['o21'],
+                                                             self.param['o22'],
+                                                             self.param['dety_size'],
+                                                             self.param['detz_size'])
                                 # Do the spatial distortion
                                 (xd,yd) = self.spatial.distort(x,y)
                                 # transform coordinates back to dety,detz
-                                (detyd,detzd) = detector.xy2detyz([xd,yd],
+                                (detyd,detzd) = detector.xy_to_detyz([xd,yd],
                                                           self.param['o11'],
                                                           self.param['o12'],
                                                           self.param['o21'],

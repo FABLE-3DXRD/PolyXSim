@@ -24,24 +24,24 @@ def write_flt(param,grain):
     format = "%f "*3 + "%i "*1 +"%f "*12 + "%i "*2   +"%f "*1 + "%i "*4 +"%f "*4 + "%i "*3 +"\n"
 
     for i in range(A.shape[0]):
-        (sc, fc) = detector.detyz2xy([A[i,A_id['dety']],A[i,A_id['detz']]],
-                                     param['o11'],
-                                     param['o12'],
-                                     param['o21'],
-                                     param['o22'],
-                                     param['dety_size'],
-                                     param['detz_size'])
+        (sc, fc) = detector.detyz_to_xy([A[i,A_id['dety']],A[i,A_id['detz']]],
+                                        param['o11'],
+                                        param['o12'],
+                                        param['o21'],
+                                        param['o22'],
+                                        param['dety_size'],
+                                        param['detz_size'])
         if param['spatial'] == None:
             sr = sc
             fr = fc
         else:
-            (sr, fr) = detector.detyz2xy([A[i,A_id['detyd']],A[i,A_id['detzd']]],
-                                         param['o11'],
-                                         param['o12'],
-                                         param['o21'],
-                                         param['o22'],
-                                         param['dety_size'],
-                                         param['detz_size'])
+            (sr, fr) = detector.detyz_to_xy([A[i,A_id['detyd']],A[i,A_id['detzd']]],
+                                            param['o11'],
+                                            param['o12'],
+                                            param['o21'],
+                                            param['o22'],
+                                            param['dety_size'],
+                                            param['detz_size'])
 
         out = format %(sc,
                        fc,
@@ -96,7 +96,7 @@ def write_grains(param):
     out = "# grainno grainsize grainvolume x y z phi1 PHI phi2 U11 U12 U13 U21 U22 U23 U31 U32 U33 eps11 eps12 eps13 eps22 eps23 eps33 \n"
     f.write(out)
     for i in range(param['no_grains']):
-        euler = 180/n.pi*tools.U2euler(param['U_grains_%s' %(param['grain_list'][i])])
+        euler = 180/n.pi*tools.u_to_euler(param['U_grains_%s' %(param['grain_list'][i])])
         out = format %(param['grain_list'][i],
                        param['size_grains_%s' %(param['grain_list'][i])],
                        n.pi/6*(param['size_grains_%s' %(param['grain_list'][i])])**3.,
@@ -143,13 +143,13 @@ def write_gve(param,grain,hkl):
     nrefl = A.shape[0]
 
     # from detector.par 
-    (z_center, y_center) = detector.detyz2xy([param['dety_center'],param['detz_center']],
-					     param['o11'],
-					     param['o12'],
-					     param['o21'],
-					     param['o22'],
-					     param['dety_size'],
-					     param['detz_size'])		
+    (z_center, y_center) = detector.detyz_to_xy([param['dety_center'],param['detz_center']],
+					        param['o11'],
+					        param['o12'],
+					        param['o21'],
+					        param['o22'],
+					        param['dety_size'],
+					        param['detz_size'])		
     dout = "# chi 0.0\n" 
     dout = dout + "# distance %f\n" %(param['distance']*1000.) 
     dout = dout + "# fit_tolerance 0.5\n" 
@@ -228,17 +228,17 @@ def write_gve(param,grain,hkl):
 
 
         for i in range(nrefl):
-            (sc, fc) = detector.detyz2xy([A[i,A_id['dety']],A[i,A_id['detz']]],
-                                         param['o11'],
-                                         param['o12'],
-                                         param['o21'],
-                                         param['o22'],
-                                         param['dety_size'],
-                                         param['detz_size'])
-            [xl,yl,zl] = detector.detector2lab(A[i,A_id['dety']],A[i,A_id['detz']],
-                                               param['distance'],
-                                               param['y_size'],param['z_size'],
-                                               param['dety_center'],param['detz_center'],
+            (sc, fc) = detector.detyz_to_xy([A[i,A_id['dety']],A[i,A_id['detz']]],
+                                            param['o11'],
+                                            param['o12'],
+                                            param['o21'],
+                                            param['o22'],
+                                            param['dety_size'],
+                                            param['detz_size'])
+            [xl,yl,zl] = detector.detector_to_lab(A[i,A_id['dety']],A[i,A_id['detz']],
+                                                  param['distance'],
+                                                  param['y_size'],param['z_size'],
+                                                  param['dety_center'],param['detz_center'],
                                                R_tilt)
             out = format %(A[i,A_id['gv1']]/(2*n.pi),
                            A[i,A_id['gv2']]/(2*n.pi),
@@ -337,13 +337,13 @@ def write_par(param):
 
     #Prepare detector part of p.par output
     #Calc beam center in ImageD11 coordinate system 
-    (z_center, y_center) = detector.detyz2xy([param['dety_center'],param['detz_center']],
-					     param['o11'],
-					     param['o12'],
-					     param['o21'],
-					     param['o22'],
-					     param['dety_size'],
-					     param['detz_size'])
+    (z_center, y_center) = detector.detyz_to_xy([param['dety_center'],param['detz_center']],
+					        param['o11'],
+					        param['o12'],
+					        param['o21'],
+					        param['o22'],
+					        param['dety_size'],
+					        param['detz_size'])
 			
     dout = "chi 0.0\n" 
     dout = dout + "distance %f\n" %(param['distance']*1000.) 
@@ -514,7 +514,7 @@ def write_ubi(param):
 	else:
             phase = param['phase_grains_%s' %(param['grain_list'][i])]
 	# Calculate the B-matrix based on the strain tensor for each grain
-        B = tools.epsilon2B(gr_eps,param['unit_cell_phase_%i' %phase])/(2*n.pi) 
+        B = tools.epsilon_to_b(gr_eps,param['unit_cell_phase_%i' %phase])/(2*n.pi) 
         UBI = n.linalg.inv(n.dot(U,B))
         for j in range(3):
             out = format %(UBI[j,0],UBI[j,1],UBI[j,2])

@@ -20,7 +20,7 @@ def generate_U(no_grains):
 		phi1 = n.random.rand()*2*n.pi
 		phi2 = n.random.rand()*2*n.pi
 		PHI  = n.random.rand()*n.pi
-		U[i] = tools.euler2U(phi1,PHI,phi2)
+		U[i] = tools.euler_to_u(phi1,PHI,phi2)
 		
 	return U
 		
