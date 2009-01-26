@@ -92,7 +92,7 @@ def write_grains(param):
     filename = '%s/%s_%0.4dgrains.txt' %(param['direc'],param['stem'],param['no_grains'])
     f = open(filename,'w')
 #    format = "%d "*1 + "%f "*1 + "%e"*1 + "%f"*18 + "\n"
-    format = "%d "*1 + "%f "*1 + "%e "*1 + "%f "*21 + "\n"
+    format = "%d "*1 + "%f "*1 + "%e "*1 + "%f "*6 + "%0.12f "*9 + "%e "*6 +"\n"
     out = "# grainno grainsize grainvolume x y z phi1 PHI phi2 U11 U12 U13 U21 U22 U23 U31 U32 U33 eps11 eps12 eps13 eps22 eps23 eps33 \n"
     f.write(out)
     for i in range(param['no_grains']):
