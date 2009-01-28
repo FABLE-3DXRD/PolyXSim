@@ -518,8 +518,10 @@ class parse_input:
         omega_start  = self.param['omega_start']
         omega_end  = self.param['omega_end']
 
-        if (n.abs(omega_end-omega_start)+1e-19)%omega_step > 1e-9: 
-            raise ValueError(), 'The omega range does not match an integer number of omega steps' 
+        modulus = n.abs(omega_end-omega_start)%omega_step
+        if  modulus > 1e-9:
+            if omega_step-modulus > 1e-9:
+                raise ValueError(), 'The omega range does not match an integer number of omega steps' 
 
         # print omega_start,omega_end,omega_step, (n.abs(omega_end-omega_start)+1e-19)%omega_step
         omega_sign = self.param['omega_sign']
