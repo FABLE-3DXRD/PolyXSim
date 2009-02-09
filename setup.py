@@ -4,9 +4,10 @@ import sys
 
 setup(
   name='PolyXSim',
-  version='0.9.0',
+  version='1.0.0',
   description='Image viewer for file series of diffraction images',
-  license='GPL', maintainer='Henning Osholm Soerensen',
+  license='GPL', 
+  maintainer='Henning Osholm Soerensen and Jette Oddershede',
   maintainer_email='henning.sorensen@risoe.dk',
   url='http://fable.wiki.sourceforge.net',
   packages=['polyxsim'],
