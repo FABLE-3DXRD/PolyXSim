@@ -1,28 +1,40 @@
 import numpy as n
 from xfab import tools
 from xfab import sg
-from xfab import detector
-import variables
 
 
-def generate_U(no_grains):
+def generate_U(no_grains,sgi):
 	# generate random U (orientations) for no_grains grains
-	#
+	# All U must be in same fundamental zone, thus trace of U must be maximal using the allowed permutations
 	# INPUT: no_grains
 	# OUTPUT: [[U11 U12 U13],[U21 U22 U23],[U31 U32 U33]] for each grain
 	#
 	# Henning Osholm Sorensen, Risoe DTU,
 	# Adapted by Jette Oddershede, RISOE DTU, March 27, 2008
 	
-	print 'Grain orientations will be randomly generated\n'
-	U = n.zeros((no_grains,3,3))
-	for i in range(no_grains):
-		phi1 = n.random.rand()*2*n.pi
-		phi2 = n.random.rand()*2*n.pi
-		PHI  = n.random.rand()*n.pi
-		U[i] = tools.euler_to_u(phi1,PHI,phi2)
-		
-	return U
+    print 'Grain orientations will be randomly generated\n'
+    U = n.zeros((no_grains,3,3))
+    Urot = n.zeros((3,3))
+    for i in range(no_grains):
+        phi1 = n.random.rand()*2*n.pi
+        phi2 = n.random.rand()*2*n.pi
+        PHI  = n.random.rand()*n.pi
+        U[i] = tools.euler_to_u(phi1,PHI,phi2)
+        t = 0
+        Ut = U[i].copy()
+#        print i
+        for j in range(sgi.nsymop):
+            if n.linalg.det(sgi.rot[j]) == 1 and (sgi.trans[j] == [0,0,0]).all():
+                Urot = n.dot(U[i],sgi.rot[j]) 
+                trace = Urot.trace()
+                if trace > t:
+                    t = trace
+                    Ut = Urot
+#                    print Ut,t
+        U[i] = Ut
+#        print U[i] ,i,'****'
+        
+    return U
 		
 def generate_pos(no_grains,gen_pos,sample_xyz=None,sample_cyl=None):
 	# generate random positions for no_grains grains for a given sample shape, 
@@ -135,63 +147,61 @@ def grain_size(no_grains,grain_size,grain_min_max,sample_vol=None):
 	
 
 def generate_grains(param):
-# Generate U if gen_U on
-	if param['gen_U'] != 0: 
-		U = generate_U(param['no_grains'])
-		for i in range(param['no_grains']):
-			param['U_grains_%s' %(param['grain_list'][i])] = U[i]
-        param['gen_U'] = 0
-			
-# Generate pos if gen_pos on
-	if param['gen_pos'][0] != 0: 
-		pos = generate_pos(param['no_grains'],param['gen_pos'][1],sample_xyz=param['sample_xyz'],sample_cyl=param['sample_cyl'])
-		for i in range(param['no_grains']):
-			param['pos_grains_%s' %(param['grain_list'][i])] = pos[i]
-        param['gen_pos'][0] = 0
-
-	
 # If pick out grain for phase
-	if param['gen_phase'][0] != 0:
+    if param['gen_phase'][0] != 0:
 		#Making random list of grain numbers
-		rand_grain_order = n.argsort(n.random.randn(param['no_grains']))
+        rand_grain_order = n.argsort(n.random.randn(param['no_grains']))
 
-		no_picked_grains = 0
-		for i in range(param['no_phases']):
-			phase = param['gen_phase'][i*2+1]
-			no_grains_phase = int(param['gen_phase'][i*2+2])
-			param['no_grains_phase_%i' %phase] = no_grains_phase
-			param['grain_list_phase_%i' %phase] = \
-			    n.array(param['grain_list'])[rand_grain_order[no_picked_grains:no_picked_grains+no_grains_phase]]
-			no_picked_grains += no_grains_phase
-			for grain in param['grain_list_phase_%i' %phase]:
-				param['phase_grains_%i' %grain] = phase
+        no_picked_grains = 0
+        for i in range(param['no_phases']):
+            phase = param['gen_phase'][i*2+1]
+            no_grains_phase = int(param['gen_phase'][i*2+2])
+            param['no_grains_phase_%i' %phase] = no_grains_phase
+            param['grain_list_phase_%i' %phase] = \
+                n.array(param['grain_list'])[rand_grain_order[no_picked_grains:no_picked_grains+no_grains_phase]]
+            no_picked_grains += no_grains_phase
+            for grain in param['grain_list_phase_%i' %phase]:
+                param['phase_grains_%i' %grain] = phase
+    param['gen_phase'][0] = 0  # Done
 
-
-	param['gen_phase'][0] = 0  # Done
-
+# Generate U if gen_U on
+    if param['gen_U'] != 0: 
+        for phase in param['phase_list']:        
+            U = generate_U(param['no_grains_phase_%i' %phase],sgi = sg.sg(sgno=param['sgno_phase_%i' %phase]))
+            for i in range(param['no_grains_phase_%i' %phase]):
+                param['U_grains_%s' %(param['grain_list_phase_%i' %phase][i])] = U[i]
+        param['gen_U'] = 0
+        
+# Generate pos if gen_pos on
+    if param['gen_pos'][0] != 0: 
+        pos = generate_pos(param['no_grains'],param['gen_pos'][1],sample_xyz=param['sample_xyz'],sample_cyl=param['sample_cyl'])
+        for i in range(param['no_grains']):
+            param['pos_grains_%s' %(param['grain_list'][i])] = pos[i]
+        param['gen_pos'][0] = 0
+	
 # Generate eps if gen_eps on
-	for phase in param['phase_list']:
-		if param['gen_eps_phase_%i' %phase][0] != 0: 
-			eps = generate_eps(param['no_grains_phase_%i' %phase],param['gen_eps_phase_%i' %phase][1:5])
-			for i in range(param['no_grains_phase_%i' %phase]):
-				param['eps_grains_%s' %(param['grain_list_phase_%i' %phase][i])] = eps[i]
-			param['gen_eps_phase_%i' %phase][0] = 0
-	if 'gen_eps' in param:
-		del param['gen_eps']
+    for phase in param['phase_list']:
+        if param['gen_eps_phase_%i' %phase][0] != 0: 
+            eps = generate_eps(param['no_grains_phase_%i' %phase],param['gen_eps_phase_%i' %phase][1:5])
+            for i in range(param['no_grains_phase_%i' %phase]):
+                param['eps_grains_%s' %(param['grain_list_phase_%i' %phase][i])] = eps[i]
+            param['gen_eps_phase_%i' %phase][0] = 0
+    if 'gen_eps' in param:
+        del param['gen_eps']
 
 
 # Generate size if gen_size on
-	for phase in param['phase_list']:
-		if param['gen_size_phase_%i' %phase][0] != 0: 
-			size = grain_size(param['no_grains_phase_%i' %phase],
-					  param['gen_size_phase_%i' %phase][1],
-					  param['gen_size_phase_%i' %phase][2:4],
-					  param['sample_vol']*param['vol_frac_phase_%i' %phase])
-			for i in range(param['no_grains_phase_%i' %phase]):
-				param['size_grains_%s' %(param['grain_list_phase_%i' %phase][i])] = size[i]
-			param['gen_size_phase_%i' %phase][0] = 0
-	if 'gen_size' in param:
-		del param['gen_size']
+    for phase in param['phase_list']:
+        if param['gen_size_phase_%i' %phase][0] != 0: 
+            size = grain_size(param['no_grains_phase_%i' %phase],
+                              param['gen_size_phase_%i' %phase][1],
+                              param['gen_size_phase_%i' %phase][2:4],
+                              param['sample_vol']*param['vol_frac_phase_%i' %phase])
+            for i in range(param['no_grains_phase_%i' %phase]):
+                param['size_grains_%s' %(param['grain_list_phase_%i' %phase][i])] = size[i]
+                param['gen_size_phase_%i' %phase][0] = 0
+    if 'gen_size' in param:
+        del param['gen_size']
 	
 	
 def gen_odf(sigma,pos,mapsize):

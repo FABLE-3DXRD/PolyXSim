@@ -68,15 +68,6 @@ logging.info('Initialize parameters etc\n')
 myinput.initialize()                            # if ok initialize
 check_input.interrupt(options.killfile)
 
-generate_grains.generate_grains(myinput.param)
-check_input.interrupt(options.killfile)
-logging.info('Write grains file')
-file_io.write_grains(myinput.param)
-check_input.interrupt(options.killfile)
-logging.info('Write res file')
-file_io.write_res(myinput.param)
-check_input.interrupt(options.killfile)
-
 # Generate reflections
 hkl = []
 
@@ -102,6 +93,14 @@ for phase in myinput.param['phase_list']:
 #    if options.killfile is not None and os.path.exists(options.killfile):
 #        raise KeyboardInterrupt()
  
+generate_grains.generate_grains(myinput.param)
+check_input.interrupt(options.killfile)
+logging.info('Write grains file')
+file_io.write_grains(myinput.param)
+check_input.interrupt(options.killfile)
+logging.info('Write res file')
+file_io.write_res(myinput.param)
+check_input.interrupt(options.killfile)
 
 if '.ubi' in myinput.param['output']:
     logging.info('Write UBI file')
