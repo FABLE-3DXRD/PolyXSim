@@ -8,7 +8,7 @@ from string import split
 from copy import copy
 import sys, os 
 import variables
-from xfab import tools
+from xfab import tools,sg
 
 import numpy as n
 import logging
@@ -228,7 +228,7 @@ class parse_input:
                     'check for multiple names or missing linies.'
                 assert phase_list_sgno == phase_list_unit_cell, \
                     'The phase numbers given to unit_cell does not match those in sgno.'
-
+                
         if len(phase_list_gen_size) != 0:
             assert len(phase_list_gen_size) == no_phases, \
                 'Input number of structural phases does not agree with number\n' +\
@@ -263,6 +263,14 @@ class parse_input:
                 
         if self.param['gen_phase'][0] != 0:
             assert len(self.param['gen_phase'][1:]) == no_phases*2, 'Missing info for  -  gen_phase'
+        # Make sure both sgname and sgno exist
+        if len(phase_list_sgno) == 0:
+            for phase in phase_list:
+                    self.param['sgno_phase_%i' %phase] = sg.sg(sgname = self.param['sgname_phase_%i' %phase]).no
+        if len(phase_list_sgname) == 0:
+            for phase in phase_list:
+                    self.param['sgname_phase_%i' %phase] = sg.sg(sgno = self.param['sgno_phase_%i' %phase]).name
+
 
 # Init no of grains belonging to phase X if not generated
         if self.param['gen_phase'][0] != 1:
@@ -403,7 +411,6 @@ class parse_input:
                 del self.param['unit_cell']
                 assert self.param['sgno'] != None or self.param['sgname'] != None , \
                     'Missing input: no space group information, please input either sgno or sgname' 
-                from xfab import sg
                 if self.param['sgno'] == None:
                     self.param['sgno_phase_0'] = sg.sg(sgname = self.param['sgname']).no
                     # rename keyword
@@ -427,6 +434,7 @@ class parse_input:
         # make old inp files work
         if len(grain_list_phase) == 0 and self.param['no_phases'] == 1:
             self.param['grain_list_phase_%i' %self.param['phase_list'][0]] = self.param['grain_list']
+
 
 
 #assert that not both sample_xyz and sample_cyl are given
