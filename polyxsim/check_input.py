@@ -239,7 +239,9 @@ class parse_input:
                 # both sg numbers and names in input check if they point at the same space group
                 for phase in phase_list_sgno:
                     assert self.param['sgname_phase_%i' %phase] == sg.sg(sgno = self.param['sgno_phase_%i' %phase]).name, \
-                        'Space group is specified both as space group name and number - and they do not correspond to the same space group - please sort this out in the input file.'
+                        '\nSpace group is specified both as space group name and number - \n' + \
+                        'and they do not correspond to the same space group. \n' + \
+                        'Please sort this out in the input file.' 
                 
                 
         if len(phase_list_gen_size) != 0:
