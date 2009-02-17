@@ -12,9 +12,9 @@ import sys
 A_id = variables.refarray().A_id
 
 class make_image:
-    def __init__(self,graindata,options):
+    def __init__(self,graindata,killfile):
         self.graindata = graindata
-        self.killfile = options.killfile
+        self.killfile = killfile
 
     def setup_odf(self):
 		
