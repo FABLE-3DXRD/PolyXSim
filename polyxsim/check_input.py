@@ -221,6 +221,10 @@ class parse_input:
                     'check for multiple names or missing linies.'
                 assert phase_list_sgname == phase_list_unit_cell, \
                     'The phase numbers given to unit_cell does not match those in sgname'
+                # add sgno for phase to parameter list
+                for phase in phase_list_sgname:
+                    self.param['sgno_phase_%i' %phase] = sg.sg(sgname = self.param['sgname_phase_%i' %phase]).no
+
             elif len(phase_list_sgname) == 0:
                 assert len(phase_list_sgno) == no_phases, \
                     'Input number of structural phases does not agree with number\n' +\
@@ -228,6 +232,15 @@ class parse_input:
                     'check for multiple names or missing linies.'
                 assert phase_list_sgno == phase_list_unit_cell, \
                     'The phase numbers given to unit_cell does not match those in sgno.'
+                # add sgname for phase to parameter list
+                for phase in phase_list_sgno:
+                    self.param['sgname_phase_%i' %phase] = sg.sg(sgno = self.param['sgno_phase_%i' %phase]).name
+            else:
+                # both sg numbers and names in input check if they point at the same space group
+                for phase in phase_list_sgno:
+                    assert self.param['sgname_phase_%i' %phase] == sg.sg(sgno = self.param['sgno_phase_%i' %phase]).name, \
+                        'Space group is specified both as space group name and number - and they do not correspond to the same space group - please sort this out in the input file.'
+                
                 
         if len(phase_list_gen_size) != 0:
             assert len(phase_list_gen_size) == no_phases, \
@@ -263,12 +276,13 @@ class parse_input:
                 
         if self.param['gen_phase'][0] != 0:
             assert len(self.param['gen_phase'][1:]) == no_phases*2, 'Missing info for  -  gen_phase'
+
         # Make sure both sgname and sgno exist
         if len(phase_list_sgno) == 0:
-            for phase in phase_list:
+            for phase in phase_list_sgno:
                     self.param['sgno_phase_%i' %phase] = sg.sg(sgname = self.param['sgname_phase_%i' %phase]).no
         if len(phase_list_sgname) == 0:
-            for phase in phase_list:
+            for phase in phase_list_sgname:
                     self.param['sgname_phase_%i' %phase] = sg.sg(sgno = self.param['sgno_phase_%i' %phase]).name
 
 

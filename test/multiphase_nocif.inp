@@ -50,9 +50,9 @@ unit_cell_phase_2 2.75 2.75 2.75 90.0 90.0 90.0
 sgno_phase_0 225
 sgno_phase_1 225
 sgno_phase_2 225
-#sgname_phase_0 'Fm-3m'
-#sgname_phase_1 'Fm-3m'
-#sgname_phase_2 'Fm-3m'
+sgname_phase_0 'Fm-3m'
+sgname_phase_1 'Fm-3m'
+sgname_phase_2 'Fm-3m'
 
 theta_max 13.4273673182
 theta_min 0.0
