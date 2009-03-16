@@ -159,6 +159,11 @@ class parse_input:
                     else:
                         assert len(val) == 5, 'Wrong number of arguments for %s' %key
                 elif key == 'gen_phase':
+                    try: 
+                        dummy = len(val)
+                    except:
+                        val = [val]
+                        self.param[key] = val
                     assert len(val) > 0, 'Wrong number of arguments for %s' %key
                 elif key == 'unit_cell' or 'eps_grains' in key:
                     assert len(val) == 6, 'Wrong number of arguments for %s' %key
@@ -275,7 +280,6 @@ class parse_input:
             else:
                 phase = 0 
                 self.param['gen_eps_phase_%i' %phase] = copy(self.param['gen_eps'])
-                
         if self.param['gen_phase'][0] != 0:
             assert len(self.param['gen_phase'][1:]) == no_phases*2, 'Missing info for  -  gen_phase'
 

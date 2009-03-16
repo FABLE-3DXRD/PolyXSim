@@ -51,7 +51,11 @@ class make_image:
 				frame = n.zeros((framedimy,framedimz))
 				omega = self.graindata.frameinfo[i].omega
 				omega_step = self.graindata.param['omega_step']
-				# loop over grains
+				# Jettes hack to add relative movement of sample and detector, modelled to be Gaussian in y and z direction with a spread of 1 micron
+                # movement of 1 micron along x judged to be irrelevant, at least for farfield data 
+				y_move = n.random.normal(0,1./self.graindata.param['dety_size'])
+				z_move = n.random.normal(0,1./self.graindata.param['detz_size'])
+                # loop over grains
 				for j in range(self.graindata.param['no_grains']):
 					# loop over reflections for each grain
 					for k in range(len(self.graindata.grain[j].refs)):
@@ -64,6 +68,9 @@ class make_image:
 							continue
 						dety = self.graindata.grain[j].refs[k,A_id['dety']]
 						detz = self.graindata.grain[j].refs[k,A_id['detz']]
+                        #apply hack
+#						dety = self.graindata.grain[j].refs[k,A_id['dety']] + y_move
+#						detz = self.graindata.grain[j].refs[k,A_id['detz']] + z_move
 						ndety = int(round(dety))
 						ndetz = int(round(detz))
 						yrange = range(ndety+frame_add-peak_add,ndety+frame_add+peak_add+1)

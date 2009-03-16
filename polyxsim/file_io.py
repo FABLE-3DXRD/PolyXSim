@@ -445,7 +445,7 @@ def write_ref(param,grain,grainno=None):
 
 
 
-def write_res(param):
+def write_res(param,filename=None):
     """
     Save the generated grain parameters in an input file to facilitate restart of PolyXSim with same grains
 
@@ -454,7 +454,9 @@ def write_res(param):
 
     Jette Oddershede, Risoe DTU, June 18 2008
     """
-    filename = '%s/%s.res' %(param['direc'],param['stem'])
+    if filename == None:
+        filename = '%s/%s.res' %(param['direc'],param['stem'])
+        
     f = open(filename,'w')
 			
     #initialise and sort keys alphabetically

@@ -34,7 +34,7 @@ no_grains  10
 
 gen_U 1        # generate grain orientations
 gen_pos 1 0    # generate grain positions
-gen_eps 1 0 0 0 0 # generate strain tensors [mean (diag) spread (diag) mean (off-diag) spread (off-diag)]
+gen_eps 1 0 0 0 0 0 # generate strain tensors [mean (diag) spread (diag) mean (off-diag) spread (off-diag)]
 gen_size 1 -0.075 0 1
 sample_xyz 0.3 0.3 0.3  # sample size in mm
 #sample_cyl 0.17 0.3    # cylinder dimension, radius and length, of sample in mm
@@ -65,8 +65,8 @@ psf 0              # spread of Gaussian point spread function (detector)
                    # corresponds roughly to the number of affected pixels on either side		   
 peakshape 1 2 0.5  # type, spread (in pixels from the central pixel), (spread in omega for type=1)
                    # type=0 spike, type=1 2D Gaussian, type = 2 based on ODF.
-odf_type 2
-odf_file 'odf5_9_10.odf'
-odf_scale 0.1
-mosaicity .2
+#odf_type 2
+#odf_file 'odf5_9_10.odf'
+#odf_scale 0.1
+#mosaicity .2
 bg 0               # background counts				
