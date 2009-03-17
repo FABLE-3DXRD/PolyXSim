@@ -19,7 +19,7 @@ wedge 0.0
 
 omega_start  0.0     # Minimum Omega in range of interest (in deg)
 omega_end  180.0      # Maximum Omega in range of interest (in deg)
-omega_step  0.30      # Omega step size (in deg)
+omega_step  10.0      # Omega step size (in deg)
 omega_sign  1        # Sign of omega rotation
 beampol_factor  1    # Polarisation factor
 beampol_direct  0    # Polarisation direction
@@ -41,7 +41,7 @@ sample_xyz 0.3 0.3 0.3  # sample size in mm
 
 #U_grains_1   -0.5288    0.7846    0.3238 -0.5178    0.0040   -0.8555   -0.6725   -0.6200    0.4041
 
- 
+
 #size_grains_1 0.075
 
 
@@ -54,19 +54,20 @@ structure_file 'bbcp5_mon.cif'
 
 
 ### Files
-direc  '.'
+direc  'bbcp5'
 stem 'bbcp_mono_'
-output '.flt' '.edf' '.gve' '.ubi' '.par'  
+output '.flt' '.edf' '.gve' '.ubi' '.par' 
 
 ### Images
 make_image 1       # generate images if different from 0, default generate
 noise 0            # put on noise if different from 0, default no noise
 psf 0              # spread of Gaussian point spread function (detector)
-                   # corresponds roughly to the number of affected pixels on either side		   
+                   # corresponds roughly to the number of affected pixels on either side
 peakshape 1 2 0.5  # type, spread (in pixels from the central pixel), (spread in omega for type=1)
                    # type=0 spike, type=1 2D Gaussian, type = 2 based on ODF.
 #odf_type 2
 #odf_file 'odf5_9_10.odf'
 #odf_scale 0.1
 #mosaicity .2
-bg 0               # background counts				
+bg 0               # background counts	
+
