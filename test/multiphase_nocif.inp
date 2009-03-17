@@ -1,4 +1,4 @@
-beamflux 1e+12
+﻿beamflux 1e+12
 beampol_angle 0.0
 beampol_direct 0
 beampol_factor 1
@@ -11,9 +11,9 @@ direc 'multiphase_nocif'
 distance 8.0
 gen_U 1
 #gen_eps 1 0 0 0 0
-gen_eps_phase_0 1 0 0. 0 0.
+gen_eps_phase_0 1 0. 0. 0. 0.
 gen_eps_phase_1 1 0. 0. 0. 0.
-gen_eps_phase_2 1 0 0. 0 0.
+gen_eps_phase_2 1 0. 0. 0. 0.
 
 gen_pos 1 0
 gen_size 1 -0.05 0.01 0.2
@@ -36,7 +36,6 @@ omega_sign 1
 omega_start 0.0
 omega_step 0.5
 output '.flt' '.gve' '.ini' '.ubi' '.par' '.edf'
-#output '.flt' '.ubi' '.edf'
 
 peakshape 1 2 0.0
 psf 0
@@ -50,9 +49,9 @@ unit_cell_phase_2 2.75 2.75 2.75 90.0 90.0 90.0
 sgno_phase_0 225
 sgno_phase_1 225
 sgno_phase_2 225
-sgname_phase_0 'Fm-3m'
-sgname_phase_1 'Fm-3m'
-sgname_phase_2 'Fm-3m'
+#sgname_phase_0 'Fm-3m'
+#sgname_phase_1 'Fm-3m'
+#sgname_phase_2 'Fm-3m'
 
 theta_max 13.4273673182
 theta_min 0.0
