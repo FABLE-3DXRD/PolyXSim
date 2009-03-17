@@ -44,7 +44,7 @@ def generate_pos(no_grains,gen_pos,sample_xyz=None,sample_cyl=None):
 	# INPUT: 	no_grains
 	#              	gen_pos (==0 default to (0,0,0), else random positions)
 	#		sample_xyz (optional) sample dimensions along x, y and z
-	#		sample_cyl (optional) sample cylinder radius and length (along z)
+	#		sample_cyl (optional) sample cylinder diameter and length (along z)
 	# OUTPUT: [x y z] for each grain
 	#
 	# Jette Oddershede, RISOE DTU, March 27, 2008
@@ -58,9 +58,9 @@ def generate_pos(no_grains,gen_pos,sample_xyz=None,sample_cyl=None):
 
 	elif sample_cyl != None and gen_pos != 0:
 		print 'Grain positions will be randomly generated'
-		print 'within a cylinder of radius ', sample_cyl[0], ' and length ', sample_cyl[1], 'mm\n'
+		print 'within a cylinder of diameter ', sample_cyl[0], ' and length ', sample_cyl[1], 'mm\n'
 		for i in range(no_grains):
-			r = n.random.rand()*sample_cyl[0]
+			r = n.random.rand()*sample_cyl[0]/2.
 			w = n.random.rand()*2*n.pi
 			z = (n.random.rand()-0.5)*sample_cyl[1]
 			pos[i] = [r*n.cos(w), r*n.sin(w), z]
