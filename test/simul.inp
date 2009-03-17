@@ -64,7 +64,7 @@ sample_xyz 0.3 0.3 0.3  # sample size in mm
 
 #eps_grains_1 0.01 0 0 0.01 0 0.01
 #eps_grains_2 0.001 0 0 0.001 0 0.001
- 
+
 #size_grains_1 0.04
 #size_grains_2 0.06
 
@@ -87,8 +87,8 @@ output '.flt' '.gve' '.ubi' '.par' '.edf'
 make_image 0
 noise 1            # put on noise if different from 0, default no noise
 psf 1              # spread of Gaussian point spread function (detector)
-                   # corresponds roughly to the number of affected pixels on either side		   
+		   # corresponds roughly to the number of affected pixels on either side		   
 peakshape 1 2 0.5  # type, spread (in pixels from the central pixel), (spread in omega for type=1)
-                   # type=0 spike, type=1 2D Gaussian
+		   # type=0 spike, type=1 2D Gaussian
 bg 20              # background counts				
 spatial 'spatial1k.spline'

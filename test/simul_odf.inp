@@ -36,7 +36,7 @@ sample_xyz 0.3 0.3 0.3  # sample size in mm
 
 U_grains_1   -0.5288    0.7846    0.3238 -0.5178    0.0040   -0.8555   -0.6725   -0.6200    0.4041
 
- 
+
 size_grains_1 0.075
 
 
@@ -58,9 +58,9 @@ output '.flt' '.tif' '.ubi' '.par'
 make_image 1       # generate images if different from 0, default generate
 noise 0            # put on noise if different from 0, default no noise
 psf 0              # spread of Gaussian point spread function (detector)
-                   # corresponds roughly to the number of affected pixels on either side		   
+			   # corresponds roughly to the number of affected pixels on either side		   
 peakshape 2 2 0.5  # type, spread (in pixels from the central pixel), (spread in omega for type=1)
-                   # type=0 spike, type=1 2D Gaussian, type = 2 based on ODF.
+			   # type=0 spike, type=1 2D Gaussian, type = 2 based on ODF.
 odf_type 1
 #odf_file 'alu.odf'
 odf_scale 0.02
