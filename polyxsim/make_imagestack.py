@@ -16,6 +16,12 @@ class make_image:
         self.graindata = graindata
         self.killfile = killfile
 
+        # wedge NB! wedge is in degrees
+        self.wy = self.graindata.param['wedge']*n.pi/180.
+        self.Phi_y = n.array([[ n.cos(self.wy), 0, n.sin(self.wy)],
+                              [0         , 1, 0        ],
+                              [-n.sin(self.wy), 0, n.cos(self.wy)]])
+
     def setup_odf(self):
 		
             odf_scale = self.graindata.param['odf_scale'] 
@@ -125,24 +131,19 @@ class make_image:
             return self.Uodf
 
 
-
-
-    def make_image(self):
+    def make_image_array(self):
         from scipy import sparse
-        from scipy import ndimage
-
-        # wedge NB! wedge is in degrees
-        wy = self.graindata.param['wedge']*n.pi/180.
-        self.Phi_y = n.array([[ n.cos(wy), 0, n.sin(wy)],
-                              [0         , 1, 0        ],
-                              [-n.sin(wy), 0, n.cos(wy)]])
-	    #make stack of empty images as a dictionary of sparse matrices
+        #make stack of empty images as a dictionary of sparse matrices
         print 'Build sparse image stack'
         stacksize = len(self.graindata.frameinfo)
         self.frames = {}
         for i in range(stacksize):
             self.frames[i]=sparse.lil_matrix((int(self.graindata.param['dety_size']),
                                               int(self.graindata.param['detz_size'])))
+
+
+    def make_image(self):
+        from scipy import ndimage
 
         # loop over grains
         for grainno in range(self.graindata.param['no_grains']):
@@ -153,7 +154,9 @@ class make_image:
 		    # loop over reflections for each grain
             for nref in range(len(self.graindata.grain[grainno].refs)):
 			    # exploit that the reflection list is sorted according to omega
-                print '\rDoing reflection %i of %i for grain %i of %i' %(nref+1,len(self.graindata.grain[grainno].refs),grainno+1,self.graindata.param['no_grains']),
+                print '\rDoing reflection %i of %i for grain %i of %i' %(nref+1,
+                                                                         len(self.graindata.grain[grainno].refs),
+                                                                         grainno+1,self.graindata.param['no_grains']),
                 sys.stdout.flush()
                 #print 'Doing reflection: %i' %nref
                 if self.graindata.param['odf_type'] == 3:
@@ -176,7 +179,7 @@ class make_image:
                                 Glen = n.sqrt(n.dot(Gw,Gw))
                                 tth = 2*n.arcsin(Glen/(2*abs(self.graindata.K)))
                                 costth = n.cos(tth)
-                                (Omega, eta) = tools.find_omega_wedge(Gw,tth,-wy)
+                                (Omega, eta) = tools.find_omega_wedge(Gw,tth,-self.wy)
                                 try:
                                     minpos = n.argmin(n.abs(Omega-self.graindata.grain[grainno].refs[nref,A_id['omega']]))
                                 except:

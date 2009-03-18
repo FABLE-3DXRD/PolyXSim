@@ -133,6 +133,7 @@ if myinput.param['make_image'] == 1:
     if  myinput.param['peakshape'][0] == 2:
 	image = make_imagestack.make_image(graindata,options.killfile)
 	image.setup_odf()
+	image.make_image_array()
 	image.make_image()
 	image.correct_image()
     else:
