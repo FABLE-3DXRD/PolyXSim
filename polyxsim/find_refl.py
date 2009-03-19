@@ -30,9 +30,7 @@ class find_refl:
 
         # wedge NB! wedge is in degrees
         self.wy = self.param['wedge']*n.pi/180.
-        self.Phi_y = n.array([[ n.cos(self.wy), 0, n.sin(self.wy)],
-                              [0         , 1, 0        ],
-                              [-n.sin(self.wy), 0, n.cos(self.wy)]])
+        self.wx = 0.
                                    
         # Spatial distortion
         if self.param['spatial'] != None:
@@ -84,10 +82,9 @@ class find_refl:
                 check_input.interrupt(self.killfile)
                 Gc = n.dot(B,hkl[0:3])
                 Gw = n.dot(self.S,n.dot(U,Gc))
-                Gw = n.dot(n.transpose(self.Phi_y),Gw) #new line added by Jette after wedge consistency check
                 tth = tools.tth2(Gw,self.param['wavelength'])
                 costth = n.cos(tth)
-                (Omega, Eta) = tools.find_omega_wedge(Gw,tth,-self.wy)
+                (Omega, Eta) = tools.find_omega_general(Gw*self.param['wavelength']/(4.*n.pi),tth,self.wx,self.wy)
                 if len(Omega) > 0:
                     for solution in range(len(Omega)):
                         omega = Omega[solution]
@@ -95,14 +92,11 @@ class find_refl:
                         if  (self.param['omega_start']*n.pi/180) < omega and\
                                 omega < (self.param['omega_end']*n.pi/180):
                             # form Omega rotation matrix
-                            Om = n.dot(self.Phi_y,tools.form_omega_mat(omega)) #new line added by Jette after wedge consistency check
-                            #Om = tools.OMEGA(omega)
+                            Om = tools.form_omega_mat_general(omega,self.wx,self.wy) 
                             Gt = n.dot(Om,Gw)
   
                             # Calc crystal position at present omega
-                            #[tx,ty]= n.dot(Om[:2,:2],gr_pos[:2])
-                            #tz = gr_pos[2]
-                            [tx,ty,tz]= n.dot(self.Phi_y,n.dot(Om,n.dot(n.transpose(self.Phi_y),gr_pos))) #new line added by Jette after wedge consistency check
+                            [tx,ty,tz]= n.dot(Om,gr_pos) 
                             
                             # Calc detector coordinate for peak 
                             (dety, detz) = detector.det_coor(Gt, 

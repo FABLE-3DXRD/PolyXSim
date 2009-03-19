@@ -38,9 +38,9 @@ class make_image:
 		totalrefl = 0
 		if frame_number == None:
 			no_frames = range(len(self.graindata.frameinfo))
+			print 'Generating diffraction images'
 		else:
 			no_frames = [frame_number]
-		print 'Generating diffraction images'
 	
 		for i in no_frames:
 			check_input.interrupt(self.killfile)

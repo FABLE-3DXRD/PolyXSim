@@ -18,9 +18,7 @@ class make_image:
 
         # wedge NB! wedge is in degrees
         self.wy = self.graindata.param['wedge']*n.pi/180.
-        self.Phi_y = n.array([[ n.cos(self.wy), 0, n.sin(self.wy)],
-                              [0         , 1, 0        ],
-                              [-n.sin(self.wy), 0, n.cos(self.wy)]])
+        self.wx = 0.
 
     def setup_odf(self):
 		
@@ -175,11 +173,10 @@ class make_image:
                             if self.odf[i,j,k] > self.odf_cut:
                                 Gtmp = n.dot(self.Uodf[i,j,k],Gc)
                                 Gw =  n.dot(SU,Gtmp)
-                                Gw = n.dot(n.transpose(self.Phi_y),Gw) #new line added by Jette after wedge consistency check
                                 Glen = n.sqrt(n.dot(Gw,Gw))
                                 tth = 2*n.arcsin(Glen/(2*abs(self.graindata.K)))
                                 costth = n.cos(tth)
-                                (Omega, eta) = tools.find_omega_wedge(Gw,tth,-self.wy)
+                                (Omega, eta) = tools.find_omega_general(Gw*self.param['wavelength']/(4.*n.pi),tth,self.wx,self.wy)
                                 try:
                                     minpos = n.argmin(n.abs(Omega-self.graindata.grain[grainno].refs[nref,A_id['omega']]))
                                 except:
@@ -191,14 +188,11 @@ class make_image:
                                 if (self.graindata.param['omega_start']*n.pi/180) > omega or\
                                     omega > (self.graindata.param['omega_end']*n.pi/180):
                                     continue
-                                #Om = tools.OMEGA(omega)
-                                Om = n.dot(self.Phi_y,tools.form_omega_mat(omega)) #new line added by Jette after wedge consistency check
+                                Om = tools.form_omega_mat_general(omega,self.wx,self.wy) 
                                 Gt = n.dot(Om,Gw)
 						
                                 # Calc crystal position at present omega
-                                #[tx,ty]= n.dot(Om[:2,:2],gr_pos[:2])
-                                #tz = gr_pos[2]
-                                [tx,ty,tz]= n.dot(self.Phi_y,n.dot(Om,n.dot(n.transpose(self.Phi_y),gr_pos))) #new line added by Jette after wedge consistency check
+                                [tx,ty,tz]= n.dot(Om,gr_pos) 
 
                                 (dety, detz) = detector.det_coor(Gt, 
                                                                  costth,
