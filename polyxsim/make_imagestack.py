@@ -140,17 +140,26 @@ class make_image:
                                               int(self.graindata.param['detz_size'])))
 
 
-    def make_image(self):
+    def make_image(self,grainno=None,refl = None):
         from scipy import ndimage
+        if grainno == None:
+            do_grains = range(self.graindata.param['no_grains'])
+        else:
+            do_grains = [grainno]
 
         # loop over grains
-        for grainno in range(self.graindata.param['no_grains']):
+        for grainno in do_grains:
             gr_pos = n.array(self.graindata.param['pos_grains_%s' \
                     %(self.graindata.param['grain_list'][grainno])])
             B = self.graindata.grain[grainno].B
             SU = n.dot(self.graindata.S,self.graindata.grain[grainno].U)
-		    # loop over reflections for each grain
-            for nref in range(len(self.graindata.grain[grainno].refs)):
+            if refl == None:
+                do_refs = range(len(self.graindata.grain[grainno].refs))
+            else:
+                do_refs = [refl]
+            # loop over reflections for each grain
+
+            for nref in do_refs:
 			    # exploit that the reflection list is sorted according to omega
                 print '\rDoing reflection %i of %i for grain %i of %i' %(nref+1,
                                                                          len(self.graindata.grain[grainno].refs),
@@ -163,8 +172,8 @@ class make_image:
                     intensity = self.graindata.grain[grainno].refs[nref,A_id['Int']]
         
                 hkl = n.array([self.graindata.grain[grainno].refs[nref,A_id['h']],
-					   self.graindata.grain[grainno].refs[nref,A_id['k']],
-					   self.graindata.grain[grainno].refs[nref,A_id['l']]])
+                               self.graindata.grain[grainno].refs[nref,A_id['k']],
+                               self.graindata.grain[grainno].refs[nref,A_id['l']]])
                 Gc  = n.dot(B,hkl)
                 for i in range(self.odf.shape[0]):
                     for j in range(self.odf.shape[1]):
@@ -176,7 +185,11 @@ class make_image:
                                 Glen = n.sqrt(n.dot(Gw,Gw))
                                 tth = 2*n.arcsin(Glen/(2*abs(self.graindata.K)))
                                 costth = n.cos(tth)
-                                (Omega, eta) = tools.find_omega_general(Gw*self.param['wavelength']/(4.*n.pi),tth,self.wx,self.wy)
+                                Qw = Gw*self.graindata.param['wavelength']/(4.*n.pi)
+                                (Omega, eta) = tools.find_omega_general(Qw,
+                                                                        tth,
+                                                                        self.wx,
+                                                                        self.wy)
                                 try:
                                     minpos = n.argmin(n.abs(Omega-self.graindata.grain[grainno].refs[nref,A_id['omega']]))
                                 except:
@@ -241,36 +254,36 @@ class make_image:
         no_frames = len(self.graindata.frameinfo)
         print '\nGenerating ', no_frames, 'frames'
         for frame_no in self.frames:
-		      t1 = time.clock()
+            t1 = time.clock()
 
-		      frame = self.frames[frame_no].toarray()
-		      if self.graindata.param['bg'] > 0:
-			      frame = frame + self.graindata.param['bg']*n.ones((self.graindata.param['dety_size'],
+            frame = self.frames[frame_no].toarray()
+            if self.graindata.param['bg'] > 0:
+                frame = frame + self.graindata.param['bg']*n.ones((self.graindata.param['dety_size'],
 								       self.graindata.param['detz_size']))
-		      # add noise
-		      if self.graindata.param['noise'] != 0:
-			      frame = n.random.poisson(frame)
-		      # apply psf
-		      if self.graindata.param['psf'] != 0:
-			      frame = ndimage.gaussian_filter(frame,self.graindata.param['psf']*0.5)
-	              # limit values above 16 bit to be 16bit
-		      frame = n.clip(frame,0,2**16-1)
-	              # convert to integers
-		      frame = n.uint16(frame)
-		      #flip detector orientation according to input: o11, o12, o21, o22
-		      frame = detector.trans_orientation(frame,
-							 self.graindata.param['o11'],
-							 self.graindata.param['o12'],
-							 self.graindata.param['o21'],
-							 self.graindata.param['o22'],
-							 'inverse')
-		      # Output frames 
-		      if '.edf' in self.graindata.param['output']:
-			      self.write_edf(frame_no,frame)
-		      if '.tif' in self.graindata.param['output']:
-			      self.write_tif(frame_no,frame)
-		      print '\rDone frame %i took %8f s' %(frame_no+1,time.clock()-t1),
-		      sys.stdout.flush()
+            # add noise
+            if self.graindata.param['noise'] != 0:
+                frame = n.random.poisson(frame)
+            # apply psf
+            if self.graindata.param['psf'] != 0:
+                frame = ndimage.gaussian_filter(frame,self.graindata.param['psf']*0.5)
+	    # limit values above 16 bit to be 16bit
+	    frame = n.clip(frame,0,2**16-1)
+	    # convert to integers
+	    frame = n.uint16(frame)
+	    #flip detector orientation according to input: o11, o12, o21, o22
+	    frame = detector.trans_orientation(frame,
+	      				 self.graindata.param['o11'],
+	      				 self.graindata.param['o12'],
+	      				 self.graindata.param['o21'],
+	      				 self.graindata.param['o22'],
+	      				 'inverse')
+	    # Output frames 
+	    if '.edf' in self.graindata.param['output']:
+	            self.write_edf(frame_no,frame)
+	    if '.tif' in self.graindata.param['output']:
+	            self.write_tif(frame_no,frame)
+	    print '\rDone frame %i took %8f s' %(frame_no+1,time.clock()-t1),
+	    sys.stdout.flush()
 				
     def write_edf(self,framenumber,frame):
 		e=edfimage.edfimage()
