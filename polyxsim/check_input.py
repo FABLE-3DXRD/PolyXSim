@@ -168,7 +168,10 @@ class parse_input:
                 elif key == 'unit_cell' or 'eps_grains' in key:
                     assert len(val) == 6, 'Wrong number of arguments for %s' %key
                 elif 'U_grains' in key:
-                    assert len(val) == 9, 'Wrong number of arguments for %s' %key
+                    if len(val) != 3:
+                        assert len(val) == 9, 'Wrong number of arguments for %s' %key
+                    else:
+                        assert val.shape == (3,3), 'Wrong number of arguments for %s' %key
                     # reshape U-matrices
                     self.param[key] = n.array(self.param[key])
                     self.param[key].shape = (3,3)
