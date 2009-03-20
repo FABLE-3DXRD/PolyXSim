@@ -142,6 +142,47 @@ def write_grains(param):
         f.write(out)
     f.close()   
             
+def write_hkl(param,hkl):
+    """
+    Write hkl file, for format
+    
+    Henning Osholm Sorensen, RisoeDTU, 2009.
+
+    """
+    for phase in param['phase_list']:
+        filename = '%s/%s_phase_%i.hkl' %(param['direc'],param['stem'],phase)
+        f = open(filename,'w')
+        for refl in range(len(hkl[phase])):
+            (h,k,l,intint) = hkl[phase][refl]
+            out = '%4i %4i %4i %8g\n'\
+                %(h,k,l, intint)
+            f.write(out)
+        f.close()
+
+def write_fcf(param,hkl):
+    """
+    Write fcf file, cif hkl file
+    
+    Henning Osholm Sorensen, RisoeDTU, 2008.
+    python translation: Jette Oddershede, Risoe DTU, March 31 2008
+    changed October 1, 2008 to new .gve format including detector.par and [xl,yl,zl]
+    """
+    for phase in param['phase_list']:
+        filename = '%s/%s_phase_%i.fcf' %(param['direc'],param['stem'],phase)
+        f = open(filename,'w')
+        f.write('data_phase_%i\n' %phase)
+        f.write('loop_\n')
+        f.write('_refln_index_h\n')
+        f.write('_refln_index_k\n')
+        f.write('_refln_index_l\n')
+        f.write('_refln_F_squared_calc\n')
+        for refl in range(len(hkl[phase])):
+            (h,k,l,intint) = hkl[phase][refl]
+            out = '%4i %4i %4i %10g\n'\
+                %(h,k,l, intint)
+            f.write(out)
+        f.write('\n')
+        f.close()
 
 def write_gve(param,grain,hkl):
     """
@@ -458,8 +499,6 @@ def write_ref(param,grain,grainno=None):
                 f.write(out)
     
         f.close()   
-        
-
 
 
 def write_res(param,filename=None):

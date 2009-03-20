@@ -92,7 +92,7 @@ for phase in myinput.param['phase_list']:
     check_input.interrupt(options.killfile)
 #    if options.killfile is not None and os.path.exists(options.killfile):
 #        raise KeyboardInterrupt()
- 
+
 generate_grains.generate_grains(myinput.param)
 check_input.interrupt(options.killfile)
 logging.info('Write grains file')
@@ -102,6 +102,12 @@ logging.info('Write res file')
 file_io.write_res(myinput.param)
 check_input.interrupt(options.killfile)
 
+if '.hkl' in myinput.param['output']:
+    logging.info('Write hkl file')
+    file_io.write_hkl(myinput.param,hkl)
+if '.fcf' in myinput.param['output']:
+    logging.info('Write fcf file')
+    file_io.write_fcf(myinput.param,hkl)
 if '.ubi' in myinput.param['output']:
     logging.info('Write UBI file')
     file_io.write_ubi(myinput.param)
