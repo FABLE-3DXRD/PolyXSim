@@ -240,7 +240,7 @@ def write_gve(param,grain,hkl):
                        unit_cell[3],unit_cell[4],unit_cell[5],
                        lattice)
         out = out + "# wavelength = %s\n" %(param['wavelength'])
-        out = out + "# wedge = %f\n" %(-1.*param['wedge']) #NB! Here wedge is i righthand rotation  in ImageD11 it is a lefthand rotation
+        out = out + "# wedge = %f\n" %(param['wedge'])
         out = out + "# axis = 0.000 0.0000 1.0000\n" 
 	    # insert detector.par as comment
         out = out + "# cell__a %s\n" %unit_cell[0]
@@ -418,7 +418,7 @@ def write_par(param):
     dout = dout + "tilt_y %f\n" %param['tilt_y']
     dout = dout + "tilt_z %f\n" %param['tilt_z']
     dout = dout + "wavelength %f\n" %param['wavelength']
-    dout = dout + "wedge %f\n" %(-1.*param['wedge']) #NB! Here wedge is i righthand rotation  in ImageD11 it is a lefthand rotation
+    dout = dout + "wedge %f\n" %(param['wedge'])
     dout = dout + "y_center %f\n" %y_center
     dout = dout + "y_size %f\n" %(param['y_size']*1000.)
     dout = dout + "z_center %f\n" %z_center

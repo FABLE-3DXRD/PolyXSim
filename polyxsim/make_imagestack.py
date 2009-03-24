@@ -17,7 +17,10 @@ class make_image:
         self.killfile = killfile
 
         # wedge NB! wedge is in degrees
-        self.wy = self.graindata.param['wedge']*n.pi/180.
+        # The sign is reversed for wedge as the parameter in 
+        # tools.find_omega_general is right handed and in ImageD11
+        # it is left-handed (at this point wedge is defined as in ImageD11)
+        self.wy = -1.*self.graindata.param['wedge']*n.pi/180.
         self.wx = 0.
 
     def setup_odf(self):
