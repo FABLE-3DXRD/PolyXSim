@@ -46,10 +46,16 @@ class determine_overlap:
         
         nover=zeros((nrefl))
         print 'Ready to compare all %i reflections' %nrefl
+        print ''
         t1 = time.clock()
         for i in range(1,nrefl):
-            if i%1000 == 0:
-                print 'Comparing reflection %i' %i
+#            if i%1000 == 0:
+#                print 'Comparing reflection %i' %i
+            t2 = time.clock()-t1
+            print '\rCompared %4.1f pct in %5.1f sec' %(100.*i/nrefl,t2),                        
+            sys.stdout.flush()
+
+
             j=i-1
             while j > -1 and self.tth[i]-self.tth[j] < dtth :
                 if abs(self.omega[i]-self.omega[j]) < self.dw:
@@ -62,26 +68,29 @@ class determine_overlap:
                         nover[j] = 1
                 j = j - 1
         print 'Number of overlaps %i out of %i refl.' %(nover.sum(),nrefl)
-        print time.clock()-t1
 
         self.nover = nover
 
-    def shells(self,nshells=10,wavelength=0.71073):
+    def shells(self,nshells=10,ntype='VOL',wavelength=0.71073):
         stl = sin(pi/180.*self.tth/2)/wavelength
         stlmax = stl[-1]
-        print stlmax
-        print stl.max()
-
         vol_shell = (4./3.*pi*stlmax**3)/nshells
         stlmax_shell = zeros(nshells+1)
+        n_in_shell = len(stl)/nshells
+        
         for i in range(1,nshells+1):
-            V=i*vol_shell
-            print 'V', V
-            stlmax_shell[i] = (3*V/(4*pi))**(1/3.)
-#            stlmax_shell[i] = stlmax/nshells*i
-        tot = 0
-        tot_over = 0
 
+            #equal volume shells
+            if ntype == 'VOL':
+                V=i*vol_shell
+                stlmax_shell[i]= (3*V/(4*pi))**(1/3.)
+            #equal stl shells
+            if ntype == 'RES':
+                stlmax_shell[i] = stlmax/nshells*i
+            # equal no refl shells
+            if ntype == 'REF':
+                stlmax_shell[i] = stl[n_in_shell*i]
+            
         refl_shell = zeros(nshells)
         nover_shell = zeros(nshells)
         for i in range(1,nshells+1):
@@ -89,13 +98,9 @@ class determine_overlap:
             gt = (stl > stlmax_shell[i-1])
             ref_range = lt*gt
             nref_range = ref_range.sum()
-            tot = tot + nref_range
             nover_range = self.nover[ref_range]
-            #print nover_range.shape,nover_range.sum(), nref_range,nover_range.sum()/nref_range
-            tot_over = tot_over + nover_range.sum()
             nover_shell[i-1] = nover_range.sum()
             refl_shell[i-1] = nref_range
-        #print tot_over,tot, tot_over/tot
         self.refl_shell = refl_shell
         self.overlap_shell = nover_shell
         self.stlmax_shell = stlmax_shell[1:]
@@ -105,16 +110,28 @@ class determine_overlap:
         overlap_frac = self.overlap_shell*100./self.refl_shell
         print'Table of overlapping reflections as a function of resolution'
         print ''
-        print '%10s%10s%10s%10s%15s' %('stl_max','d_min','reflec','overlap','overlap ratio')
-        print '%10s%10s%10s%10s%15s' %('-------','-----','------','-------','-------------')
+        print '%10s%10s%10s%10s%15s' %('stl_max',
+                                       'd_min',
+                                       'reflec',
+                                       'overlap',
+                                       'overlap ratio')
+        print '%10s%10s%10s%10s%15s' %('-------',
+                                       '-----',
+                                       '------',
+                                       '-------',
+                                       '-------------')
         for i in range(len(self.refl_shell)):
             print '%10.4f%10.4f%10i%10i%15.2f' %(self.stlmax_shell[i],
                                                  dmin_shell[i],
                                                  self.refl_shell[i],
                                                  self.overlap_shell[i],
                                                  overlap_frac[i])
-        print '%10s%10s%10s%10s%15s' %('-------','-----','------','-------','-------------')
-        print '%10s%10s%10i%10i%15.2f' %('All      ',
+        print '%10s%10s%10s%10s%15s' %('-------',
+                                       '-----',
+                                       '------',
+                                       '-------',
+                                       '-------------')
+        print '%10s%10s%10i%10i%15.2f' %('  All    ',
                                          '',
                                          self.refl_shell.sum(),
                                          self.overlap_shell.sum(),
@@ -123,7 +140,8 @@ class determine_overlap:
 
     def plot(self):
         import pylab as p
-        p.plot(self.stlmax_shell,self.overlap_shell*1./self.refl_shell)
+        overlap_frac = self.overlap_shell*1./self.refl_shell
+        p.plot(self.stlmax_shell,overlap_frac)
         p.xlabel('$\sin(\ttheta)/\lambda$')
         p.ylabel('Fraction of overlap')
         p.show()
@@ -155,7 +173,10 @@ if __name__=='__main__':
                       help="distance limit in omega (degrees)")
     parser.add_option("-s", "--nshells", action="store",
                       dest="nshells", type="int",default=9,
-                      help="Divide the reflecions in to nshells")
+                      help="Show overlap fractions divided into resolution shells")
+    parser.add_option("-t", "--type", action="store",
+                      dest="type", type="string",default='VOL',
+                      help="Resolution shells divided to have equal volume (VOL), resolution (RES), or no. of reflections (REF)")
     options , args = parser.parse_args()
     if options.stem == None:
         parser.print_help()
@@ -172,6 +193,6 @@ if __name__=='__main__':
     overlap.readgff()
     overlap.readref()
     overlap.find_overlap()
-    overlap.shells(nshells=options.nshells,wavelength=options.wavelength)
+    overlap.shells(nshells=options.nshells,ntype=options.type,wavelength=options.wavelength)
     overlap.output()
     overlap.plot()
