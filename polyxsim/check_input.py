@@ -51,7 +51,7 @@ class parse_input:
             'wedge': 0.0,
             'beampol_apply' : 1,
             'beampol_factor': 1,
-            'beampol_angle' : 0.0,
+            'beampol_direct' : 0.0,
             'lorentz_apply' : 1,
             'start_frame': 0,
             'omega_sign': 1,
