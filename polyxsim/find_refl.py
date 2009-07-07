@@ -98,8 +98,12 @@ class find_refl:
                             Om = tools.form_omega_mat_general(omega,self.wx,self.wy) 
                             Gt = n.dot(Om,Gw)
   
-                            # Calc crystal position at present omega
+                            # Calc crystal position at present omega and continue if this is outside the illuminated volume
                             [tx,ty,tz]= n.dot(Om,gr_pos) 
+                            if self.param['beam_width'] != None:
+                                if n.abs(ty) > self.param['beam_width']/2.:
+                                    continue                        
+							
                             
                             # Calc detector coordinate for peak 
                             (dety, detz) = detector.det_coor(Gt, 

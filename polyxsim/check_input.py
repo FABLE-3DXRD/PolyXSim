@@ -49,6 +49,7 @@ class parse_input:
             'tilt_y': 0,
             'tilt_z': 0,
             'wedge': 0.0,
+            'beam_width': None,
             'beampol_apply' : 1,
             'beampol_factor': 1,
             'beampol_direct' : 0.0,
