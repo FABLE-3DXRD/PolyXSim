@@ -60,7 +60,6 @@ class find_refl:
             else:
                 phase = self.param['phase_grains_%s' %(self.param['grain_list'][grainno])]
             unit_cell = self.param['unit_cell_phase_%i' %phase]
-
             self.grain.append(variables.grain_cont(U))
             gr_pos = n.array(self.param['pos_grains_%s' %(self.param['grain_list'][grainno])])
             gr_eps = n.array(self.param['eps_grains_%s' %(self.param['grain_list'][grainno])])
