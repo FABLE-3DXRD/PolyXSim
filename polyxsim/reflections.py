@@ -11,7 +11,7 @@ def gen_miller(param,phase):
         sintlmin = n.sin(param['theta_min']*n.pi/180)/param['wavelength']
         sintlmax = n.sin(param['theta_max']*n.pi/180)/param['wavelength']
 
-	hkl  = tools.genhkl(param['sgno_phase_%i' %phase],
+	hkl  = tools.genhkl(sg.sg(sgno=param['sgno_phase_%i' %phase]).crystal_system,
 				 param['unit_cell_phase_%i' %phase],
 				 sg.sg(sgno=param['sgno_phase_%i' %phase]).syscond,
 				 sintlmin,

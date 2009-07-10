@@ -1,7 +1,7 @@
 import numpy as n
 from xfab import tools
 from xfab import sg
-
+from xfab import symmetry
 
 def generate_U(no_grains,sgi):
 	# generate random U (orientations) for no_grains grains
@@ -23,13 +23,15 @@ def generate_U(no_grains,sgi):
         t = 0
         Ut = U[i].copy()
 #        print i
-        for j in range(sgi.nsymop):
-            if n.linalg.det(sgi.rot[j]) == 1 and (sgi.trans[j] == [0,0,0]).all():
-                Urot = n.dot(U[i],sgi.rot[j]) 
-                trace = Urot.trace()
-                if trace > t:
-                    t = trace
-                    Ut = Urot
+        symmetries = ['triclinic','monoclinic', 'orthorhombic','tetragonal','trigonal','hexagonal','cubic']
+        crystal_system = symmetries.index(sgi.crystal_system)+1
+        rot = symmetry.rotations(crystal_system)
+        for j in range(len(rot)):
+            Urot = n.dot(U[i],rot[j]) 
+            trace = Urot.trace()
+            if trace > t:
+                t = trace
+                Ut = Urot
 #                    print Ut,t
         U[i] = Ut
 #        print U[i] ,i,'****'

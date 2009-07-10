@@ -84,7 +84,11 @@ class find_refl:
                 check_input.interrupt(self.killfile)
                 Gc = n.dot(B,hkl[0:3])
                 Gw = n.dot(self.S,n.dot(U,Gc))
+                tth2 = tools.tth(unit_cell,hkl[0:3],self.param['wavelength'])
+                tth3 = tools.tth2(Gc,self.param['wavelength'])
                 tth = tools.tth2(Gw,self.param['wavelength'])
+                if abs(tth-tth2) > .001:
+                    print tth, tth2, tth3, int(hkl[0]),int(hkl[1]),int(hkl[2]), n.linalg.det(U), n.linalg.det(self.S), n.sum(n.dot(Gw,Gw)), n.sum(n.dot(Gc,Gc))
                 costth = n.cos(tth)
                 (Omega, Eta) = tools.find_omega_general(Gw*self.param['wavelength']/(4.*n.pi),tth,self.wx,self.wy)
                 if len(Omega) > 0:
