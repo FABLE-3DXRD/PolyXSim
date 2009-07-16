@@ -40,9 +40,9 @@ def run(options):
     #print '\n'
     if options.killfile is not None and os.path.exists(options.killfile):
         print "The purpose of the killfile option is to create that file"
-        print "only when you want peaksearcher to stop"
+        print "only when you want PolyXsim to stop"
         print "If the file already exists when you start PolyXsim, it is"
-        print "stopped imidiately"
+        print "stopped immediately"
         raise ValueError("Your killfile "+options.killfile+" already exists")
     
     

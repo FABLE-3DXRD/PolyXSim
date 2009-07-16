@@ -606,6 +606,101 @@ class parse_input:
             self.param['theta_max'] = theta_max
 			
 
+    def init_values(self):
+        #Gaelle duplicate code from check_input for the GUI while loading the file to avoid a check input and all the errors launched if file is wrong
+        # set all non-read items to defaults
+        for item in self.optional_items:
+            if (item not in self.param):
+                self.param[item] = self.optional_items[item]
+            if (self.param[item] == []):
+                self.param[item] = self.optional_items[item]*self.param['no_grains']
+                
+        # assert that the correct number of arguments are given
+        for key in self.param:
+            val = self.param[key] 
+            if val != None and key != 'output' and key != 'grain_list':
+                if key == 'peakshape':
+                    assert len(val) <= 3, 'Wrong number of arguments for %s' %key
+                elif key == 'sample_cyl' or key == 'gen_pos':
+                    assert len(val) == 2 , 'Wrong number of arguments for %s' %key
+                elif key == 'sample_xyz' or 'pos_grains' in key:
+                    assert len(val) == 3, 'Wrong number of arguments for %s' %key
+                elif 'gen_size' in key:
+                    assert len(val) == 4, 'Wrong number of arguments for %s' %key
+                elif 'gen_eps' in key:
+                    if type(val) == type(1):
+                        assert val == 0, 'Wrong number of arguments for %s' %key
+                    else:
+                        assert len(val) == 5, 'Wrong number of arguments for %s' %key
+                elif key == 'gen_phase':
+                    try: 
+                        dummy = len(val)
+                    except:
+                        val = [val]
+                        self.param[key] = val
+                    assert len(val) > 0, 'Wrong number of arguments for %s' %key
+                elif key == 'unit_cell' or 'eps_grains' in key:
+                    assert len(val) == 6, 'Wrong number of arguments for %s' %key
+                elif 'U_grains' in key:
+                    if len(val) != 3:
+                        assert len(val) == 9, 'Wrong number of arguments for %s' %key
+                    else:
+                        assert val.shape == (3,3), 'Wrong number of arguments for %s' %key
+                    # reshape U-matrices
+                    self.param[key] = n.array(self.param[key])
+                    self.param[key].shape = (3,3)
+#                else:
+#                    assert type(val) != list, 'Wrong number of arguments for %s' %key
+
+
+        # init no of phases
+        no_phases = self.param['no_phases']
+
+        phase_list_structure = []
+        phase_list_unit_cell = []
+        phase_list_sgno = []
+        phase_list_sgname = []
+        phase_list_gen_size = []
+        phase_list_gen_eps = []
+        phase_list = []
+
+        for item in self.param:
+            if '_phase_' in item:
+                if 'structure' in item:
+                    phase_list_structure.append(eval(split(item,'_phase_')[1]))
+                elif 'unit_cell' in item:
+                    phase_list_unit_cell.append(eval(split(item,'_phase_')[1]))
+                elif 'sgno' in item:
+                    phase_list_sgno.append(eval(split(item,'_phase_')[1]))
+                elif 'sgname' in item:
+                    phase_list_sgname.append(eval(split(item,'_phase_')[1]))
+                elif 'gen_size' in item:
+                    phase_list_gen_size.append(eval(split(item,'_phase_')[1]))
+                elif 'gen_eps' in item:
+                    phase_list_gen_eps.append(eval(split(item,'_phase_')[1]))
+                    
+
+        phase_list_structure.sort()
+        phase_list_unit_cell.sort()
+        phase_list_sgno.sort()
+        phase_list_sgname.sort()
+        phase_list_gen_size.sort()
+        phase_list_gen_eps.sort()
+    
+        # Init no of grains belonging to phase X if not generated
+        if self.param['gen_phase'][0] != 1:
+            if len(phase_list) == 0:
+                self.param['no_grains_phase_0'] = self.param['no_grains']
+            else:
+                for phase in phase_list:
+                    self.param['no_grains_phase_%i' %phase] = 0
+        else:
+            for i in range(self.param['no_phases']):
+                phase = self.param['gen_phase'][i*2+1]
+                no_grains_phase = int(self.param['gen_phase'][i*2+2])
+                self.param['no_grains_phase_%i' %phase] = no_grains_phase
+            
+
 if __name__=='__main__':
 
     #import check_input
