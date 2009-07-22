@@ -99,8 +99,7 @@ class parse_input:
         try:
             f = open(self.filename,'r')
         except IOError:
-            logging.error('No file named %s' %self.filename)
-            raise IOError
+            raise IOError, 'No file named %s' %self.filename
         
         self.input = f.readlines()
         f.close()
@@ -147,7 +146,12 @@ class parse_input:
             val = self.param[key] 
             if val != None and key != 'output' and key != 'grain_list':
                 if key == 'peakshape':
-                    assert len(val) <= 3, 'Wrong number of arguments for %s' %key
+                    if type(val) == type(1):
+                        assert val == 0, 'Wrong number of arguments for %s' %key
+                        val = [0, 0]
+                        self.param[key] = val
+                    else:
+                        assert len(val) <= 3, 'Wrong number of arguments for %s' %key
                 elif key == 'sample_cyl' or key == 'gen_pos':
                     assert len(val) == 2 , 'Wrong number of arguments for %s' %key
                 elif key == 'sample_xyz' or 'pos_grains' in key:
@@ -620,7 +624,12 @@ class parse_input:
             val = self.param[key] 
             if val != None and key != 'output' and key != 'grain_list':
                 if key == 'peakshape':
-                    assert len(val) <= 3, 'Wrong number of arguments for %s' %key
+                    if type(val) == type(1):
+                        assert val == 0, 'Wrong number of arguments for %s' %key
+                        val = [0, 0]
+                        self.param[key] = val
+                    else:
+                        assert len(val) <= 3, 'Wrong number of arguments for %s' %key
                 elif key == 'sample_cyl' or key == 'gen_pos':
                     assert len(val) == 2 , 'Wrong number of arguments for %s' %key
                 elif key == 'sample_xyz' or 'pos_grains' in key:
