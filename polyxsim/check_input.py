@@ -618,7 +618,10 @@ class parse_input:
                 self.param[item] = self.optional_items[item]
             if (self.param[item] == []):
                 self.param[item] = self.optional_items[item]*self.param['no_grains']
-                
+        #Gaelle : create a new parameter to get all grains id (contains a list of keys with U_grains_Y
+        self.param['UgrainsId']=[]  
+        self.param['posgrainsId']=[]      
+        self.param['epsgrainsId']=[]
         # assert that the correct number of arguments are given
         for key in self.param:
             val = self.param[key] 
@@ -633,6 +636,8 @@ class parse_input:
                 elif key == 'sample_cyl' or key == 'gen_pos':
                     assert len(val) == 2 , 'Wrong number of arguments for %s' %key
                 elif key == 'sample_xyz' or 'pos_grains' in key:
+                    if 'pos_grains' in key:
+                      self.param['posgrainsId'].append(key)
                     assert len(val) == 3, 'Wrong number of arguments for %s' %key
                 elif 'gen_size' in key:
                     assert len(val) == 4, 'Wrong number of arguments for %s' %key
@@ -649,12 +654,18 @@ class parse_input:
                         self.param[key] = val
                     assert len(val) > 0, 'Wrong number of arguments for %s' %key
                 elif key == 'unit_cell' or 'eps_grains' in key:
+                    if 'eps_grains' in key:
+                        self.param['epsgrainsId'].append(key)
                     assert len(val) == 6, 'Wrong number of arguments for %s' %key
                 elif 'U_grains' in key:
+                    #Gaelle : add this key to my new parameter so that it' s easier to get in the GUI.
+                    self.param['UgrainsId'].append(key) 
                     if len(val) != 3:
                         assert len(val) == 9, 'Wrong number of arguments for %s' %key
                     else:
                         assert val.shape == (3,3), 'Wrong number of arguments for %s' %key
+                   
+                    #end add Gaelle
                     # reshape U-matrices
                     self.param[key] = n.array(self.param[key])
                     self.param[key].shape = (3,3)
@@ -708,6 +719,44 @@ class parse_input:
                 phase = self.param['gen_phase'][i*2+1]
                 no_grains_phase = int(self.param['gen_phase'][i*2+2])
                 self.param['no_grains_phase_%i' %phase] = no_grains_phase
+            
+        #If no structure file is given - unit_cell should be               
+        if len(phase_list) == 0:
+            # This is a monophase simulation probably using the "old" keywords
+            if self.param['structure_file'] == None:
+                #print 'NO structure file'
+                assert self.param['unit_cell'] != None, \
+                    'Missing input: structure_file or unit_cell' 
+                
+                # rename keyword
+                self.param['unit_cell_phase_0'] = self.param['unit_cell']
+                # and delete old one
+                del self.param['unit_cell']
+                assert self.param['sgno'] != None or self.param['sgname'] != None , \
+                    'Missing input: no space group information, please input either sgno or sgname' 
+                if self.param['sgno'] == None:
+                    self.param['sgno_phase_0'] = sg.sg(sgname = self.param['sgname']).no
+                    # rename keyword
+                    self.param['sgname_phase_0'] = self.param['sgname']
+                    # and delete old one
+                    del self.param['sgname']
+                else:
+                    self.param['sgname_phase_0'] = sg.sg(sgno = self.param['sgno']).name
+                    # rename keyword
+                    self.param['sgno_phase_0'] = self.param['sgno']
+                    # and delete old one
+                    del self.param['sgno']
+            else:
+                # rename keyword
+                self.param['structure_phase_0'] = self.param['structure_file']
+                # and delete old one
+                del self.param['structure_file']
+            phase_list = [0]
+        self.param['phase_list'] = phase_list
+
+       #make old input file work
+        #if len(grain_list_phase) == 0 and self.param['no_phases'] == 1:
+           # self.param['grain_list_phase_%i' %self.param['phase_list'][0]] = self.param['grain_list']
             
 
 if __name__=='__main__':
