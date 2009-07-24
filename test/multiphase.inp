@@ -35,7 +35,7 @@ omega_end 180.0
 omega_sign 1
 omega_start 0.0
 omega_step 0.5
-output '.flt' '.gve' '.ini' '.ubi' '.par' '.edf'
+output '.flt' '.gve' '.ini' '.ubi' '.par' '.edf' '.fcf'
 peakshape 1 2 0.0
 psf 0
 sample_vol 0.008

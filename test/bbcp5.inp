@@ -1,5 +1,5 @@
 ### Instrumental
-beamflux 1e12
+beamflux 1e14
 # Experimental setup
 wavelength  0.4859292
 distance 202.748505698
@@ -19,18 +19,18 @@ wedge 0.0
 
 omega_start  0.0     # Minimum Omega in range of interest (in deg)
 omega_end  180.0      # Maximum Omega in range of interest (in deg)
-omega_step  10.0      # Omega step size (in deg)
+omega_step  .5      # Omega step size (in deg)
 omega_sign  1        # Sign of omega rotation
 beampol_factor  1    # Polarisation factor
 beampol_direct  0    # Polarisation direction
-#theta_min  0         # Minimum theta angle for reflection generation
-#theta_max  15        # Maximum theta angle for reflection generation
+theta_min  0         # Minimum theta angle for reflection generation
+theta_max  5        # Maximum theta angle for reflection generation
 o11   1              # Orientation matrix of detector 
 o12   0              # [[o11,o12]
 o21   0              #  [o21,o22]]
 o22  -1              # 
 ### Grains
-no_grains  10
+no_grains  2
 
 gen_U 1        # generate grain orientations
 gen_pos 1 0    # generate grain positions
@@ -56,7 +56,7 @@ structure_file 'bbcp5_mon.cif'
 ### Files
 direc  'bbcp5'
 stem 'bbcp_mono_'
-output '.flt' '.edf' '.gve' '.ubi' '.par' 
+output '.flt' '.edf' '.gve' '.ubi' '.par' '.gff'
 
 ### Images
 make_image 1       # generate images if different from 0, default generate
