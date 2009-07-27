@@ -622,6 +622,7 @@ class parse_input:
         self.param['UgrainsId']=[]  
         self.param['posgrainsId']=[]      
         self.param['epsgrainsId']=[]
+        self.param['sizegrainsId']=[]
         # assert that the correct number of arguments are given
         for key in self.param:
             val = self.param[key] 
@@ -660,15 +661,17 @@ class parse_input:
                 elif 'U_grains' in key:
                     #Gaelle : add this key to my new parameter so that it' s easier to get in the GUI.
                     self.param['UgrainsId'].append(key) 
+                    #end add Gaelle
                     if len(val) != 3:
                         assert len(val) == 9, 'Wrong number of arguments for %s' %key
                     else:
                         assert val.shape == (3,3), 'Wrong number of arguments for %s' %key
-                   
-                    #end add Gaelle
                     # reshape U-matrices
                     self.param[key] = n.array(self.param[key])
                     self.param[key].shape = (3,3)
+                elif 'size_grains' in key:
+                    #added by gaelle
+                    self.param['sizegrainsId'].append(key)
 #                else:
 #                    assert type(val) != list, 'Wrong number of arguments for %s' %key
 
@@ -683,7 +686,7 @@ class parse_input:
         phase_list_gen_size = []
         phase_list_gen_eps = []
         phase_list = []
-
+        
         for item in self.param:
             if '_phase_' in item:
                 if 'structure' in item:
@@ -727,7 +730,6 @@ class parse_input:
                 #print 'NO structure file'
                 assert self.param['unit_cell'] != None, \
                     'Missing input: structure_file or unit_cell' 
-                
                 # rename keyword
                 self.param['unit_cell_phase_0'] = self.param['unit_cell']
                 # and delete old one
