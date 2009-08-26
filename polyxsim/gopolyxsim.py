@@ -9,6 +9,7 @@ from polyxsim import generate_grains
 from polyxsim import make_image
 from polyxsim import make_imagestack
 from polyxsim import reflections
+from polyxsim import help_input
 import logging
 logging.basicConfig(level=logging.INFO,format='\n%(levelname)s: %(message)s')
 
@@ -23,6 +24,9 @@ def get_options(parser):
     parser.add_option("-d", "--debug", action="store_true",
                       dest="debug",default =False,
                       help="Run in debug mode")
+    parser.add_option("-p", "--print", action="store_true",
+                      dest="print_input",default =False,
+                      help="Show input parameters and syntax")
     parser.add_option("-k","--killfile", action="store",
                       dest="killfile", default=None, type="string",
                       help="Name of file to create halt PolyXSim")
@@ -31,6 +35,9 @@ def get_options(parser):
     return options
 
 def run(options):
+    if options.print_input:
+        print help_input.show_input()
+        sys.exit()
     if options.filename == None:
         parser.print_help()
         print "\nNo input file supplied [-i filename]\n"
@@ -38,6 +45,7 @@ def run(options):
         raise ValueError("No input file supplied [-i filename]")
     #print 'options = ',options
     #print '\n'
+
     if options.killfile is not None and os.path.exists(options.killfile):
         print "The purpose of the killfile option is to create that file"
         print "only when you want PolyXsim to stop"
