@@ -150,7 +150,7 @@ class find_refl:
                             if self.param['beampol_apply'] == 1:
                                 #Polarization factor (Kahn, J. Appl. Cryst. (1982) 15, 330-337.)
                                 rho = n.pi/2.0 + eta + self.param['beampol_direct']*n.pi/180.0 
-                                P = 0.5 * (1 + costth*costth +\
+                                P = 0.5 * (1 + costth*costth -\
                                          self.param['beampol_factor']*n.cos(2*rho)*n.sin(tth)**2)
                             else:
                                 P = 1.0
