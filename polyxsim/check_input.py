@@ -127,12 +127,14 @@ class parse_input:
                 
     def check(self):
         self.missing = False
+        self.errors = {}
 
 # check that all needed items are present
         for item in self.needed_items:
             if item not in self.param:
-                print self.needed_items[item]
-                self.missing = True
+                #print self.needed_items[item]
+                #self.missing = True
+                self.errors[item] =  self.needed_items[item]
 		
 # set all non-read items to defaults
         for item in self.optional_items:
@@ -147,39 +149,63 @@ class parse_input:
             if val != None and key != 'output' and key != 'grain_list':
                 if key == 'peakshape':
                     if type(val) == type(1):
-                        assert val == 0, 'Wrong number of arguments for %s' %key
-                        val = [0, 0]
-                        self.param[key] = val
+                        #assert val == 0, 'Wrong number of arguments for %s' %key
+                        if val != 0: 
+                            self.errors[key] = 'Wrong number of arguments' 
+                        else:
+                            val = [0, 0]
+                            self.param[key] = val
                     else:
-                        assert len(val) <= 3, 'Wrong number of arguments for %s' %key
+                        #assert len(val) <= 3, 'Wrong number of arguments for %s' %key
+                        if len(val) > 3: 
+                            self.errors[key] = 'Wrong number of arguments' 
                 elif key == 'sample_cyl' or key == 'gen_pos':
-                    assert len(val) == 2 , 'Wrong number of arguments for %s' %key
+                    #assert len(val) == 2 , 'Wrong number of arguments for %s' %key
+                    if len(val) != 2: 
+                        self.errors[key] = 'Wrong number of arguments' 
                 elif key == 'sample_xyz' or 'pos_grains' in key:
-                    assert len(val) == 3, 'Wrong number of arguments for %s' %key
+                    #assert len(val) == 3, 'Wrong number of arguments for %s' %key
+                    if len(val) != 3: 
+                        self.errors[key] = 'Wrong number of arguments' 
                 elif 'gen_size' in key:
-                    assert len(val) == 4, 'Wrong number of arguments for %s' %key
+                    #assert len(val) == 4, 'Wrong number of arguments for %s' %key
+                    if len(val) != 4: 
+                        self.errors[key] = 'Wrong number of arguments' 
                 elif 'gen_eps' in key:
                     if type(val) == type(1):
-                        assert val == 0, 'Wrong number of arguments for %s' %key
+                        #assert val == 0, 'Wrong number of arguments for %s' %key
+                        if val != 0: 
+                            self.errors[key] = 'Wrong number of arguments' 
                     else:
-                        assert len(val) == 5, 'Wrong number of arguments for %s' %key
+                        #assert len(val) == 5, 'Wrong number of arguments for %s' %key
+                        if len(val) != 5: 
+                            self.errors[key] = 'Wrong number of arguments' 
                 elif key == 'gen_phase':
                     try: 
                         dummy = len(val)
                     except:
                         val = [val]
                         self.param[key] = val
-                    assert len(val) > 0, 'Wrong number of arguments for %s' %key
+                    #assert len(val) > 0, 'Wrong number of arguments for %s' %key
+                    if len(val) < 1: 
+                        self.errors[key] = 'Wrong number of arguments' 
                 elif key == 'unit_cell' or 'eps_grains' in key:
-                    assert len(val) == 6, 'Wrong number of arguments for %s' %key
+                    #assert len(val) == 6, 'Wrong number of arguments for %s' %key
+                    if len(val) != 6: 
+                        self.errors[key] = 'Wrong number of arguments' 
                 elif 'U_grains' in key:
                     if len(val) != 3:
-                        assert len(val) == 9, 'Wrong number of arguments for %s' %key
+                        #assert len(val) == 9, 'Wrong number of arguments for %s' %key
+                        if len(val) != 9: 
+                            self.errors[key] = 'Wrong number of arguments' 
+                        else:
+                            self.param[key] = n.array(self.param[key])
+                            self.param[key].shape = (3,3)
                     else:
-                        assert val.shape == (3,3), 'Wrong number of arguments for %s' %key
+                        #assert val.shape == (3,3), 'Wrong number of arguments for %s' %key
+                        if  val.shape != (3,3): 
+                            self.errors[key] = 'Wrong number of arguments' 
                     # reshape U-matrices
-                    self.param[key] = n.array(self.param[key])
-                    self.param[key].shape = (3,3)
 #                else:
 #                    assert type(val) != list, 'Wrong number of arguments for %s' %key
 
@@ -218,50 +244,94 @@ class parse_input:
         phase_list_gen_eps.sort()
                        
         if len(phase_list_structure) != 0:
-            assert len(phase_list_structure) == no_phases, \
-                'Input number of structural phases does not agree with number\n' +\
-                ' of structure_phase, check for multiple names or missing files.'
-            phase_list = phase_list_structure
-        elif  len(phase_list_unit_cell) != 0:
-            assert len(phase_list_unit_cell) == no_phases, \
-                'Input number of structural phases does not agree with number\n' +\
-                ' of unit_cell, check for multiple names or missing linies.'
-            phase_list = phase_list_unit_cell
-            if len(phase_list_sgno) == 0:
-                assert len(phase_list_sgname) == no_phases, \
+#             assert len(phase_list_structure) == no_phases, \
+#                 'Input number of structural phases does not agree with number\n' +\
+#                 ' of structure_phase, check for multiple names or missing files.'
+#             phase_list = phase_list_structure
+            if len(phase_list_structure) != no_phases:
+                self.errors['phase_list_structure'] = \
                     'Input number of structural phases does not agree with number\n' +\
-                    'of space group information given (sgno or sgname),\n' +\
-                    'check for multiple names or missing linies.'
-                assert phase_list_sgname == phase_list_unit_cell, \
-                    'The phase numbers given to unit_cell does not match those in sgname'
+                    ' of structure_phase, check for multiple names or missing files.'
+            else:
+                phase_list = phase_list_structure
+        elif  len(phase_list_unit_cell) != 0:
+#             assert  len(phase_list_unit_cell) == no_phases, \
+#                 'Input number of structural phases does not agree with number\n' +\
+#                 ' of unit_cell, check for multiple names or missing linies.'
+#             phase_list = phase_list_unit_cell
+            if len(phase_list_unit_cell) != no_phases:
+                self.errors['phase_list_unit_cell'] = \
+                    'Input number of structural phases does not agree with number\n' +\
+                    ' of unit_cell, check for multiple names or missing linies.'
+            else:
+                phase_list = phase_list_unit_cell
+            if len(phase_list_sgno) == 0:
+#                 assert len(phase_list_sgname) == no_phases, \
+#                     'Input number of structural phases does not agree with number\n' +\
+#                     'of space group information given (sgno or sgname),\n' +\
+#                     'check for multiple names or missing linies.'
+                if len(phase_list_sgname) != no_phases:
+                    self.errors['phase_list_sgname'] = \
+                        'Input number of structural phases does not agree with number\n' +\
+                        'of space group information given (sgno or sgname),\n' +\
+                        'check for multiple names or missing linies.'
+#                 assert phase_list_sgname == phase_list_unit_cell, \
+#                     'The phase numbers given to unit_cell does not match those in sgname'
+                if phase_list_sgname != phase_list_unit_cell:
+                    self.errors['phase_list_sgname_2'] = \
+                        'The phase numbers given to unit_cell does not match those in sgname'
+
                 # add sgno for phase to parameter list
                 for phase in phase_list_sgname:
                     self.param['sgno_phase_%i' %phase] = sg.sg(sgname = self.param['sgname_phase_%i' %phase]).no
 
             elif len(phase_list_sgname) == 0:
-                assert len(phase_list_sgno) == no_phases, \
-                    'Input number of structural phases does not agree with number\n' +\
-                    'of space group information given (sgno or sgname),\n' +\
-                    'check for multiple names or missing linies.'
-                assert phase_list_sgno == phase_list_unit_cell, \
-                    'The phase numbers given to unit_cell does not match those in sgno.'
+#                 assert len(phase_list_sgno) == no_phases, \
+#                     'Input number of structural phases does not agree with number\n' +\
+#                     'of space group information given (sgno or sgname),\n' +\
+#                     'check for multiple names or missing linies.'
+                if len(phase_list_sgno) != no_phases:
+                    self.errors['phase_list_sgno'] = \
+                        'Input number of structural phases does not agree with number\n' +\
+                        'of space group information given (sgno or sgname),\n' +\
+                        'check for multiple names or missing linies.'
+#                 assert phase_list_sgno == phase_list_unit_cell, \
+#                     'The phase numbers given to unit_cell does not match those in sgno.'
+                if phase_list_sgno != phase_list_unit_cell:
+                    self.errors['phase_list_sgno_2'] = \
+                        'The phase numbers given to unit_cell does not match those in sgno.'
+
                 # add sgname for phase to parameter list
                 for phase in phase_list_sgno:
                     self.param['sgname_phase_%i' %phase] = sg.sg(sgno = self.param['sgno_phase_%i' %phase]).name
             else:
                 # both sg numbers and names in input check if they point at the same space group
                 for phase in phase_list_sgno:
-                    assert self.param['sgname_phase_%i' %phase] == sg.sg(sgno = self.param['sgno_phase_%i' %phase]).name, \
-                        '\nSpace group is specified both as space group name and number - \n' + \
-                        'and they do not correspond to the same space group. \n' + \
-                        'Please sort this out in the input file.' 
+#                     assert self.param['sgname_phase_%i' %phase] == sg.sg(sgno = self.param['sgno_phase_%i' %phase]).name, \
+#                         '\nSpace group is specified both as space group name and number - \n' + \
+#                         'and they do not correspond to the same space group. \n' + \
+#                         'Please sort this out in the input file.' 
+                    if self.param['sgname_phase_%i' %phase] != sg.sg(sgno = self.param['sgno_phase_%i' %phase]).name:
+                        self.errors['sgname_phase_list_sgno_2'] = \
+                            '\nSpace group is specified both as space group name and number - \n' + \
+                            'and they do not correspond to the same space group. \n' + \
+                            'Please sort this out in the input file for phase %i.' %phase 
                 
                 
         if len(phase_list_gen_size) != 0:
-            assert len(phase_list_gen_size) == no_phases, \
-                'Input number of structural phases does not agree with number\n' +\
-                'of gen_size_phase_ keywords given'
-            assert phase_list_gen_size == phase_list, \
+#             assert len(phase_list_gen_size) == no_phases, \
+#                 'Input number of structural phases does not agree with number\n' +\
+#                 'of gen_size_phase_ keywords given'
+            if len(phase_list_gen_size) != no_phases:
+                self.errors['phase_list_gen_size_1'] = \
+                    'Input number of structural phases does not agree with number\n' +\
+                    'of gen_size_phase_ keywords given'
+#            assert phase_list_gen_size == phase_list, \
+#                    'The phase numbers given to gen_size_phase does not match those\n' +\
+#                    'in crystallographic part - structure_phase_X or unit_cell_phase_X.'
+            
+            if phase_list_gen_size != phase_list:
+                self.errors['phase_list_gen_size_2'] = \
                     'The phase numbers given to gen_size_phase does not match those\n' +\
                     'in crystallographic part - structure_phase_X or unit_cell_phase_X.'
             self.param['gen_size'][0] = 1
@@ -274,10 +344,18 @@ class parse_input:
                 self.param['gen_size_phase_%i' %phase] = copy(self.param['gen_size'])
                 
         if len(phase_list_gen_eps) != 0:
-            assert len(phase_list_gen_eps) == no_phases, \
-                'Input number of structural phases does not agree with number\n' +\
-                'of gen_size_phase_ keywords given'
-            assert phase_list_gen_eps == phase_list, \
+#             assert len(phase_list_gen_eps) == no_phases, \
+#                 'Input number of structural phases does not agree with number\n' +\
+#                 'of gen_size_phase_ keywords given'
+            if len(phase_list_gen_eps) != no_phases:
+                self.errors['phase_list_gen_eps_1'] = \
+                    'Input number of structural phases does not agree with number\n' +\
+                    'of gen_size_phase_ keywords given'
+#             assert phase_list_gen_eps == phase_list, \
+#                     'The phase numbers given to gen_size_phase does not match those\n' +\
+#                     'in crystallographic part - structure_phase_X or unit_cell_phase_X.'
+            if phase_list_gen_eps != phase_list:
+                self.errors['phase_list_gen_eps_2'] = \
                     'The phase numbers given to gen_size_phase does not match those\n' +\
                     'in crystallographic part - structure_phase_X or unit_cell_phase_X.'
             self.param['gen_eps'][0] = 1
@@ -289,7 +367,9 @@ class parse_input:
                 phase = 0 
                 self.param['gen_eps_phase_%i' %phase] = copy(self.param['gen_eps'])
         if self.param['gen_phase'][0] != 0:
-            assert len(self.param['gen_phase'][1:]) == no_phases*2, 'Missing info for  -  gen_phase'
+#             assert len(self.param['gen_phase'][1:]) == no_phases*2, 'Missing info for  -  gen_phase'
+            if len(self.param['gen_phase'][1:]) != no_phases*2:
+                self.errors['gen_phase'] = 'Missing info for  -  gen_phase'
 
         # Make sure both sgname and sgno exist
         if len(phase_list_sgno) == 0:
@@ -342,9 +422,13 @@ class parse_input:
         if self.param['no_phases'] > 1:
             for phase in phase_list:
                 sum_of_grains += self.param['no_grains_phase_%i' %phase]
-            assert sum_of_grains == no_grains, \
-                'Input number of grains (%i) does not agree ' %no_grains +\
-                'with number of phase_grains_ keywords (%i)' %sum_of_grains
+#             assert sum_of_grains == no_grains, \
+#                 'Input number of grains (%i) does not agree ' %no_grains +\
+#                 'with number of phase_grains_ keywords (%i)' %sum_of_grains
+            if sum_of_grains != no_grains:
+                self.errors['no_grains_2'] = \
+                    'Input number of grains (%i) does not agree ' %no_grains +\
+                    'with number of phase_grains_ keywords (%i)' %sum_of_grains
         else:
             self.param['no_grains_phase_0'] = no_grains
 
@@ -356,89 +440,159 @@ class parse_input:
         grain_list_size.sort()
         grain_list_phase.sort()
         if len(grain_list_U) != 0 and self.param['gen_U'] == 0:
-            assert len(grain_list_U) == no_grains, \
-                'Input number of grains does not agree with number\n' +\
-                ' of U_grains, check for multiple names'
+#             assert len(grain_list_U) == no_grains, \
+#                 'Input number of grains does not agree with number\n' +\
+#                 ' of U_grains, check for multiple names'
+            if len(grain_list_U) != no_grains:
+                self.errors['grain_list_U'] = \
+                    'Input number of grains does not agree with number\n' +\
+                    ' of U_grains, check for multiple names'
             self.param['grain_list'] = grain_list_U
             if len(grain_list_pos) != 0 and self.param['gen_pos'][0] == 0:
-                assert grain_list_U == grain_list_pos, \
-                    'Specified grain numbers for U_grains and pos_grains disagree'
+#                 assert grain_list_U == grain_list_pos, \
+#                     'Specified grain numbers for U_grains and pos_grains disagree'
+                if grain_list_U != grain_list_pos:
+                    self.errors['grain_list_U_pos'] = \
+                        'Specified grain numbers for U_grains and pos_grains disagree'
                 if len(grain_list_eps) != 0 and self.param['gen_eps'][0] == 0:
-                    assert grain_list_U == grain_list_eps, \
-                        'Specified grain numbers for U_grains and eps_grains disagree'
+#                     assert grain_list_U == grain_list_eps, \
+#                         'Specified grain numbers for U_grains and eps_grains disagree'
+                    if grain_list_U != grain_list_eps:
+                        self.errors['grain_list_U_eps'] = \
+                            'Specified grain numbers for U_grains and eps_grains disagree'
                 if len(grain_list_size) != 0 and self.param['gen_size'][0] == 0:
-                    assert grain_list_U == grain_list_size, \
-                        'Specified grain numbers for U_grains and size_grains disagree'
+#                     assert grain_list_U == grain_list_size, \
+#                         'Specified grain numbers for U_grains and size_grains disagree'
+                    if grain_list_U != grain_list_size:
+                        self.errors['grain_list_U_size'] = \
+                            'Specified grain numbers for U_grains and size_grains disagree'
                 if len(grain_list_phase) != 0 and self.param['gen_phase'][0] == 0:
-                    assert grain_list_U == grain_list_phase, \
-                        'Specified grain numbers for U_grains and phase_grains disagree'
+#                     assert grain_list_U == grain_list_phase, \
+#                         'Specified grain numbers for U_grains and phase_grains disagree'
+                    if grain_list_U != grain_list_phase:
+                        self.errors['grain_list_U_phase'] = \
+                            'Specified grain numbers for U_grains and phase_grains disagree'
         else:
             if len(grain_list_pos) != 0 and self.param['gen_pos'][0] == 0:
-                assert len(grain_list_pos) == no_grains, \
-                    'Input number of grains does not agree with number\n'+\
-                    ' of pos_grains, check for multiple names'
+#                 assert len(grain_list_pos) == no_grains, \
+#                     'Input number of grains does not agree with number\n'+\
+#                     ' of pos_grains, check for multiple names'
+                if len(grain_list_pos) == no_grains:
+                    self.errors['grain_list_pos_nograins'] = \
+                        'Input number of grains does not agree with number\n'+\
+                        ' of pos_grains, check for multiple names'
                 self.param['grain_list'] = grain_list_pos
                 if len(grain_list_eps) != 0 and self.param['gen_eps'][0] == 0:
-                    assert grain_list_pos == grain_list_eps, \
-                        'Specified grain number for pos_grains and eps_grains disagree'
+#                     assert grain_list_pos == grain_list_eps, \
+#                         'Specified grain number for pos_grains and eps_grains disagree'
+                    if grain_list_pos != grain_list_eps:
+                        self.errors['grain_list_pos_eps'] = \
+                            'Specified grain number for pos_grains and eps_grains disagree'
                 if len(grain_list_size) != 0 and self.param['gen_size'][0] == 0:
-                    assert grain_list_pos == grain_list_size, \
-                        'Specified grain number for pos_grains and size_grains disagree'
+#                     assert grain_list_pos == grain_list_size, \
+#                         'Specified grain number for pos_grains and size_grains disagree'
+                    if grain_list_pos != grain_list_size:
+                        self.errors['grain_list_pos_size'] = \
+                            'Specified grain number for pos_grains and size_grains disagree'
                 if len(grain_list_phase) != 0 and self.param['gen_phase'][0] == 0:
-                    assert grain_list_pos == grain_list_phase, \
-                        'Specified grain numbers for pos_grains and phase_grains disagree'
+#                     assert grain_list_pos == grain_list_phase, \
+#                         'Specified grain numbers for pos_grains and phase_grains disagree'
+                    if grain_list_pos != grain_list_phase:
+                        self.errors['grain_list_pos_phase'] = \
+                            'Specified grain number for pos_grains and phase_grains disagree'
             elif len(grain_list_eps) != 0 and self.param['gen_eps'][0] == 0:
-                assert len(grain_list_eps) == no_grains, \
-                    'Input number of grains does not agree with number'+\
-                    ' of eps_grains, check for multiple names'
+#                 assert len(grain_list_eps) == no_grains, \
+#                     'Input number of grains does not agree with number'+\
+#                     ' of eps_grains, check for multiple names'
+                if len(grain_list_eps) != no_grains:
+                    self.errors['grain_list_eps_nograins'] = \
+                        'Input number of grains does not agree with number'+\
+                        ' of eps_grains, check for multiple names'
                 self.param['grain_list'] = grain_list_eps
                 if len(grain_list_size) != 0 and self.param['gen_size'][0] == 0:
-                    assert grain_list_eps == grain_list_size, \
-                        'Specified grain number for eps_grains and size_grains disagree'
+#                     assert grain_list_eps == grain_list_size, \
+#                         'Specified grain number for eps_grains and size_grains disagree'
+                    if grain_list_eps != grain_list_size:
+                        self.errors['grain_list_eps_size'] = \
+                            'Specified grain number for eps_grains and size_grains disagree'
                 if len(grain_list_phase) != 0 and self.param['gen_phase'][0] == 0:
-                    assert grain_list_eps == grain_list_phase, \
-                        'Specified grain numbers for eps_grains and phase_grains disagree'
+#                     assert grain_list_eps == grain_list_phase, \
+#                         'Specified grain numbers for eps_grains and phase_grains disagree'
+                    if grain_list_eps != grain_list_phase:
+                        self.errors['grain_list_eps_phase'] = \
+                            'Specified grain number for eps_grains and phase_grains disagree'
             elif len(grain_list_size) != 0 and self.param['gen_size'][0] == 0:
-                assert len(grain_list_size) == no_grains, \
-                    'Input number of grains does not agree with number\n'+\
-                    ' of size_grains, check for multiple names'
+#                 assert len(grain_list_size) == no_grains, \
+#                     'Input number of grains does not agree with number\n'+\
+#                     ' of size_grains, check for multiple names'
+                if len(grain_list_size) != no_grains:
+                    self.errors['grain_list_size_nograins'] = \
+                        'Input number of grains does not agree with number\n'+\
+                        ' of size_grains, check for multiple names'
                 self.param['grain_list'] = grain_list_size
                 if len(grain_list_phase) != 0 and self.param['gen_phase'][0] == 0:
-                    assert grain_list_size == grain_list_phase, \
-                        'Specified grain numbers for size_grains and phase_grains disagree'
+#                     assert grain_list_size == grain_list_phase, \
+#                         'Specified grain numbers for size_grains and phase_grains disagree'
+                    if grain_list_size != grain_list_phase:
+                        self.errors['grain_list_size_phase'] = \
+                            'Specified grain numbers for size_grains and' +\
+                            'phase_grains disagree'
             elif len(grain_list_phase) != 0 and self.param['gen_phase'][0] == 0:
-                assert len(grain_list_phase) == no_grains, \
-                    'Input number of grains does not agree with number\n'+\
-                    ' of phase_grains, check for multiple names'
+#                 assert len(grain_list_phase) == no_grains, \
+#                     'Input number of grains does not agree with number\n'+\
+#                     ' of phase_grains, check for multiple names'
+                if len(grain_list_phase) != no_grains:
+                    self.errors['grain_list_phase_nograins'] = \
+                        'Input number of grains does not agree with number\n'+\
+                        ' of phase_grains, check for multiple names'
                 self.param['grain_list'] = grain_list_phase
             else:
                 self.param['grain_list'] = range(no_grains)
 
 # assert that all information needed to generate grains is present	
-        assert len(grain_list_U) != 0 or self.param['gen_U'] != 0,\
-            'Information on U generations missing'
-        assert len(grain_list_pos) != 0 or self.param['gen_pos'][0] != 0,\
-            'Information on position generation missing'
-        assert len(grain_list_eps) != 0 or self.param['gen_eps'][0] != 0,\
-            'Information on strain tensor generation missing'
-        assert len(grain_list_size) != 0 or self.param['gen_size'][0] != 0,\
-            'Information on grain size generation missing'
+#         assert len(grain_list_U) != 0 or self.param['gen_U'] != 0,\
+#             'Information on U generations missing'
+#         assert len(grain_list_pos) != 0 or self.param['gen_pos'][0] != 0,\
+#             'Information on position generation missing'
+#         assert len(grain_list_eps) != 0 or self.param['gen_eps'][0] != 0,\
+#             'Information on strain tensor generation missing'
+#         assert len(grain_list_size) != 0 or self.param['gen_size'][0] != 0,\
+#             'Information on grain size generation missing'
+        if len(grain_list_U) != 0 and self.param['gen_U'] != 0:
+            self.errors['grain_list_gen_U'] = \
+                'Information on U generations missing'
+        if len(grain_list_pos) != 0 and self.param['gen_pos'][0] != 0:
+            self.errors['grain_list_gen_pos'] = \
+                'Information on position generation missing'
+        if len(grain_list_eps) != 0 and self.param['gen_eps'][0] != 0:
+            self.errors['grain_list_gen_eps'] = \
+                'Information on strain tensor generation missing'
+        if len(grain_list_size) != 0 and self.param['gen_size'][0] != 0:
+            self.errors['grain_list_gen_size'] = \
+                'Information on grain size generation missing'
 			
 
-#If no structure file is given - unit_cell should be               
+#If no structure file is given - unit_cel should be               
         if len(phase_list) == 0:
             # This is a monophase simulation probably using the "old" keywords
             if self.param['structure_file'] == None:
                 #print 'NO structure file'
-                assert self.param['unit_cell'] != None, \
-                    'Missing input: structure_file or unit_cell' 
+#                 assert self.param['unit_cell'] != None, \
+#                     'Missing input: structure_file or unit_cell' 
+                if self.param['unit_cell'] == None:
+                    self.errors['unit_cell'] = \
+                        'Missing input: either structure_file or unit_cell has to be specified' 
                 
                 # rename keyword
                 self.param['unit_cell_phase_0'] = self.param['unit_cell']
                 # and delete old one
                 del self.param['unit_cell']
-                assert self.param['sgno'] != None or self.param['sgname'] != None , \
-                    'Missing input: no space group information, please input either sgno or sgname' 
+#                 assert self.param['sgno'] != None or self.param['sgname'] != None , \
+#                     'Missing input: no space group information, please input either sgno or sgname' 
+                if self.param['sgno'] == None and self.param['sgname'] == None:
+                    self.errors['sgno'] = \
+                        'Missing input: no space group information, '+\
+                        'please input either sgno or sgname' 
                 if self.param['sgno'] == None:
                     self.param['sgno_phase_0'] = sg.sg(sgname = self.param['sgname']).no
                     # rename keyword
@@ -466,35 +620,58 @@ class parse_input:
 
 
 #assert that not both sample_xyz and sample_cyl are given
-        if self.param['sample_xyz'] != None:
-            assert self.param['sample_cyl'] == None, 'Both sample_xyz and sample_cyl are given'
+#         if self.param['sample_xyz'] != None:
+#             assert self.param['sample_cyl'] == None, 'Both sample_xyz and sample_cyl are given'
+        if self.param['sample_xyz'] != None and self.param['sample_cyl'] != None:
+            self.errors['sample_dim'] = \
+                'Both sample_xyz and sample_cyl are given'
 			
 # assert that mean grain size != 0 and if mean > 0 then min < mean < max, assure that min non-negative
         if self.param['gen_size'][0] != 0:
             for phase in  phase_list:
                 phase_key = 'gen_size_phase_%i' %phase
-                assert  self.param[phase_key][1] != 0, 'Invalid gen_size command, mean size 0'
+#                 assert  self.param[phase_key][1] != 0, 'Invalid gen_size command, mean size 0'
+                if self.param[phase_key][1] == 0:
+                    self.errors['phase_key_1'] = 'Invalid gen_size command, mean size 0'
                 if self.param[phase_key][1] > 0:
-                    assert self.param[phase_key][2] < self.param[phase_key][1], \
-                        'grain_min larger than grain_size for phase %i' %phase
-                    assert self.param[phase_key][3] > self.param[phase_key][1], \
-                        'grain_max smaller than grain_size for phase %i' %phase
+#                     assert self.param[phase_key][2] < self.param[phase_key][1], \
+#                         'grain_min larger than grain_size for phase %i' %phase
+#                     assert self.param[phase_key][3] > self.param[phase_key][1], \
+#                         'grain_max smaller than grain_size for phase %i' %phase
+                    if self.param[phase_key][2] > self.param[phase_key][1]:
+                        self.errors['phase_key_2'] = \
+                            'grain_min larger than grain_size for phase %i' %phase
+                    if self.param[phase_key][3] < self.param[phase_key][1]:
+                        self.errors['phase_key_3'] = \
+                            'grain_max smaller than grain_size for phase %i' %phase
                     if self.param[phase_key][2] < 0:
                         self.param[phase_key][2] = 0
                     
 #check that the given grain_size and no_grains are consistent with sample_vol, adjust max to sample size
         if self.param['sample_xyz'] != None:
-            assert self.param['sample_xyz'][0] > 0 and self.param['sample_xyz'][1] > 0 and self.param['sample_xyz'][2] > 0,\
-                'Invalid sample_xyz <= 0'
-            self.param['sample_vol'] = self.param['sample_xyz'][0]*\
-                                       self.param['sample_xyz'][1]*\
-                                       self.param['sample_xyz'][2]
-            sample_min_dim = min(self.param['sample_xyz'])
+#             assert self.param['sample_xyz'][0] > 0 and self.param['sample_xyz'][1] > 0 and self.param['sample_xyz'][2] > 0,\
+#                 'Invalid sample_xyz <= 0'
+            if self.param['sample_xyz'][0] < 0 or \
+                    self.param['sample_xyz'][1] < 0 or \
+                    self.param['sample_xyz'][2] < 0:
+                self.errors['sample_xyz'] = 'Invalid sample_xyz all values should be positive'
+                self.param['sample_vol'] = None
+            else:
+                self.param['sample_vol'] = self.param['sample_xyz'][0]*\
+                    self.param['sample_xyz'][1]*\
+                    self.param['sample_xyz'][2]
+                sample_min_dim = min(self.param['sample_xyz'])
         elif self.param['sample_cyl'] != None:
-            assert self.param['sample_cyl'][0] > 0 and self.param['sample_cyl'][1] > 0,\
-                'Invalid sample_cyl <= 0'
-            self.param['sample_vol'] = n.pi*self.param['sample_cyl'][0]*\
-                                       self.param['sample_cyl'][0]*self.param['sample_cyl'][1]/4.
+#             assert self.param['sample_cyl'][0] > 0 and self.param['sample_cyl'][1] > 0,\
+#                 'Invalid sample_cyl <= 0'
+            if self.param['sample_cyl'][0] <= 0 or \
+                    self.param['sample_cyl'][1] <= 0:
+                self.errors['sample_cyl'] = \
+                    'Invalid sample_cyl <= 0'
+                self.param['sample_vol'] = None
+            else:
+                self.param['sample_vol'] = n.pi*self.param['sample_cyl'][0]*\
+                    self.param['sample_cyl'][0]*self.param['sample_cyl'][1]/4.
             sample_min_dim = min(self.param['sample_cyl'])
         else:					
             self.param['sample_vol'] = None
@@ -515,14 +692,22 @@ class parse_input:
                 self.param['vol_frac_phase_%i' %phase_list[i]] = vol[i]/n.sum(vol)
             
 
-            assert mean_diam <= diam_limit, \
-                'The sample volume is too small to contain the '+\
-                'specified number of grains with the given grain size'
+#             assert mean_diam <= diam_limit, \
+#                 'The sample volume is too small to contain the '+\
+#                 'specified number of grains with the given grain size'
+            if mean_diam > diam_limit:
+                self.errors['mean_diam'] = \
+                    'The sample volume is too small to contain the '+\
+                    'specified number of grains with the given grain size'
             if len(grain_list_size) > 0:
                 for i in range(len(grain_list_size)):
-                    assert self.param['size_grains_%s' %(self.param['grain_list'][i])] < diam_limit, \
-                'The sample volume is too small to contain the '+\
-                'specified number of grains with the given grain size'
+#                     assert self.param['size_grains_%s' %(self.param['grain_list'][i])] < diam_limit, \
+#                         'The sample volume is too small to contain the '+\
+#                         'specified number of grains with the given grain size'
+                    if self.param['size_grains_%s' %(self.param['grain_list'][i])] >= diam_limit:
+                        self.errors['size_grains_%s' %(self.param['grain_list'][i])] = \
+                            'The sample diameter is too small to contain the size of the grain ' +\
+                            'by size_grains_%s' %(self.param['grain_list'][i])
 
             
             #self.param['gen_size'][3] = sample_min_dim
@@ -533,6 +718,16 @@ class parse_input:
             if self.param['odf_type'] == 2:
                 assert self.param['odf_file'] != None, 'No filename given for ODF'
 
+    def show_errors(self):
+        if len(self.errors) > 0:
+            print 'List of errors and/or inconsistensies found in input: '
+            print '----------------------------------------------------- '
+            no = 0
+            for i in self.errors:
+                no += 1
+                print 'Error %3i : ' %no, self.errors[i], i
+            print '----------------------------------------------------- \n'
+            
 
 
     def initialize(self):

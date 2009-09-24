@@ -73,10 +73,14 @@ def run(options):
     check_input.interrupt(options.killfile)
     
     
-    if myinput.missing == True:                   # if problem exit
-        logging.info('MISSING ITEMS')
-        sys.exit()
+#     if myinput.missing == True:                   # if problem exit
+#         logging.info('MISSING ITEMS')
+#         sys.exit()
     
+    if len(myinput.errors) > 0:
+        myinput.show_errors()
+        sys.exit()
+
     logging.info('Initialize parameters etc\n')
     myinput.initialize()                            # if ok initialize
     check_input.interrupt(options.killfile)
@@ -130,14 +134,14 @@ def run(options):
     check_input.interrupt(options.killfile)
     
     
-    
     # Determine the reflection parameters for grains
     graindata = find_refl.find_refl(myinput.param,hkl,options.killfile)
     graindata.frameinfo = myinput.frameinfo
     logging.info('Determine reflections positions')
     graindata.run()
-    logging.info('Save reflections')
-    graindata.save()
+    if '.ref' in myinput.param['output']:
+        logging.info('Write reflection file')
+        graindata.save()
     if '.gve' in myinput.param['output']:
         logging.info('Write g-vector file')
         graindata.write_gve()
@@ -147,7 +151,7 @@ def run(options):
     if '.flt' in myinput.param['output']:
         logging.info('Write filtered peaks file')
         graindata.write_flt()
-    #Gaelle to Henning ? image should be indented with my editor. Is it correct?
+
     if myinput.param['make_image'] == 1:
         if  myinput.param['peakshape'][0] == 2:
             image = make_imagestack.make_image(graindata,options.killfile)
