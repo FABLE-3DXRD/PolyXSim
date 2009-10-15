@@ -35,9 +35,20 @@ def get_options(parser):
     return options
 
 def run(options):
+    # Check for print_input
+    try:
+        options.print_input
+    except:
+        options.print_input = None;
     if options.print_input:
         print help_input.show_input()
         sys.exit()
+
+    # Check if filename is specified
+    try:
+        options.filename
+    except:
+        options.filename = None;
     if options.filename == None:
         parser.print_help()
         print "\nNo input file supplied [-i filename]\n"
@@ -46,13 +57,17 @@ def run(options):
     #print 'options = ',options
     #print '\n'
 
+    # Check killfile does not exist
+    try:
+        options.killfile
+    except:
+        options.killfile = None;
     if options.killfile is not None and os.path.exists(options.killfile):
         print "The purpose of the killfile option is to create that file"
         print "only when you want PolyXsim to stop"
         print "If the file already exists when you start PolyXsim, it is"
         print "stopped immediately"
         raise ValueError("Your killfile "+options.killfile+" already exists")
-    
     
     # Is the input file available?
     

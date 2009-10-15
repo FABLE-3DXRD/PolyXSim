@@ -720,7 +720,7 @@ class parse_input:
 
     def show_errors(self):
         if len(self.errors) > 0:
-            print 'List of errors and/or inconsistensies found in input: '
+            print 'List of errors and/or inconsistencies found in input: '
             print '----------------------------------------------------- '
             no = 0
             for i in self.errors:
