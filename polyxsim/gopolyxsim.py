@@ -50,10 +50,9 @@ def run(options):
     except:
         options.filename = None;
     if options.filename == None:
-        parser.print_help()
         print "\nNo input file supplied [-i filename]\n"
         #Gaelle comment : ? sys.exit() and add raise error instead
-        raise ValueError("No input file supplied [-i filename]")
+        sys.exit()
     #print 'options = ',options
     #print '\n'
 

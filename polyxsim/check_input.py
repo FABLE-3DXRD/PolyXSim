@@ -365,6 +365,10 @@ class parse_input:
                     self.param['gen_eps_phase_%i' %phase] = copy(self.param['gen_eps'])
             else:
                 phase = 0 
+                # If strain is not provided and no generation of strains have be asked for
+                # "set" all eps to zero. 
+                if self.param['gen_eps'][0] == 0:
+                    self.param['gen_eps'] = [1, 0.0, 0.0, 0.0, 0.0]
                 self.param['gen_eps_phase_%i' %phase] = copy(self.param['gen_eps'])
         if self.param['gen_phase'][0] != 0:
 #             assert len(self.param['gen_phase'][1:]) == no_phases*2, 'Missing info for  -  gen_phase'
@@ -558,20 +562,21 @@ class parse_input:
 #             'Information on strain tensor generation missing'
 #         assert len(grain_list_size) != 0 or self.param['gen_size'][0] != 0,\
 #             'Information on grain size generation missing'
-        if len(grain_list_U) != 0 and self.param['gen_U'] != 0:
+        if len(grain_list_U) == 0 and self.param['gen_U'] == 0:
             self.errors['grain_list_gen_U'] = \
                 'Information on U generations missing'
-        if len(grain_list_pos) != 0 and self.param['gen_pos'][0] != 0:
+        if len(grain_list_pos) == 0 and self.param['gen_pos'][0] == 0:
             self.errors['grain_list_gen_pos'] = \
                 'Information on position generation missing'
-        if len(grain_list_eps) != 0 and self.param['gen_eps'][0] != 0:
-            self.errors['grain_list_gen_eps'] = \
-                'Information on strain tensor generation missing'
-        if len(grain_list_size) != 0 and self.param['gen_size'][0] != 0:
+# Not used anymore as zero strains are given if not strains are provide 
+# and no gen_eps's are given. Might be used to write warnings later.
+#        if len(grain_list_eps) == 0 and self.param['gen_eps'][0] == 0:
+#            self.errors['grain_list_gen_eps'] = \
+#                'Information on strain tensor generation missing'
+        if len(grain_list_size) == 0 and self.param['gen_size'][0] == 0:
             self.errors['grain_list_gen_size'] = \
                 'Information on grain size generation missing'
 			
-
 #If no structure file is given - unit_cel should be               
         if len(phase_list) == 0:
             # This is a monophase simulation probably using the "old" keywords
@@ -674,8 +679,7 @@ class parse_input:
                     self.param['sample_cyl'][0]*self.param['sample_cyl'][1]/4.
             sample_min_dim = min(self.param['sample_cyl'])
         else:					
-            self.param['sample_vol'] = None
-
+            self.param['sample_vol'] = n.inf
 
         if self.param['sample_vol'] != None and self.param['gen_size'][0] != 0:
             diam_limit = (6*self.param['sample_vol']/\
@@ -685,9 +689,9 @@ class parse_input:
             for phase in phase_list:
 
                 weight = self.param['no_grains_phase_%i' %phase]/self.param['no_grains']
-                vol.append(abs(self.param['gen_size_phase_%i' %phase][1])**3*n.pi/6.* self.param['no_grains_phase_%i' %phase])
+                vol.append(abs(self.param['gen_size_phase_%i' %phase][1])**3 *\
+                               n.pi/6.* self.param['no_grains_phase_%i' %phase])
                 mean_diam += abs(self.param['gen_size_phase_%i' %phase][1])*weight
-
             for i in range(self.param['no_phases']):
                 self.param['vol_frac_phase_%i' %phase_list[i]] = vol[i]/n.sum(vol)
             
@@ -708,9 +712,6 @@ class parse_input:
                         self.errors['size_grains_%s' %(self.param['grain_list'][i])] = \
                             'The sample diameter is too small to contain the size of the grain ' +\
                             'by size_grains_%s' %(self.param['grain_list'][i])
-
-            
-            #self.param['gen_size'][3] = sample_min_dim
 
 
 #check that a file name with the odf file is input is odf_type chosen to be 2.
