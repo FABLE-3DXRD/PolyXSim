@@ -645,10 +645,10 @@ class parse_input:
 #                         'grain_max smaller than grain_size for phase %i' %phase
                     if self.param[phase_key][2] > self.param[phase_key][1]:
                         self.errors['phase_key_2'] = \
-                            'grain_min larger than grain_size for phase %i' %phase
+                            'gen_size (phase %i): the minimum grain size is made larger than the mean grain size - it should be smaller' %phase
                     if self.param[phase_key][3] < self.param[phase_key][1]:
                         self.errors['phase_key_3'] = \
-                            'grain_max smaller than grain_size for phase %i' %phase
+                            'gen_size (phase %i): the maximum grain size is made smaller than the mean grain size - it should be larger' %phase
                     if self.param[phase_key][2] < 0:
                         self.param[phase_key][2] = 0
                     
@@ -726,7 +726,7 @@ class parse_input:
             no = 0
             for i in self.errors:
                 no += 1
-                print 'Error %3i : ' %no, self.errors[i], i
+                print 'Error %3i : ' %no, self.errors[i]
             print '----------------------------------------------------- \n'
             
 
