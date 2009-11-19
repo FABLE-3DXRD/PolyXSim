@@ -93,7 +93,14 @@ class parse_input:
             'no_phases': 1,
             'intensity_const': 0
             }
-
+        self.output_types = ['.edf', 
+                             '.tif', 
+                             '.ref',
+                             '.par', 
+                             '.flt',
+                             '.gve',
+                             '.ini',
+                             '.ubi']
         
     def read(self):     
         try:
@@ -206,8 +213,10 @@ class parse_input:
                         if  val.shape != (3,3): 
                             self.errors[key] = 'Wrong number of arguments' 
                     # reshape U-matrices
-#                else:
-#                    assert type(val) != list, 'Wrong number of arguments for %s' %key
+            elif key == 'output':
+                for item in val:
+                    if item not in self.output_types:
+                        self.errors[key] = 'Output type given %s is not an option' %item 
 
 # Check no of phases
         no_phases = self.param['no_phases']
