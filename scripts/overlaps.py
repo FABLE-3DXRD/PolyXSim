@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from ImageD11 import columnfile
-from numpy import array,concatenate,zeros,abs,sqrt,pi,sin
+from numpy import array,concatenate,floor,arange,zeros,abs,sqrt,pi,sin,int8
 import sys
 
 class determine_overlap:
@@ -70,6 +70,133 @@ class determine_overlap:
         print 'Number of overlaps %i out of %i refl.' %(nover.sum(),nrefl)
 
         self.nover = nover
+
+    def overlap_new(self):
+        """
+        New routine for identifying possible spot overlaps. This routine is much faster 
+        than the "overlaps", but does not provide information about which specific spots
+        are overlapped, but merely flags a spot as overlapped or not.
+
+        This routine sets up an array over all images and adds the value 
+        of 1 at the position of each spot
+        A filter (elliptic, user defines the size in pixels and image length)
+        is made with center at the peak position.
+        if the sum of filter * image is larger than 1 it meens the the center 
+        of another (or more) spots is found within the area considered to give overlaps.
+
+        """
+
+        from scipy import sparse
+        
+        # build one big array of reflection info of all grains
+#         A = self.grain[0].refs
+#         for grainno in range(1,self.param['no_grains']):
+#             A = concatenate((A,self.grain[grainno].refs))
+        
+        #initialize
+        nrefl = self.tth.shape[0]
+#         nrefl = A.shape[0]
+        self.nover=zeros((nrefl))
+        overlaps = dict([(i,[]) for i in range(nrefl)])
+        print 'Ready to compare all %i reflections' %nrefl
+
+        # Make filter 
+#         y_max  = self.param['overlap_specs'][1]*2+1
+#         z_max  = self.param['overlap_specs'][2]*2+1
+#         om_max = self.param['overlap_specs'][0]*2+1
+        y_max = self.dy*2+1
+        z_max = self.dz*2+1
+        om_max = self.dw
+
+        y_cen = (y_max-1)/2
+        z_cen = (z_max-1)/2
+        om_cen = 1 #(om_max-1)/2
+        print 'om_cen',om_cen
+
+        filter = zeros((y_max,z_max))
+
+        for i in range(y_max):
+            for j in range(z_max):
+                if (i-y_cen)**2/float(y_cen)**2 + (j-z_cen)**2/float(z_cen)**2 <= 1:
+                    filter[i,j] = 1
+
+        # Loop over rotation ranges
+        
+        #images = range(self.param['frame_range'][0],
+         #              self.param['frame_range'][1]+1)
+
+#         # make A array for only including reflections within this rotation range 
+#         Atest = A[A[:,22] >= self.param['frame_range'][0]]
+#         Atest = Atest[Atest[:,22] <= self.param['frame_range'][1]]
+#         nrefl = Atest.shape[0]
+
+        # make stack of empty images as a dictionary of sparse matrices
+        omega_sign = 1
+        omega_start = 0.
+        omega_end = 90.
+        omega_step = 0.5
+        self.dety_size = 3072
+        self.detz_size = 3072
+
+
+        omegalist = omega_sign*arange(omega_start,omega_end+omega_step+1e-19,omega_step)
+        stacksize = len(omegalist)
+        frames= zeros((stacksize,int(self.dety_size),int(self.detz_size)),int8)
+
+        # add one in center position of reflections into the image stack. 
+        for i in range(nrefl):
+#             frameindex =  images.index(int(Atest[i,22]))
+            frameindex = omega_sign*\
+                floor((self.omega[i]-omega_start)/omega_step)
+
+            frames[frameindex,int(self.dety[i]), int(self.detz[i])] += 1
+         
+        # determine if reflections are overlapped
+        for i in range(nrefl):
+            filter_use = filter.copy()
+            frameindex =  omega_sign*\
+                floor((self.omega[i]-omega_start)/omega_step)
+#            print frameindex
+            yc = int(self.dety[i])
+            zc = int(self.detz[i])
+            om_1 = frameindex-om_cen
+            om_2 = frameindex+om_cen+1
+            y_1 = yc - y_cen
+            y_2 = yc + y_cen + 1
+            z_1 = zc - z_cen
+            z_2 = zc + z_cen + 1
+
+            # Check if filterbox is extending outside detector images 
+            # if so change filterbox accordingly
+            if om_1 < 0 : 
+                om_1 = 0
+            if om_2 > stacksize+1 : 
+                om_2 = stacksize+1
+            if y_1 < 0: 
+                filter_use = filter_use[abs(y_1):,:]
+                y_1 = 0
+            if y_2 > self.dety_size+1: 
+                filter_use = filter_use[:self.dety_size+1-y_2 ,:]
+                self.dety_size+1
+            if z_1 < 0: 
+                filter_use = filter_use[:,abs(z_1):]
+                z_1 = 0
+            if z_2 > self.detz_size + 1:
+                filter_use = filter_use[:,:self.detz_size+1-z_2]
+                z_2 = self.detz_size+1
+
+#            print om_1, om_2
+            box = frames[om_1:om_2, y_1:y_2, z_1:z_2]
+
+            # Calculate no of overlaps with this reflection
+            no_over = (box*filter_use).sum()-1
+
+#            print no_over
+            # if any put overlap flag in reflection list
+            if no_over > 0:
+                self.nover[i] += 1
+            
+
 
     def shells(self,nshells=10,ntype='VOL',wavelength=0.71073):
         stl = sin(pi/180.*self.tth/2)/wavelength
@@ -192,7 +319,8 @@ if __name__=='__main__':
                                 options.dw)
     overlap.readgff()
     overlap.readref()
-    overlap.find_overlap()
+#    overlap.find_overlap()
+    overlap.overlap_new()
     overlap.shells(nshells=options.nshells,ntype=options.type,wavelength=options.wavelength)
     overlap.output()
     overlap.plot()

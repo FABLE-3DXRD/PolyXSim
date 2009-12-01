@@ -11,9 +11,8 @@ import variables
 from xfab import tools,sg
 
 import numpy as n
-import logging
-
-logging.basicConfig(level=logging.DEBUG,format='%(levelname)s %(message)s')
+#import logging
+#logging.basicConfig(level=logging.DEBUG,format='%(levelname)s %(message)s')
 
 def interrupt(killfile):
     if killfile is not None and os.path.exists(killfile):
@@ -811,7 +810,7 @@ class parse_input:
             c2c[3] = (dety_center_mm-0)**2 + (detz_center_mm-0)**2
             c2c_max = n.max(n.sqrt(c2c))
             theta_max = n.arctan(c2c_max/self.param['distance'])/2.0 * 180./n.pi
-            logging.info('To make full detector coverage sets theta_max: %f' %theta_max)
+            print('To make full detector coverage sets theta_max: %f' %theta_max)
             self.param['theta_max'] = theta_max
 			
 

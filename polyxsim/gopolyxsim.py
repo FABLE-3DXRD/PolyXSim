@@ -10,8 +10,8 @@ from polyxsim import make_image
 from polyxsim import make_imagestack
 from polyxsim import reflections
 from polyxsim import help_input
-import logging
-logging.basicConfig(level=logging.INFO,format='\n%(levelname)s: %(message)s')
+#import logging
+#logging.basicConfig(level=logging.INFO,format='\n%(levelname)s: %(message)s')
 
 from optparse import OptionParser
 
@@ -73,29 +73,26 @@ def run(options):
     # Read and check input
     
     # Make instance of parse_input class
-    logging.info('Reading input\n')
+    print('Reading input\n')
     
     myinput = check_input.parse_input(input_file=options.filename)
     
     myinput.read()                                # read input file
-    #except:
-    #    logging.error('Cannot read input - exit')
-    #sys.exit()
     
-    logging.info('Checking input\n')
+    print('Checking input\n')
     myinput.check()                               # check validity of input
     check_input.interrupt(options.killfile)
     
     
 #     if myinput.missing == True:                   # if problem exit
-#         logging.info('MISSING ITEMS')
+#         print('MISSING ITEMS')
 #         sys.exit()
     
     if len(myinput.errors) > 0:
         myinput.show_errors()
         sys.exit()
 
-    logging.info('Initialize parameters etc\n')
+    print('Initialize parameters etc\n')
     myinput.initialize()                            # if ok initialize
     check_input.interrupt(options.killfile)
     
@@ -106,16 +103,16 @@ def run(options):
         if  ('structure_phase_%i' %phase) in myinput.param:
             xtal_structure = reflections.open_structure(myinput.param,phase)
             #print 'UNIT CELL', myinput.param['unit_cell_phase_%i' %phase]
-            logging.info('Generating miller indices')
+            print('Generating miller indices')
             hkl_tmp = reflections.gen_miller(myinput.param,phase)
             if myinput.param['structure_factors'] != 0:
-                logging.info('Structure factor calculation')
+                print('Structure factor calculation')
                 hkl.append(reflections.calc_intensity(hkl_tmp,
                                                       xtal_structure,
                                                       options.killfile))
             else:
                 hkl.append(reflections.add_intensity(hkl,myinput.param))
-                logging.info('No structure factor calculation')
+                print('No structure factor calculation')
         else:
             hkl_tmp = reflections.gen_miller(myinput.param,phase)
             hkl.append(reflections.add_intensity(hkl_tmp,myinput.param))
@@ -126,24 +123,24 @@ def run(options):
     
     generate_grains.generate_grains(myinput.param)
     check_input.interrupt(options.killfile)
-    logging.info('Write grains file')
+    print('Write grains file')
     file_io.write_grains(myinput.param)
     check_input.interrupt(options.killfile)
-    logging.info('Write res file')
+    print('Write res file')
     file_io.write_res(myinput.param)
     check_input.interrupt(options.killfile)
     
     if '.hkl' in myinput.param['output']:
-        logging.info('Write hkl file')
+        print('Write hkl file')
         file_io.write_hkl(myinput.param,hkl)
     if '.fcf' in myinput.param['output']:
-        logging.info('Write fcf file')
+        print('Write fcf file')
         file_io.write_fcf(myinput.param,hkl)
     if '.ubi' in myinput.param['output']:
-        logging.info('Write UBI file')
+        print('Write UBI file')
         file_io.write_ubi(myinput.param)
     if '.par' in myinput.param['output']:
-        logging.info('Write detector.par file')
+        print('Write detector.par file')
         file_io.write_par(myinput.param)
     check_input.interrupt(options.killfile)
     
@@ -151,19 +148,19 @@ def run(options):
     # Determine the reflection parameters for grains
     graindata = find_refl.find_refl(myinput.param,hkl,options.killfile)
     graindata.frameinfo = myinput.frameinfo
-    logging.info('Determine reflections positions')
+    print('Determine reflections positions')
     graindata.run()
     if '.ref' in myinput.param['output']:
-        logging.info('Write reflection file')
+        print('Write reflection file')
         graindata.save()
     if '.gve' in myinput.param['output']:
-        logging.info('Write g-vector file')
+        print('Write g-vector file')
         graindata.write_gve()
     if '.ini' in myinput.param['output']:
-        logging.info('Write GrainSpotter ini file - Remember it is just a template')
+        print('Write GrainSpotter ini file - Remember it is just a template')
         graindata.write_ini()
     if '.flt' in myinput.param['output']:
-        logging.info('Write filtered peaks file')
+        print('Write filtered peaks file')
         graindata.write_flt()
 
     if myinput.param['make_image'] == 1:

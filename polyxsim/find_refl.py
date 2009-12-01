@@ -6,8 +6,8 @@ from xfab.structure import int_intensity
 import variables,check_input,file_io
 import sys
 from ImageD11 import blobcorrector
-import logging
-logging.basicConfig(level=logging.DEBUG,format='%(levelname)s %(message)s')
+#import logging
+#logging.basicConfig(level=logging.DEBUG,format='%(levelname)s %(message)s')
 
 A_id = variables.refarray().A_id
 
@@ -43,7 +43,7 @@ class find_refl:
         self.nframes = (self.param['omega_end']-self.param['omega_start'])/self.param['omega_step']
         
         # Generate Miller indices for reflections within a certain resolution
-        logging.info('Generating reflections')
+        print('Generating reflections')
 
 
         print 'Finished generating reflections\n'
@@ -218,17 +218,17 @@ class find_refl:
         A = self.grain[0].refs
         for grainno in range(1,self.param['no_grains']):
             A = n.concatenate((A,self.grain[grainno].refs))
-        logging.debug('Finished concatenating ref arrays')
+#         logging.debug('Finished concatenating ref arrays')
         A = A[n.argsort(A,0)[:,A_id['tth']],:] # sort rows according to tth
-        logging.debug('Sorted full ref array after twotheta')
+#         logging.debug('Sorted full ref array after twotheta')
         nrefl = A.shape[0]
         
         nover=n.zeros((nrefl))
-        logging.debug('Ready to compare all %i reflections',nrefl)
+#         logging.debug('Ready to compare all %i reflections',nrefl)
         overlaps = dict([(i,[]) for i in range(nrefl)])
         for i in range(1,nrefl):
-            if i%1000 == 0:
-                logging.debug('Comparing reflection %i', i)
+#             if i%1000 == 0:
+#                 logging.debug('Comparing reflection %i', i)
             j=i-1
             while j > -1 and A[i,A_id['tth']]-A[j,A_id['tth']] < dtth :
                 if abs(A[i,A_id['omega']]-A[j,A_id['omega']]) \

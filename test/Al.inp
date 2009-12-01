@@ -5,7 +5,9 @@ stem 'Al_ssch'
 make_image 0
 output  '.edf''.flt' '.gve' '.par' '.ubi' 
 #Structural parameters
-structure_phase_0 '/home/osho/fable/simulation/PolyXSim/trunk/test/Al.cif'
+#structure_phase_0 '/home/osho/fable/simulation/PolyXSim/trunk/test/Al.cif'
+unit_cell 4.05 4.05 4.05 90 90 90
+sgname 'P21'
 #Structural parameters
 #Crystal/grains parameters
 no_grains 1 #Total number of grains summed over all phases to be simulated. Need to match the number of U_Grains_X key word
