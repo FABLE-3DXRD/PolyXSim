@@ -810,7 +810,7 @@ class parse_input:
             c2c[3] = (dety_center_mm-0)**2 + (detz_center_mm-0)**2
             c2c_max = n.max(n.sqrt(c2c))
             theta_max = n.arctan(c2c_max/self.param['distance'])/2.0 * 180./n.pi
-            print('To make full detector coverage sets theta_max: %f' %theta_max)
+#            print('To make full detector coverage sets theta_max: %f' %theta_max)
             self.param['theta_max'] = theta_max
 			
 
