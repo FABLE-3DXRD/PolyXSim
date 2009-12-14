@@ -119,7 +119,7 @@ class parse_input:
                     key = line[0]
                     val = line[1:]
                     # This ensures that file names with space can be handled 
-                    if key == 'direc' or key == 'stem' or 'structure' in key:
+                    if key == 'direc' or key == 'stem' or key == 'spatial' or 'structure' in key:
                         valtmp = ''
                         valend = ''
                         sepa = ' '
@@ -139,7 +139,7 @@ class parse_input:
                     # Problems using the Windows path separator as they can 
                     # cause part of a string to be interpreted as a special charactor
                     # like \n - newline.
-                    if key == 'direc' or key == 'stem' or 'structure' in key:
+                    if key == 'direc' or key == 'stem' or key == 'spatial' or 'structure' in key:
                         # Hack to remove a final backslash in the directory path
                         if str(val).endswith('\\\''):
                             val = val[:-2]+"'"
