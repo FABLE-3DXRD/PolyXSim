@@ -5,7 +5,7 @@ import variables,check_input
 from scipy import ndimage
 from scipy.stats import norm
 import numpy as n
-from PIL import Image
+import Image
 
 A_id = variables.refarray().A_id
 
