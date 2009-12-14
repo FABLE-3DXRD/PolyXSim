@@ -5,7 +5,6 @@ from xfab import detector
 from xfab.structure import int_intensity
 import variables,check_input,file_io
 import sys
-from ImageD11 import blobcorrector
 #import logging
 #logging.basicConfig(level=logging.DEBUG,format='%(levelname)s %(message)s')
 
@@ -37,6 +36,7 @@ class find_refl:
                                    
         # Spatial distortion
         if self.param['spatial'] != None:
+            from ImageD11 import blobcorrector
             self.spatial = blobcorrector.correctorclass(self.param['spatial'])
 
         # %No of images
