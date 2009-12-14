@@ -118,19 +118,47 @@ class parse_input:
                 if len(line) != 0:
                     key = line[0]
                     val = line[1:]
-                    valtmp = '['
+                    # This ensures that file names with space can be handled 
+                    if key == 'direc' or key == 'stem' or 'structure' in key:
+                        valtmp = ''
+                        valend = ''
+                        sepa = ' '
+                    else:   
+                        valtmp = '['
+                        valend = ']'
+                        sepa = ','
+                    
                     if len(val) > 1:
                         for i in val:
-                            valtmp = valtmp + i +','
-							
-                        val = valtmp + ']'
+                            valtmp = valtmp + i + sepa
+                        # remove last separator
+                        val = valtmp[:-len(sepa)] + valend
                     else:
                         val = val[0]
-                    self.param[key] = eval(val)
-					
+                        
+                    # Problems using the Windows path separator as they can 
+                    # cause part of a string to be interpreted as a special charactor
+                    # like \n - newline.
+                    if key == 'direc' or key == 'stem' or 'structure' in key:
+                        # Hack to remove a final backslash in the directory path
+                        if str(val).endswith('\\\''):
+                            val = val[:-2]+"'"
+                        # Unfortunately the escape character can be changed like this
+                        val = val.replace('\\x','/x')
+                        # before taking care of the rest
+                        val = eval(val)
+                        val = val.replace('\t','\\t')
+                        val = val.replace('\n','\\n')
+                        val = val.replace('\c','\\c')
+                        val = val.replace('\b','\\b')
+                        val = val.replace('\f','\\f')
+                        val = val.replace('\r','\\r')
+                        val = val.replace('\v','\\v')
+                        # Added value to key
+                        self.param[key] = val                        
+                    else:
+                        self.param[key] = eval(val)
            
-
-                
     def check(self):
         self.missing = False
         self.errors = {}
@@ -751,8 +779,8 @@ class parse_input:
      
         # Does output directory exist?
         if not os.path.exists(self.param['direc']):
-            os.mkdir(self.param['direc'])
-
+            os.makedirs(self.param['direc'])
+        
 	    # Generate FILENAME of frames
         omega_step = self.param['omega_step']
         omega_start  = self.param['omega_start']
