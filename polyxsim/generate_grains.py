@@ -22,19 +22,16 @@ def generate_U(no_grains,sgi):
         U[i] = tools.euler_to_u(phi1,PHI,phi2)
         t = 0
         Ut = U[i].copy()
-#        print i
         symmetries = ['triclinic','monoclinic', 'orthorhombic','tetragonal','trigonal','hexagonal','cubic']
         crystal_system = symmetries.index(sgi.crystal_system)+1
-        rot = symmetry.rotations(crystal_system)
+        rot = symmetry.permutations(crystal_system)
         for j in range(len(rot)):
             Urot = n.dot(U[i],rot[j]) 
             trace = Urot.trace()
             if trace > t:
                 t = trace
                 Ut = Urot
-#                    print Ut,t
         U[i] = Ut
-#        print U[i] ,i,'****'
         
     return U
 		
