@@ -24,7 +24,7 @@ def generate_U(no_grains,sgi):
         Ut = U[i].copy()
         symmetries = ['triclinic','monoclinic', 'orthorhombic','tetragonal','trigonal','hexagonal','cubic']
         crystal_system = symmetries.index(sgi.crystal_system)+1
-        rot = symmetry.permutations(crystal_system)
+        rot = symmetry.rotations(crystal_system)
         for j in range(len(rot)):
             Urot = n.dot(U[i],rot[j]) 
             trace = Urot.trace()
