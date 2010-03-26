@@ -301,6 +301,10 @@ if __name__=='__main__':
     parser.add_option("-s", "--nshells", action="store",
                       dest="nshells", type="int",default=9,
                       help="Show overlap fractions divided into resolution shells")
+    parser.add_option("-p", "--plot", action="store_true",
+                      dest="doplot",default=False,
+                      help="Plot the overlap fractions")
+
     parser.add_option("-t", "--type", action="store",
                       dest="type", type="string",default='VOL',
                       help="Resolution shells divided to have equal volume (VOL), resolution (RES), or no. of reflections (REF)")
@@ -319,8 +323,9 @@ if __name__=='__main__':
                                 options.dw)
     overlap.readgff()
     overlap.readref()
-#    overlap.find_overlap()
-    overlap.overlap_new()
+    overlap.find_overlap()
+#    overlap.overlap_new()
     overlap.shells(nshells=options.nshells,ntype=options.type,wavelength=options.wavelength)
     overlap.output()
-    overlap.plot()
+    if options.doplot:
+        overlap.plot()
