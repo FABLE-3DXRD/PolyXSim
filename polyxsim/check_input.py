@@ -517,7 +517,7 @@ class parse_input:
 #                 assert len(grain_list_pos) == no_grains, \
 #                     'Input number of grains does not agree with number\n'+\
 #                     ' of pos_grains, check for multiple names'
-                if len(grain_list_pos) == no_grains:
+                if len(grain_list_pos) != no_grains:
                     self.errors['grain_list_pos_nograins'] = \
                         'Input number of grains does not agree with number\n'+\
                         ' of pos_grains, check for multiple names'
