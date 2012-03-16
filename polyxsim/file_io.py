@@ -14,14 +14,16 @@ def write_flt(param,grain):
     """
     filename = '%s/%s.flt' %(param['direc'],param['stem'])
     f = open(filename,'w')
-    out = '#  sc  fc  omega  Number_of_pixels  avg_intensity  s_raw  f_raw  sigs  sigf  covsf  sigo  covso  covfo  sum_intensity  sum_intensity^2  IMax_int  IMax_s  IMax_f  IMax_o  Min_s  Max_s  Min_f  Max_f  Min_o  Max_o  dety  detz  onfirst  onlast  spot3d_id \n'
+#    out = '#  sc  fc  omega  Number_of_pixels  avg_intensity  s_raw  f_raw  sigs  sigf  covsf  sigo  covso  covfo  sum_intensity  sum_intensity^2  IMax_int  IMax_s  IMax_f  IMax_o  Min_s  Max_s  Min_f  Max_f  Min_o  Max_o  dety  detz  onfirst  onlast  spot3d_id \n'
+    out = '#  sc  fc  omega  Number_of_pixels  avg_intensity  s_raw  f_raw  sigs  sigf  covsf  sigo  covso  covfo  sum_intensity  sum_intensity^2  IMax_int  IMax_s  IMax_f  IMax_o  Min_s  Max_s  Min_f  Max_f  Min_o  Max_o  dety  detz  onfirst  onlast  spot3d_id  labels  tth_per_grain  eta_per_grain  h  k  l\n'
     f.write(out)
     	
     A = grain[0].refs
     for grainno in range(1,param['no_grains']):
         A = n.concatenate((A,grain[grainno].refs))
     A = A[n.argsort(A,0)[:,A_id['omega']],:] # sort rows according to omega
-    format = "%f "*3 + "%i "*1 +"%f "*12 + "%i "*2   +"%f "*1 + "%i "*4 +"%f "*4 + "%i "*3 +"\n"
+#    format = "%f "*3 + "%i "*1 +"%f "*12 + "%i "*2   +"%f "*1 + "%i "*4 +"%f "*4 + "%i "*3+"\n"
+    format = "%f "*3 + "%i "*1 +"%f "*12 + "%i "*2   +"%f "*1 + "%i "*4 +"%f "*4 + "%i "*4 +"%f "*2 + "%i "*3+"\n"
 
     for i in range(A.shape[0]):
         (sc, fc) = detector.detyz_to_xy([A[i,A_id['dety']],A[i,A_id['detz']]],
@@ -72,7 +74,13 @@ def write_flt(param,grain):
                        A[i,A_id['detz']],
                        0,
                        0,
-                       A[i,A_id['spot_id']]
+                       A[i,A_id['spot_id']],
+                       A[i,A_id['grain_id']],
+                       A[i,A_id['tth']],
+                       A[i,A_id['eta']],
+                       A[i,A_id['h']],
+                       A[i,A_id['k']],
+                       A[i,A_id['l']],
                       )
         f.write(out)
 
@@ -101,8 +109,10 @@ def write_grains(param):
             phase = param['phase_list'][0]
         else:
             phase = param['phase_grains_%s' %(param['grain_list'][i])]
-        ubi = tools.u_to_ubi(param['U_grains_%s' %(param['grain_list'][i])],
+        b = tools.epsilon_to_b(param['eps_grains_%s' %(param['grain_list'][i])],
                              param['unit_cell_phase_%i' %phase ])
+        u = param['U_grains_%s' %(param['grain_list'][i])]
+        ubi = n.linalg.inv(n.dot(u,b))*2*n.pi
 
         out = format %(param['grain_list'][i],
                        phase,

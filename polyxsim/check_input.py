@@ -134,6 +134,7 @@ class parse_input:
                         # remove last separator
                         val = valtmp[:-len(sepa)] + valend
                     else:
+                        #print key,val
                         val = val[0]
                         
                     # Problems using the Windows path separator as they can 
