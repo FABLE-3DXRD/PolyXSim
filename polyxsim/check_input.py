@@ -192,7 +192,7 @@ class parse_input:
                             self.param[key] = val
                     else:
                         #assert len(val) <= 3, 'Wrong number of arguments for %s' %key
-                        if len(val) > 3: 
+                        if len(val) > 5: 
                             self.errors[key] = 'Wrong number of arguments' 
                 elif key == 'sample_cyl' or key == 'gen_pos':
                     #assert len(val) == 2 , 'Wrong number of arguments for %s' %key
