@@ -83,8 +83,8 @@ class make_image:
                     elif self.graindata.grain[j].refs[k,A_id['omega']]*180/n.pi < \
                             omega-2*peakwsig:
                         continue
-                    dety = self.graindata.grain[j].refs[k,A_id['dety']]
-                    detz = self.graindata.grain[j].refs[k,A_id['detz']]
+                    dety = self.graindata.grain[j].refs[k,A_id['detyd']]   # must be spot position after
+                    detz = self.graindata.grain[j].refs[k,A_id['detzd']]   # applying spatial distortion
                 #apply hack
 #                   dety = self.graindata.grain[j].refs[k,A_id['dety']] + y_move
 #                   detz = self.graindata.grain[j].refs[k,A_id['detz']] + z_move
@@ -122,9 +122,38 @@ class make_image:
                                                                                   tx, 
                                                                                   ty, 
                                                                                   tz,)
+
+                                if self.graindata.param['spatial'] != None :
+                                    from ImageD11 import blobcorrector
+                                    self.spatial = blobcorrector.correctorclass(self.graindata.param['spatial'])
+                                    # To match the coordinate system of the spline file
+                                    # SPLINE(i,j): i = detz; j = (dety_size-1)-dety
+                                    # Well at least if the spline file is for frelon2k
+                                    (x,y) = detector.detyz_to_xy([dety_present,detz_present],
+                                                              self.graindata.param['o11'],
+                                                              self.graindata.param['o12'],
+                                                              self.graindata.param['o21'],
+                                                              self.graindata.param['o22'],
+                                                              self.graindata.param['dety_size'],
+                                                              self.graindata.param['detz_size'])
+                                    # Do the spatial distortion
+                                    (xd,yd) = self.spatial.distort(x,y)
+
+                                    # transform coordinates back to dety,detz
+                                    (dety_present,detz_present) = detector.xy_to_detyz([xd,yd],
+                                                                    self.graindata.param['o11'],
+                                                                    self.graindata.param['o12'],
+                                                                    self.graindata.param['o21'],
+                                                                    self.graindata.param['o22'],
+                                                                    self.graindata.param['dety_size'],
+                                                                    self.graindata.param['detz_size'])
+
                                 y = round(dety_present)
                                 z = round(detz_present)
-                                frame[y,z] = frame[y,z] + fraction*intensity*filter_tth_eta[t,e]
+                                try:
+                                    frame[y+frame_add,z+frame_add] = frame[y+frame_add,z+frame_add] + fraction*intensity*filter_tth_eta[t,e]
+                                except:
+                                    pass
 
 
 
