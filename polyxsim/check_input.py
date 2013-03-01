@@ -321,6 +321,7 @@ class parse_input:
                 # add sgno for phase to parameter list
                 for phase in phase_list_sgname:
                     self.param['sgno_phase_%i' %phase] = sg.sg(sgname = self.param['sgname_phase_%i' %phase]).no
+                    self.param['cell_choice_phase_%i' %phase] = sg.sg(sgname = self.param['sgname_phase_%i' %phase]).cell_choice
 
             elif len(phase_list_sgname) == 0:
 #                 assert len(phase_list_sgno) == no_phases, \
@@ -340,7 +341,11 @@ class parse_input:
 
                 # add sgname for phase to parameter list
                 for phase in phase_list_sgno:
-                    self.param['sgname_phase_%i' %phase] = sg.sg(sgno = self.param['sgno_phase_%i' %phase]).name
+                    try:
+                        self.param['cell_choice_phase_%i' %phase] = sg.sg(sgno = self.param['sgno_phase_%i' %phase],cell_choice=self.param['cell_choice_phase_%i' %phase]).cell_choice
+                    except:
+                        self.param['cell_choice_phase_%i' %phase] = sg.sg(sgno = self.param['sgno_phase_%i' %phase]).cell_choice
+                    self.param['sgname_phase_%i' %phase] = sg.sg(sgno = self.param['sgno_phase_%i' %phase],cell_choice=self.param['cell_choice_phase_%i' %phase]).name
             else:
                 # both sg numbers and names in input check if they point at the same space group
                 for phase in phase_list_sgno:
@@ -418,7 +423,7 @@ class parse_input:
                     self.param['sgno_phase_%i' %phase] = sg.sg(sgname = self.param['sgname_phase_%i' %phase]).no
         if len(phase_list_sgname) == 0:
             for phase in phase_list_sgname:
-                    self.param['sgname_phase_%i' %phase] = sg.sg(sgno = self.param['sgno_phase_%i' %phase]).name
+                    self.param['sgname_phase_%i' %phase] = sg.sg(sgno = self.param['sgno_phase_%i' %phase], cell_choice = self.param['cell_choice_phase_%i' %phase]).name
 
 
 # Init no of grains belonging to phase X if not generated
@@ -637,12 +642,18 @@ class parse_input:
                         'please input either sgno or sgname' 
                 if self.param['sgno'] == None:
                     self.param['sgno_phase_0'] = sg.sg(sgname = self.param['sgname']).no
+                    self.param['cell_choice_phase_0'] = sg.sg(sgname = self.param['sgname']).cell_choice
                     # rename keyword
                     self.param['sgname_phase_0'] = self.param['sgname']
                     # and delete old one
                     del self.param['sgname']
                 else:
-                    self.param['sgname_phase_0'] = sg.sg(sgno = self.param['sgno']).name
+                    try:
+                        self.param['cell_choice_phase_0'] = sg.sg(sgno = self.param['sgno'],cell_choice=self.param['cell_choice']).cell_choice
+                        del self.param['cell_choice']
+                    except:
+                        self.param['cell_choice_phase_0'] = sg.sg(sgno = self.param['sgno']).cell_choice
+                    self.param['sgname_phase_0'] = sg.sg(sgno = self.param['sgno'], cell_choice = self.param['cell_choice_phase_0']).name
                     # rename keyword
                     self.param['sgno_phase_0'] = self.param['sgno']
                     # and delete old one
@@ -976,7 +987,12 @@ class parse_input:
                     # and delete old one
                     del self.param['sgname']
                 else:
-                    self.param['sgname_phase_0'] = sg.sg(sgno = self.param['sgno']).name
+                    try:
+                        self.param['cell_choice_phase_0'] = sg.sg(sgno = self.param['sgno'],cell_choice=self.param['cell_choice']).cell_choice
+                        del self.param['cell_choice']
+                    except:
+                        self.param['cell_choice_phase_0'] = sg.sg(sgno = self.param['sgno']).cell_choice
+                    self.param['sgname_phase_0'] = sg.sg(sgno = self.param['sgno'], cell_choice = self.param['cell_choice_phase_0']).name
                     # rename keyword
                     self.param['sgno_phase_0'] = self.param['sgno']
                     # and delete old one

@@ -166,7 +166,7 @@ def generate_grains(param):
 # Generate U if gen_U on
     if param['gen_U'] != 0: 
         for phase in param['phase_list']:        
-            U = generate_U(param['no_grains_phase_%i' %phase],sgi = sg.sg(sgno=param['sgno_phase_%i' %phase]))
+            U = generate_U(param['no_grains_phase_%i' %phase],sgi = sg.sg(sgname=param['sgname_phase_%i' %phase]))
             for i in range(param['no_grains_phase_%i' %phase]):
                 param['U_grains_%s' %(param['grain_list_phase_%i' %phase][i])] = U[i]
         param['gen_U'] = 0
