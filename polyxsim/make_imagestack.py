@@ -24,7 +24,7 @@ class make_image:
         self.wx = 0.
 
     def setup_odf(self):
-		
+        
             odf_scale = self.graindata.param['odf_scale'] 
             if self.graindata.param['odf_type'] == 1:
                 odf_spread = self.graindata.param['mosaicity']/4
@@ -119,7 +119,7 @@ class make_image:
                                      j-odf_center[1],
                                      k-odf_center[2]])
                         self.Uodf[i,j,k,:,:] = tools.rod_to_u(r)
-	    
+        
             if self.graindata.param['odf_type'] !=  2:
                 file = open(self.graindata.param['stem']+'.odf','w')
                 file.write('ODF size: %i %i %i\n' %(r1_range,r2_range,r3_range))
@@ -128,7 +128,7 @@ class make_image:
                     self.odf[i,:,:].tofile(file,sep=' ',format='%f')
                     file.write(' ')
                 file.close()
-	    
+        
             return self.Uodf
 
 
@@ -163,7 +163,7 @@ class make_image:
             # loop over reflections for each grain
 
             for nref in do_refs:
-			    # exploit that the reflection list is sorted according to omega
+                # exploit that the reflection list is sorted according to omega
                 print '\rDoing reflection %i of %i for grain %i of %i' %(nref+1,
                                                                          len(self.graindata.grain[grainno].refs),
                                                                          grainno+1,self.graindata.param['no_grains']),
@@ -206,7 +206,7 @@ class make_image:
                                     continue
                                 Om = tools.form_omega_mat_general(omega,self.wx,self.wy) 
                                 Gt = n.dot(Om,Gw)
-						
+                        
                                 # Calc crystal position at present omega
                                 [tx,ty,tz]= n.dot(Om,gr_pos) 
 
@@ -244,7 +244,7 @@ class make_image:
                                                                     self.graindata.param['o22'],
                                                                     self.graindata.param['dety_size'],
                                                                     self.graindata.param['detz_size'])
-								   
+                                   
                                 if dety > -0.5 and dety <= self.graindata.param['dety_size']-0.5 and\
                                     detz > -0.5 and detz <= self.graindata.param['detz_size']-0.5:
                                     dety = int(round(dety))
@@ -262,55 +262,56 @@ class make_image:
             frame = self.frames[frame_no].toarray()
             if self.graindata.param['bg'] > 0:
                 frame = frame + self.graindata.param['bg']*n.ones((self.graindata.param['dety_size'],
-								       self.graindata.param['detz_size']))
+                                       self.graindata.param['detz_size']))
             # add noise
             if self.graindata.param['noise'] != 0:
                 frame = n.random.poisson(frame)
             # apply psf
             if self.graindata.param['psf'] != 0:
                 frame = ndimage.gaussian_filter(frame,self.graindata.param['psf']*0.5)
-	    # limit values above 16 bit to be 16bit
-	    frame = n.clip(frame,0,2**16-1)
-	    # convert to integers
-	    frame = n.uint16(frame)
-	    #flip detector orientation according to input: o11, o12, o21, o22
-	    frame = detector.trans_orientation(frame,
-	      				 self.graindata.param['o11'],
-	      				 self.graindata.param['o12'],
-	      				 self.graindata.param['o21'],
-	      				 self.graindata.param['o22'],
-	      				 'inverse')
-	    # Output frames 
-	    if '.edf' in self.graindata.param['output']:
-	            self.write_edf(frame_no,frame)
-	    if '.tif' in self.graindata.param['output']:
-	            self.write_tif(frame_no,frame)
-	    print '\rDone frame %i took %8f s' %(frame_no+1,time.clock()-t1),
-	    sys.stdout.flush()
-				
+        # limit values above 16 bit to be 16bit
+        frame = n.clip(frame,0,2**16-1)
+        # convert to integers
+        frame = n.uint16(frame)
+        #flip detector orientation according to input: o11, o12, o21, o22
+        frame = detector.trans_orientation(frame,
+                         self.graindata.param['o11'],
+                         self.graindata.param['o12'],
+                         self.graindata.param['o21'],
+                         self.graindata.param['o22'],
+                         'inverse')
+        # Output frames 
+        if '.edf' in self.graindata.param['output']:
+                self.write_edf(frame_no,frame)
+        if '.tif' in self.graindata.param['output']:
+                self.write_tif(frame_no,frame)
+        print '\rDone frame %i took %8f s' %(frame_no+1,time.clock()-t1),
+        sys.stdout.flush()
+                
     def write_edf(self,framenumber,frame):
-		e=edfimage.edfimage()
-		e.data=frame
-		e.dim2,e.dim1=frame.shape
-		e.header = {}
-		e.header['Dim_1']=e.dim1
-		e.header['Dim_2']=e.dim2
-		e.header['col_end']=e.dim1-1
-		e.header['row_end']=e.dim2-1
-		e.header['DataType']='UnsignedShort'
-		e.header['Image']=1
-		e.header['ByteOrder']='Low'
-		e.header['time']=time.asctime()
-		e.header['Omega']= self.graindata.frameinfo[framenumber].omega +\
-		    self.graindata.param['omega_step']/2.0
-		e.header['OmegaStep']=self.graindata.param['omega_step']
-		e.header['grainfile']='%s/%s_%0.4dgrains.txt' \
-			%(self.graindata.param['direc'],self.graindata.param['stem'],self.graindata.param['no_grains'])
-		e.write('%s%s' %(self.graindata.frameinfo[framenumber].name,'.edf'))
-				
+        e=edfimage.edfimage()
+        e.data=frame
+        e.dim2,e.dim1=frame.shape
+        e.header = {}
+        e.header['origin']='PolyXSim'
+        e.header['Dim_1']=e.dim1
+        e.header['Dim_2']=e.dim2
+        e.header['col_end']=e.dim1-1
+        e.header['row_end']=e.dim2-1
+        e.header['DataType']='UnsignedShort'
+        e.header['Image']=1
+        e.header['ByteOrder']='Low'
+        e.header['time']=time.asctime()
+        e.header['Omega']= self.graindata.frameinfo[framenumber].omega +\
+            self.graindata.param['omega_step']/2.0
+        e.header['OmegaStep']=self.graindata.param['omega_step']
+        e.header['grainfile']='%s/%s_%0.4dgrains.txt' \
+            %(self.graindata.param['direc'],self.graindata.param['stem'],self.graindata.param['no_grains'])
+        e.write('%s%s' %(self.graindata.frameinfo[framenumber].name,'.edf'))
+                
     def write_tif(self,framenumber,frame):
-		e=tifimage.tifimage()
-		e.data=frame
-		e.write('%s%s' %(self.graindata.frameinfo[framenumber].name,'.tif'))
+        e=tifimage.tifimage()
+        e.data=frame
+        e.write('%s%s' %(self.graindata.frameinfo[framenumber].name,'.tif'))
 
 

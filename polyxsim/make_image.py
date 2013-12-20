@@ -207,6 +207,7 @@ class make_image:
         e.data=frame
         e.dim2,e.dim1=frame.shape
         e.header = {}
+        e.header['origin']='PolyXSim'
         e.header['Dim_1']=e.dim1
         e.header['Dim_2']=e.dim2
         e.header['col_end']=e.dim1-1
