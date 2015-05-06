@@ -491,8 +491,8 @@ class parse_input:
 #                 ' of U_grains, check for multiple names'
             if len(grain_list_U) != no_grains:
                 self.errors['grain_list_U'] = \
-                    'Input number of grains does not agree with number\n' +\
-                    ' of U_grains, check for multiple names'
+                    'Input number of grains (%i) does not agree with number\n'  %no_grains +\
+                    ' of U_grains (%i), check for multiple names' %len(grain_list_U) 
             self.param['grain_list'] = grain_list_U
             if len(grain_list_pos) != 0 and self.param['gen_pos'][0] == 0:
 #                 assert grain_list_U == grain_list_pos, \
