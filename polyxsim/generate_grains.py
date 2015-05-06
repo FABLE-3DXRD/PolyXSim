@@ -16,10 +16,11 @@ def generate_U(no_grains,sgi):
     U = n.zeros((no_grains,3,3))
     Urot = n.zeros((3,3))
     for i in range(no_grains):
-        phi1 = n.random.rand()*2*n.pi
-        phi2 = n.random.rand()*2*n.pi
-        PHI  = n.random.rand()*n.pi
-        U[i] = tools.euler_to_u(phi1,PHI,phi2)
+        #http://www.cognitive-antics.net/mw/index.php?title=Uniform_random_orientation
+        tilt_z = n.random.rand()*2*n.pi
+        tilt_y = n.arcsin(n.random.rand())
+        tilt_x  = n.pi*(2*n.random.rand()*n.pi-1)
+        U[i] = tools.detect_tilt(tilt_x, tilt_y, tilt_z)
         t = 0
         Ut = U[i].copy()
         symmetries = ['triclinic','monoclinic', 'orthorhombic','tetragonal','trigonal','hexagonal','cubic']
