@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from __future__ import absolute_import
+from __future__ import print_function
 from ImageD11 import columnfile
 from numpy import array,concatenate,floor,arange,zeros,abs,sqrt,pi,sin,int8
 import sys
@@ -45,14 +47,14 @@ class determine_overlap:
         nrefl = self.tth.shape[0]
         
         nover=zeros((nrefl))
-        print 'Ready to compare all %i reflections' %nrefl
-        print ''
+        print('Ready to compare all %i reflections' %nrefl)
+        print('')
         t1 = time.clock()
         for i in range(1,nrefl):
 #            if i%1000 == 0:
 #                print 'Comparing reflection %i' %i
             t2 = time.clock()-t1
-            print '\rCompared %4.1f pct in %5.1f sec' %(100.*i/nrefl,t2),                        
+            print('\rCompared %4.1f pct in %5.1f sec' %(100.*i/nrefl,t2), end=' ')                        
             sys.stdout.flush()
 
 
@@ -67,7 +69,7 @@ class determine_overlap:
                         nover[i] = 1
                         nover[j] = 1
                 j = j - 1
-        print 'Number of overlaps %i out of %i refl.' %(nover.sum(),nrefl)
+        print('Number of overlaps %i out of %i refl.' %(nover.sum(),nrefl))
 
         self.nover = nover
 
@@ -98,7 +100,7 @@ class determine_overlap:
 #         nrefl = A.shape[0]
         self.nover=zeros((nrefl))
         overlaps = dict([(i,[]) for i in range(nrefl)])
-        print 'Ready to compare all %i reflections' %nrefl
+        print('Ready to compare all %i reflections' %nrefl)
 
         # Make filter 
 #         y_max  = self.param['overlap_specs'][1]*2+1
@@ -111,7 +113,7 @@ class determine_overlap:
         y_cen = (y_max-1)/2
         z_cen = (z_max-1)/2
         om_cen = 1 #(om_max-1)/2
-        print 'om_cen',om_cen
+        print('om_cen',om_cen)
 
         filter = zeros((y_max,z_max))
 
@@ -235,35 +237,35 @@ class determine_overlap:
     def output(self):
         dmin_shell = 1./(2*self.stlmax_shell)
         overlap_frac = self.overlap_shell*100./self.refl_shell
-        print'Table of overlapping reflections as a function of resolution'
-        print ''
-        print '%10s%10s%10s%10s%15s' %('stl_max',
+        print('Table of overlapping reflections as a function of resolution')
+        print('')
+        print('%10s%10s%10s%10s%15s' %('stl_max',
                                        'd_min',
                                        'reflec',
                                        'overlap',
-                                       'overlap ratio')
-        print '%10s%10s%10s%10s%15s' %('-------',
+                                       'overlap ratio'))
+        print('%10s%10s%10s%10s%15s' %('-------',
                                        '-----',
                                        '------',
                                        '-------',
-                                       '-------------')
+                                       '-------------'))
         for i in range(len(self.refl_shell)):
-            print '%10.4f%10.4f%10i%10i%15.2f' %(self.stlmax_shell[i],
+            print('%10.4f%10.4f%10i%10i%15.2f' %(self.stlmax_shell[i],
                                                  dmin_shell[i],
                                                  self.refl_shell[i],
                                                  self.overlap_shell[i],
-                                                 overlap_frac[i])
-        print '%10s%10s%10s%10s%15s' %('-------',
+                                                 overlap_frac[i]))
+        print('%10s%10s%10s%10s%15s' %('-------',
                                        '-----',
                                        '------',
                                        '-------',
-                                       '-------------')
-        print '%10s%10s%10i%10i%15.2f' %('  All    ',
+                                       '-------------'))
+        print('%10s%10s%10i%10i%15.2f' %('  All    ',
                                          '',
                                          self.refl_shell.sum(),
                                          self.overlap_shell.sum(),
-                                         self.overlap_shell.sum()/self.refl_shell.sum()*100)
-        print ''
+                                         self.overlap_shell.sum()/self.refl_shell.sum()*100))
+        print('')
 
     def plot(self):
         import pylab as p
@@ -311,10 +313,10 @@ if __name__=='__main__':
     options , args = parser.parse_args()
     if options.stem == None:
         parser.print_help()
-        print "No stem (part of file name before the file number) provided [-n stem]\n"
+        print("No stem (part of file name before the file number) provided [-n stem]\n")
         sys.exit()
         
-    print options
+    print(options)
 
     overlap = determine_overlap(options.direc,
                                 options.stem,

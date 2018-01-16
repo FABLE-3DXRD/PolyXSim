@@ -1,7 +1,10 @@
+from __future__ import absolute_import
+from __future__ import print_function
 import numpy as n
 from xfab import tools
 from xfab import sg
 from xfab import symmetry
+
 
 def generate_U(no_grains,sgi):
 	# generate random U (orientations) for no_grains grains
@@ -12,7 +15,7 @@ def generate_U(no_grains,sgi):
 	# Henning Osholm Sorensen, Risoe DTU,
 	# Adapted by Jette Oddershede, RISOE DTU, March 27, 2008
 	
-    print 'Grain orientations will be randomly generated\n'
+    print('Grain orientations will be randomly generated\n')
     U = n.zeros((no_grains,3,3))
     Urot = n.zeros((3,3))
     for i in range(no_grains):
@@ -51,14 +54,14 @@ def generate_pos(no_grains,gen_pos,sample_xyz=None,sample_cyl=None):
 	
 	pos = n.zeros((no_grains,3))
 	if sample_xyz != None and gen_pos != 0:
-		print 'Grain positions will be randomly generated within a box of ', sample_xyz[0], sample_xyz[1], sample_xyz[2], 'mm\n'
+		print('Grain positions will be randomly generated within a box of ', sample_xyz[0], sample_xyz[1], sample_xyz[2], 'mm\n')
 		for i in range(no_grains):
 			for j in range(3):
 				pos[i,j] = (n.random.rand()-0.5)*sample_xyz[j]
 
 	elif sample_cyl != None and gen_pos != 0:
-		print 'Grain positions will be randomly generated'
-		print 'within a cylinder of diameter ', sample_cyl[0], ' and length ', sample_cyl[1], 'mm\n'
+		print('Grain positions will be randomly generated')
+		print('within a cylinder of diameter ', sample_cyl[0], ' and length ', sample_cyl[1], 'mm\n')
 		for i in range(no_grains):
 			r = n.random.rand()*sample_cyl[0]/2.
 			w = n.random.rand()*2*n.pi
@@ -66,7 +69,7 @@ def generate_pos(no_grains,gen_pos,sample_xyz=None,sample_cyl=None):
 			pos[i] = [r*n.cos(w), r*n.sin(w), z]
 
 	else:
-		print 'Grain positions will be set to (0,0,0)\n'
+		print('Grain positions will be set to (0,0,0)\n')
 
 	return pos
 
@@ -84,11 +87,11 @@ def generate_eps(no_grains,gen_eps):
 	offdiag = [1,2,4]
 	
 	if gen_eps == [0,0,0,0]:
-		print 'No strain\n'
+		print('No strain\n')
 	else:
-		print 'Grain strain tensors will be randomly generated using a normal distribution'
-		print 'For diagonal elements, mean: ', gen_eps[0], ' and spread: ', gen_eps[1]
-		print 'For off-diagonal elements, mean: ', gen_eps[2], ' and spread: ', gen_eps[3],'\n'
+		print('Grain strain tensors will be randomly generated using a normal distribution')
+		print('For diagonal elements, mean: ', gen_eps[0], ' and spread: ', gen_eps[1])
+		print('For off-diagonal elements, mean: ', gen_eps[2], ' and spread: ', gen_eps[3],'\n')
 
 		for i in range(no_grains):
 			if gen_eps[1] == 0:   # non-zero spread of diagonal elements
@@ -124,7 +127,7 @@ def grain_size(no_grains,grain_size,grain_min_max,sample_vol=None):
 	size = n.zeros((no_grains))
 	grain_vol = 0
 	if grain_size < 0:
-		print 'All grains have the following mean diameter: ', abs(grain_size), ' mm\n'
+		print('All grains have the following mean diameter: ', abs(grain_size), ' mm\n')
 		for i in range(no_grains):
 			size[i] = abs(grain_size)
 			grain_vol = grain_vol + n.pi/6*size[i]**3
@@ -132,8 +135,8 @@ def grain_size(no_grains,grain_size,grain_min_max,sample_vol=None):
 	else:
 	# NB the standard lognormal distribution
         # lognormal() = exp(normal(mean=0, spread=1) has a mean of exp(.5)
-		print 'Grain sizes from a lognormal distribution with a mean diameter of: ',\
-		abs(grain_size), ' mm\n'
+		print('Grain sizes from a lognormal distribution with a mean diameter of: ',\
+		abs(grain_size), ' mm\n')
 		for i in range(no_grains):
 			while size[i] <= grain_min_max[0] or size[i] > grain_min_max[1]:
 				size[i] = grain_size*n.random.lognormal()/n.exp(.5)
@@ -142,7 +145,7 @@ def grain_size(no_grains,grain_size,grain_min_max,sample_vol=None):
 	
 	if sample_vol != None:
 		fraction = grain_vol/sample_vol
-		print 'The generated grains cover the following fraction of the sample volume: %6f' %fraction
+		print('The generated grains cover the following fraction of the sample volume: %6f' %fraction)
 	return size
 	
 

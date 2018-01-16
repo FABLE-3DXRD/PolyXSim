@@ -1,11 +1,14 @@
+from __future__ import absolute_import
+from __future__ import print_function
 import sys,time
 from xfab import tools,detector
 from fabio import edfimage,tifimage
-import variables,check_input
+from . import variables,check_input
 from scipy import ndimage
 from scipy.stats import norm
 import numpy as n
 from PIL import Image
+
 
 A_id = variables.refarray().A_id
 
@@ -55,8 +58,8 @@ class make_image:
         
         totalrefl = 0
         if frame_number == None:
-            no_frames = range(len(self.graindata.frameinfo))
-            print 'Generating diffraction images'
+            no_frames = list(range(len(self.graindata.frameinfo)))
+            print('Generating diffraction images')
         else:
             no_frames = [frame_number]
     
@@ -90,8 +93,8 @@ class make_image:
 #                   detz = self.graindata.grain[j].refs[k,A_id['detz']] + z_move
                     ndety = int(round(dety))
                     ndetz = int(round(detz))
-                    yrange = range(ndety+frame_add-peak_add,ndety+frame_add+peak_add+1)
-                    zrange = range(ndetz+frame_add-peak_add,ndetz+frame_add+peak_add+1)
+                    yrange = list(range(ndety+frame_add-peak_add,ndety+frame_add+peak_add+1))
+                    zrange = list(range(ndetz+frame_add-peak_add,ndetz+frame_add+peak_add+1))
                     intensity = int(round(self.graindata.grain[j].refs[k,A_id['Int']]))
                     nrefl = nrefl + 1
                     totalrefl = totalrefl + 1
@@ -199,7 +202,7 @@ class make_image:
                 self.write_tif(i,frame)
             if '.tif16bit' in self.graindata.param['output']:
                 self.write_tif16bit(i,frame)
-            print '\rDone frame %i took %8f s' %(i+1,time.clock()-t1),
+            print('\rDone frame %i took %8f s' %(i+1,time.clock()-t1), end=' ')
             sys.stdout.flush()
                 
     def write_edf(self,framenumber,frame):

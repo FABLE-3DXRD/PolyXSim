@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+from __future__ import print_function
 from xfab import tools,detector
 import numpy as n
 #
@@ -62,9 +64,9 @@ Gt = n.dot(Om,Gw)
 
 (ddety_n,ddetz_n) = detector.det_coor(Gt,n.cos(tth),wavelength,distance,y_size,z_size,dety_center,detz_center,n.identity(3),0,0,0)
 
-print 'Distance in pixels %f' %(n.sqrt((ddety_p-dety)*(ddety_p-dety)+(ddetz_p-detz)*(ddetz_p-detz)))
-print 'Distance in pixels %f' %(n.sqrt((ddety_n-dety)*(ddety_n-dety)+(ddetz_n-detz)*(ddetz_n-detz)))
-print 'Omage values, c, p, n:', omega_0, omega_p, omega_n
+print('Distance in pixels %f' %(n.sqrt((ddety_p-dety)*(ddety_p-dety)+(ddetz_p-detz)*(ddetz_p-detz))))
+print('Distance in pixels %f' %(n.sqrt((ddety_n-dety)*(ddety_n-dety)+(ddetz_n-detz)*(ddetz_n-detz))))
+print('Omage values, c, p, n:', omega_0, omega_p, omega_n)
 
 from polyxsim import pixel_trace
 from scipy.stats import norm

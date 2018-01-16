@@ -15,6 +15,8 @@ Proc. Eurographics '87, Amsterdam, The Netherlands, August 1987, pp 1-10.
 
 """
 
+from __future__ import absolute_import
+from __future__ import print_function
 import numpy as n
 #import copy
 
@@ -93,4 +95,4 @@ if __name__=='__main__':
     pixlist = pixel_trace(start,end)
 
     #print int
-    print pixlist
+    print(pixlist)

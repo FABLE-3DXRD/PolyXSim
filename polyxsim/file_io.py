@@ -1,6 +1,8 @@
+from __future__ import absolute_import, print_function
 import numpy as n
 from xfab import tools,detector
-import variables
+from . import variables
+
 
 A_id = variables.refarray().A_id
 
@@ -462,7 +464,7 @@ def write_ref(param,grain,grainno=None):
     """
 
     if grainno == None:
-        savegrains = range(len(grain))
+        savegrains = list(range(len(grain)))
     else:
         savegrains = grainno
 
@@ -527,7 +529,7 @@ def write_res(param,filename=None):
 			
     #initialise and sort keys alphabetically
     out = "" 
-    keys = param.keys()
+    keys = list(param.keys())
     keys.sort()
 
     for item in keys:

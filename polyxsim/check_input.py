@@ -4,13 +4,16 @@
 # Checking input  
 #
 
+from __future__ import absolute_import
+from __future__ import print_function
 from string import split
 from copy import copy
 import sys, os 
-import variables
+from . import variables
 from xfab import tools,sg
 
 import numpy as n
+
 #import logging
 #logging.basicConfig(level=logging.DEBUG,format='%(levelname)s %(message)s')
 
@@ -105,7 +108,7 @@ class parse_input:
         try:
             f = open(self.filename,'r')
         except IOError:
-            raise IOError, 'No file named %s' %self.filename
+            raise IOError('No file named %s' %self.filename)
         
         self.input = f.readlines()
         f.close()
@@ -593,7 +596,7 @@ class parse_input:
                         ' of phase_grains, check for multiple names'
                 self.param['grain_list'] = grain_list_phase
             else:
-                self.param['grain_list'] = range(no_grains)
+                self.param['grain_list'] = list(range(no_grains))
 
 # assert that all information needed to generate grains is present	
 #         assert len(grain_list_U) != 0 or self.param['gen_U'] != 0,\
@@ -769,13 +772,13 @@ class parse_input:
 
     def show_errors(self):
         if len(self.errors) > 0:
-            print 'List of errors and/or inconsistencies found in input: '
-            print '----------------------------------------------------- '
+            print('List of errors and/or inconsistencies found in input: ')
+            print('----------------------------------------------------- ')
             no = 0
             for i in self.errors:
                 no += 1
-                print 'Error %3i : ' %no, self.errors[i]
-            print '----------------------------------------------------- \n'
+                print('Error %3i : ' %no, self.errors[i])
+            print('----------------------------------------------------- \n')
             
 
 
@@ -801,7 +804,7 @@ class parse_input:
         modulus = n.abs(omega_end-omega_start)%omega_step
         if  modulus > 1e-9:
             if omega_step-modulus > 1e-9:
-                raise ValueError, 'The omega range does not match an integer number of omega steps' 
+                raise ValueError('The omega range does not match an integer number of omega steps') 
 
         # print omega_start,omega_end,omega_step, (n.abs(omega_end-omega_start)+1e-19)%omega_step
         omega_sign = self.param['omega_sign']
@@ -1016,13 +1019,13 @@ if __name__=='__main__':
     try:
         filename = sys.argv[1] 
     except:
-        print 'Usage: check_input.py  <input.inp>'
+        print('Usage: check_input.py  <input.inp>')
         sys.exit()
 
     myinput = parse_input(input_file = filename)
     myinput.read()
     myinput.check() 
     if myinput.missing == True:
-        print 'MISSING ITEMS'
+        print('MISSING ITEMS')
     myinput.evaluate()
-    print myinput.param
+    print(myinput.param)

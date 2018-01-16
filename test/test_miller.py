@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import unittest
 from polyxsim import check_input
 from polyxsim import reflections

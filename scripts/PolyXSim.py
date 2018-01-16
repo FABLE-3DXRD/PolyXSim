@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 # Modules to import 
+from __future__ import absolute_import
+from __future__ import print_function
 from polyxsim import gopolyxsim
 
 import logging
@@ -12,7 +14,7 @@ if __name__=="__main__":
         from optparse import OptionParser
         parser = OptionParser()
         options  = gopolyxsim.get_options(parser)
-        print options
+        print(options)
         gopolyxsim.run(options)
     except:
         if options != None:
