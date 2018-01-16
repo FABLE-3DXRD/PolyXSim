@@ -26,7 +26,7 @@ pos = [0.0, 0.0 , 0.0]
 hkl = n.array([1,1,1])*3
 
 unit_cell = [4.04975, 4.04975, 4.04975, 90, 90, 90]
-B = tools.FormB(unit_cell)
+B = tools.form_b_mat(unit_cell)
 Gc = n.dot(B,hkl)
 Gw = n.dot(U,Gc)
 
@@ -40,7 +40,7 @@ wavelength = wavelength_0
 tth = tools.tth2(Gw,wavelength)
 (Omega, Eta) = tools.find_omega_wedge(Gw,tth,wedge)
 omega_0 = Omega[1]*180./n.pi
-Om = tools.OMEGA(Omega[1])
+Om = tools.form_omega_mat(Omega[1])
 Gt = n.dot(Om,Gw)
 (dety,detz) = detector.det_coor(Gt,n.cos(tth),wavelength,distance,y_size,z_size,dety_center,detz_center,n.identity(3),0,0,0)
 
@@ -49,7 +49,7 @@ wavelength = wavelength_0*(1.0+wavedisp/2.*sigma_limit)
 tth = tools.tth2(Gw,wavelength)
 (Omega, Eta) = tools.find_omega_wedge(Gw,tth,wedge)
 omega_p = Omega[1]*180./n.pi
-Om = tools.OMEGA(Omega[1])
+Om = tools.form_omega_mat(Omega[1])
 Gt = n.dot(Om,Gw)
 
 (ddety_p,ddetz_p) = detector.det_coor(Gt,n.cos(tth),wavelength,distance,y_size,z_size,dety_center,detz_center,n.identity(3),0,0,0)
@@ -59,7 +59,7 @@ wavelength = wavelength_0*(1.0-wavedisp/2.*sigma_limit)
 tth = tools.tth2(Gw,wavelength)
 (Omega, Eta) = tools.find_omega_wedge(Gw,tth,wedge)
 omega_n = Omega[1]*180./n.pi
-Om = tools.OMEGA(Omega[1])
+Om = tools.form_omega_mat(Omega[1])
 Gt = n.dot(Om,Gw)
 
 (ddety_n,ddetz_n) = detector.det_coor(Gt,n.cos(tth),wavelength,distance,y_size,z_size,dety_center,detz_center,n.identity(3),0,0,0)
@@ -80,14 +80,14 @@ frac =  cdfcums[1:]-cdfcums[:-1]
 ### CHANGE UNIT_CELL
 unit_cell = n.array([4.04975, 4.04975, 4.04975, 90, 90, 90])
 unit_cell[:3] =  unit_cell[:3]*(1.0+1.0e-3)
-B = tools.FormB(unit_cell)
+B = tools.form_b_mat(unit_cell)
 Gc = n.dot(B,hkl)
 Gw = n.dot(U,Gc)
 
 wavelength = wavelength_0
 tth = tools.tth2(Gw,wavelength)
 (Omega, Eta) = tools.find_omega_wedge(Gw,tth,wedge)
-Om = tools.OMEGA(Omega[1])
+Om = tools.form_omega_mat(Omega[1])
 Gt = n.dot(Om,Gw)
 
 (dddety,dddetz) = detector.det_coor(Gt,n.cos(tth),wavelength,distance,y_size,z_size,dety_center,detz_center,n.identity(3),0,0,0)

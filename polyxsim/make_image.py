@@ -53,8 +53,8 @@ class make_image:
             filter_tth_eta = ndimage.gaussian_filter(raw_tth_eta,[0.5*fwhm_tth,0.5*fwhm_eta])
             peakwsig = 1.
         
-        framedimy = self.graindata.param['dety_size']+2*frame_add
-        framedimz = self.graindata.param['detz_size']+2*frame_add
+        framedimy = int(self.graindata.param['dety_size']+2*frame_add)
+        framedimz = int(self.graindata.param['detz_size']+2*frame_add)
         
         totalrefl = 0
         if frame_number == None:

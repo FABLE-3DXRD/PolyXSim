@@ -65,11 +65,11 @@ def add_intensity(hkl,param):
     Calculate the reflection intensities
         """
     if 'structure_int' in param:
-        int = param['structure_int']
+        myint = param['structure_int']
     else:
-        int = 2**15
+        myint = 2**15
 
-    int = n.ones((len(hkl),1))*int
-    hkl = n.concatenate((hkl,int),1)
+    myint = n.ones((len(hkl),1))*myint
+    hkl = n.concatenate((hkl,myint),1)
     return hkl
 

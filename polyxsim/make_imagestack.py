@@ -33,7 +33,7 @@ class make_image:
                 odf_spread = self.graindata.param['mosaicity']/4
                 odf_spread_grid = odf_spread/odf_scale
                 sigma = odf_spread_grid*n.ones(3)
-                r1_max = n.ceil(3*odf_spread_grid)
+                r1_max = int(n.ceil(3*odf_spread_grid))
                 r1_range = r1_max*2 + 1
                 r2_range = r1_max*2 + 1
                 r3_range = r1_max*2 + 1

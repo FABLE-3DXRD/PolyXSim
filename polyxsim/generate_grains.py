@@ -212,7 +212,7 @@ def gen_odf(sigma,pos,mapsize):
     Generate a 3D orietation distributio function as a 3D Gaussion
     Henning Osholm Sorensen, Risoe-DTU, June 9, 2008
     """
-    odf = n.zeros(mapsize)
+    odf = n.zeros(tuple([int(m) for m in mapsize]))
     
     for i in range(int(mapsize[0])):
         for j in range(int(mapsize[1])):

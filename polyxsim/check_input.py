@@ -6,7 +6,7 @@
 
 from __future__ import absolute_import
 from __future__ import print_function
-from string import split
+
 from copy import copy
 import sys, os 
 from . import variables
@@ -116,8 +116,8 @@ class parse_input:
         for lines in self.input:
             if lines.find('#') != 0:
                 if lines.find('#') > 0:
-                    lines = split(lines,'#')[0]
-                line = split(lines)
+                    lines = lines.split('#')[0]
+                line = lines.split()
                 if len(line) != 0:
                     key = line[0]
                     val = line[1:]
@@ -131,7 +131,7 @@ class parse_input:
                         valend = ']'
                         sepa = ','
                     
-                    if len(val) > 1:
+                    if len(val) > 1 or key == "output":
                         for i in val:
                             valtmp = valtmp + i + sepa
                         # remove last separator
@@ -263,17 +263,17 @@ class parse_input:
         for item in self.param:
             if '_phase_' in item:
                 if 'structure' in item:
-                    phase_list_structure.append(eval(split(item,'_phase_')[1]))
+                    phase_list_structure.append(eval(item.split('_phase_')[1]))
                 elif 'unit_cell' in item:
-                    phase_list_unit_cell.append(eval(split(item,'_phase_')[1]))
+                    phase_list_unit_cell.append(eval(item.split('_phase_')[1]))
                 elif 'sgno' in item:
-                    phase_list_sgno.append(eval(split(item,'_phase_')[1]))
+                    phase_list_sgno.append(eval(item.split('_phase_')[1]))
                 elif 'sgname' in item:
-                    phase_list_sgname.append(eval(split(item,'_phase_')[1]))
+                    phase_list_sgname.append(eval(item.split('_phase_')[1]))
                 elif 'gen_size' in item:
-                    phase_list_gen_size.append(eval(split(item,'_phase_')[1]))
+                    phase_list_gen_size.append(eval(item.split('_phase_')[1]))
                 elif 'gen_eps' in item:
-                    phase_list_gen_eps.append(eval(split(item,'_phase_')[1]))
+                    phase_list_gen_eps.append(eval(item.split('_phase_')[1]))
                     
 
         phase_list_structure.sort()
@@ -453,15 +453,15 @@ class parse_input:
         for item in self.param:
             if '_grains_' in item:
                 if 'U' in item:
-                    grain_list_U.append(eval(split(item,'_grains_')[1]))
+                    grain_list_U.append(eval(item.split('_grains_')[1]))
                 elif 'pos' in item:
-                    grain_list_pos.append(eval(split(item,'_grains_')[1]))
+                    grain_list_pos.append(eval(item.split('_grains_')[1]))
                 elif 'eps' in item:
-                    grain_list_eps.append(eval(split(item,'_grains_')[1]))
+                    grain_list_eps.append(eval(item.split('_grains_')[1]))
                 elif 'size' in item:
-                    grain_list_size.append(eval(split(item,'_grains_')[1]))
+                    grain_list_size.append(eval(item.split('_grains_')[1]))
                 elif 'phase' in item[:5]:
-                    grain_list_phase.append(eval(split(item,'_grains_')[1]))
+                    grain_list_phase.append(eval(item.split('_grains_')[1]))
                     self.param['no_grains_phase_%i' %self.param[item]] += 1
 
 #assert that the number of grains in all match 
@@ -937,17 +937,17 @@ class parse_input:
         for item in self.param:
             if '_phase_' in item:
                 if 'structure' in item:
-                    phase_list_structure.append(eval(split(item,'_phase_')[1]))
+                    phase_list_structure.append(eval(item.split('_phase_')[1]))
                 elif 'unit_cell' in item:
-                    phase_list_unit_cell.append(eval(split(item,'_phase_')[1]))
+                    phase_list_unit_cell.append(eval(item.split('_phase_')[1]))
                 elif 'sgno' in item:
-                    phase_list_sgno.append(eval(split(item,'_phase_')[1]))
+                    phase_list_sgno.append(eval(item.split('_phase_')[1]))
                 elif 'sgname' in item:
-                    phase_list_sgname.append(eval(split(item,'_phase_')[1]))
+                    phase_list_sgname.append(eval(item.split('_phase_')[1]))
                 elif 'gen_size' in item:
-                    phase_list_gen_size.append(eval(split(item,'_phase_')[1]))
+                    phase_list_gen_size.append(eval(item.split('_phase_')[1]))
                 elif 'gen_eps' in item:
-                    phase_list_gen_eps.append(eval(split(item,'_phase_')[1]))
+                    phase_list_gen_eps.append(eval(item.split('_phase_')[1]))
                     
 
         phase_list_structure.sort()

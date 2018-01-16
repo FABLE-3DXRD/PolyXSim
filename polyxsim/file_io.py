@@ -19,7 +19,7 @@ def write_flt(param,grain):
 #    out = '#  sc  fc  omega  Number_of_pixels  avg_intensity  s_raw  f_raw  sigs  sigf  covsf  sigo  covso  covfo  sum_intensity  sum_intensity^2  IMax_int  IMax_s  IMax_f  IMax_o  Min_s  Max_s  Min_f  Max_f  Min_o  Max_o  dety  detz  onfirst  onlast  spot3d_id \n'
     out = '#  sc  fc  omega  Number_of_pixels  avg_intensity  s_raw  f_raw  sigs  sigf  covsf  sigo  covso  covfo  sum_intensity  sum_intensity^2  IMax_int  IMax_s  IMax_f  IMax_o  Min_s  Max_s  Min_f  Max_f  Min_o  Max_o  dety  detz  onfirst  onlast  spot3d_id  labels  tth_per_grain  eta_per_grain  h  k  l\n'
     f.write(out)
-    	
+        
     A = grain[0].refs
     for grainno in range(1,param['no_grains']):
         A = n.concatenate((A,grain[grainno].refs))
@@ -86,7 +86,7 @@ def write_flt(param,grain):
                       )
         f.write(out)
 
-    	
+        
     f.close()   
       
       
@@ -209,17 +209,17 @@ def write_gve(param,grain,hkl):
     A = grain[0].refs
     for grainno in range(1,param['no_grains']):
         A = n.concatenate((A,grain[grainno].refs))
-    		
+            
     nrefl = A.shape[0]
 
     # from detector.par 
     (z_center, y_center) = detector.detyz_to_xy([param['dety_center'],param['detz_center']],
-					        param['o11'],
-					        param['o12'],
-					        param['o21'],
-					        param['o22'],
-					        param['dety_size'],
-					        param['detz_size'])		
+                            param['o11'],
+                            param['o12'],
+                            param['o21'],
+                            param['o22'],
+                            param['dety_size'],
+                            param['detz_size'])        
     dout = "# chi 0.0\n" 
     dout = dout + "# distance %f\n" %(param['distance']*1000.) 
     dout = dout + "# fit_tolerance 0.5\n" 
@@ -254,19 +254,19 @@ def write_gve(param,grain,hkl):
         out = out + "# wavelength = %s\n" %(param['wavelength'])
         out = out + "# wedge = %f\n" %(param['wedge'])
         out = out + "# axis = 0.000 0.0000 1.0000\n" 
-	    # insert detector.par as comment
+        # insert detector.par as comment
         out = out + "# cell__a %s\n" %unit_cell[0]
         out = out + "# cell__b %s\n" %unit_cell[1]
         out = out + "# cell__c %s\n" %unit_cell[2]
         out = out + "# cell_alpha %s\n" %unit_cell[3]
         out = out + "# cell_beta %s\n" %unit_cell[4]
-        out = out + "# cell_gamma %s\n" %unit_cell[5]	
+        out = out + "# cell_gamma %s\n" %unit_cell[5]    
         out = out + "# cell_lattice_[P,A,B,C,I,F,R] %s\n" %param['sgname_phase_%i' %phase][0]
         out = out + dout
         # continue with gve format
         out = out +"# ds h k l\n" 
         f.write(out)
-    	
+        
         thkl = hkl[param['phase_list'].index(phase)].copy()
         ds = n.zeros((thkl.shape[0],1))
 
@@ -324,7 +324,7 @@ def write_gve(param,grain,hkl):
                            zl*1000.
                            )
             f.write(out)
-    	
+        
         f.close()   
 
 
@@ -408,13 +408,13 @@ def write_par(param):
     #Prepare detector part of p.par output
     #Calc beam center in ImageD11 coordinate system 
     (z_center, y_center) = detector.detyz_to_xy([param['dety_center'],param['detz_center']],
-					        param['o11'],
-					        param['o12'],
-					        param['o21'],
-					        param['o22'],
-					        param['dety_size'],
-					        param['detz_size'])
-			
+                            param['o11'],
+                            param['o12'],
+                            param['o21'],
+                            param['o22'],
+                            param['dety_size'],
+                            param['detz_size'])
+            
     dout = "chi 0.0\n" 
     dout = dout + "distance %f\n" %(param['distance']*1000.) 
     dout = dout + "fit_tolerance 0.5\n" 
@@ -437,24 +437,24 @@ def write_par(param):
     dout = dout + "z_size %f\n" %(param['z_size']*1000.)
 
     for phase in param['phase_list']:
-	    if param['no_phases'] > 1:
+        if param['no_phases'] > 1:
                 filename = '%s/%s_phase_%i.par' %(param['direc'],param['stem'],phase)
-            else:
+        else:
                 filename = '%s/%s.par' %(param['direc'],param['stem'])
-	    f = open(filename,'w')
-	    
-	    unit_cell = param['unit_cell_phase_%i' %phase]
-	    out = "cell__a %s\n" %unit_cell[0]
-	    out = out + "cell__b %s\n" %unit_cell[1]
-	    out = out + "cell__c %s\n" %unit_cell[2]
-	    out = out + "cell_alpha %s\n" %unit_cell[3]
-	    out = out + "cell_beta %s\n" %unit_cell[4]
-	    out = out + "cell_gamma %s\n" %unit_cell[5]	
-	    out = out + "cell_lattice_[P,A,B,C,I,F,R] %s\n" %param['sgname_phase_%i' %phase][0]
-	    out = out + dout
+        f = open(filename,'w')
+        
+        unit_cell = param['unit_cell_phase_%i' %phase]
+        out = "cell__a %s\n" %unit_cell[0]
+        out = out + "cell__b %s\n" %unit_cell[1]
+        out = out + "cell__c %s\n" %unit_cell[2]
+        out = out + "cell_alpha %s\n" %unit_cell[3]
+        out = out + "cell_beta %s\n" %unit_cell[4]
+        out = out + "cell_gamma %s\n" %unit_cell[5]    
+        out = out + "cell_lattice_[P,A,B,C,I,F,R] %s\n" %param['sgname_phase_%i' %phase][0]
+        out = out + dout
 
-	    f.write(out)
-	    f.close()   
+        f.write(out)
+        f.close()   
 
 
 
@@ -526,7 +526,7 @@ def write_res(param,filename=None):
         filename = '%s/%s.res' %(param['direc'],param['stem'])
         
     f = open(filename,'w')
-			
+            
     #initialise and sort keys alphabetically
     out = "" 
     keys = list(param.keys())
@@ -534,7 +534,7 @@ def write_res(param,filename=None):
 
     for item in keys:
         # rule out None entries
-        if param[item] != None:
+        if param[item] is not None:
             # treat all strings, remember quotation marks
             if type(param[item]) == str:
                 out += "%s '%s'\n" %(item,param[item])
@@ -579,19 +579,18 @@ def write_ubi(param):
     for i in range(param['no_grains']):
         U = param['U_grains_%s' %(param['grain_list'][i])]
         gr_eps = n.array(param['eps_grains_%s' %(param['grain_list'][i])])
-	if param['no_phases'] == 1:
+        if param['no_phases'] == 1:
             phase = param['phase_list'][0]
-	else:
+        else:
             phase = param['phase_grains_%s' %(param['grain_list'][i])]
-	# Calculate the B-matrix based on the strain tensor for each grain
+# Calculate the B-matrix based on the strain tensor for each grain
         B = tools.epsilon_to_b(gr_eps,param['unit_cell_phase_%i' %phase])/(2*n.pi) 
         UBI = n.linalg.inv(n.dot(U,B))
         for j in range(3):
             out = format %(UBI[j,0],UBI[j,1],UBI[j,2])
             f.write(out)
-			
         out = "\n"
         f.write(out)
     f.close()   
 
-	
+    
