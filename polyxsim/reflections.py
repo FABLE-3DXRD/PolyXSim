@@ -1,6 +1,7 @@
+from __future__ import absolute_import
 import numpy as n
 from xfab import tools,structure,sg
-import check_input
+from . import check_input
 
 def gen_miller(param,phase):
     """
@@ -36,7 +37,7 @@ def open_structure(param,phase):
         struct = structure.build_atomlist()
         struct.PDBread(pdbfile=file)
     else:
-        raise IOError, 'Unknown structure file format'
+        raise IOError('Unknown structure file format')
     param['sgno_phase_%i' %phase] = sg.sg(sgname=struct.atomlist.sgname).no
     param['sgname_phase_%i' %phase] = struct.atomlist.sgname
     param['cell_choice_phase_%i' %phase] = sg.sg(sgname=struct.atomlist.sgname).cell_choice
@@ -64,11 +65,11 @@ def add_intensity(hkl,param):
     Calculate the reflection intensities
         """
     if 'structure_int' in param:
-        int = param['structure_int']
+        myint = param['structure_int']
     else:
-        int = 2**15
+        myint = 2**15
 
-    int = n.ones((len(hkl),1))*int
-    hkl = n.concatenate((hkl,int),1)
+    myint = n.ones((len(hkl),1))*myint
+    hkl = n.concatenate((hkl,myint),1)
     return hkl
 

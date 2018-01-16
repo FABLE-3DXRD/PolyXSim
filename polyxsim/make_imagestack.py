@@ -1,13 +1,16 @@
+from __future__ import absolute_import
+from __future__ import print_function
 import numpy as n
 
 from xfab import tools
 from xfab import detector
 from fabio import edfimage,tifimage
 from scipy import ndimage
-import variables,check_input
-import generate_grains
+from . import variables,check_input
+from . import generate_grains
 import time 
 import sys
+
 
 A_id = variables.refarray().A_id
 
@@ -30,13 +33,13 @@ class make_image:
                 odf_spread = self.graindata.param['mosaicity']/4
                 odf_spread_grid = odf_spread/odf_scale
                 sigma = odf_spread_grid*n.ones(3)
-                r1_max = n.ceil(3*odf_spread_grid)
+                r1_max = int(n.ceil(3*odf_spread_grid))
                 r1_range = r1_max*2 + 1
                 r2_range = r1_max*2 + 1
                 r3_range = r1_max*2 + 1
                 mapsize = r1_range*n.ones(3)
                 odf_center = r1_max*n.ones(3)
-                print 'size of ODF map', mapsize
+                print('size of ODF map', mapsize)
                 self.odf = generate_grains.gen_odf(sigma,odf_center,mapsize)
                 #from pylab import *
                 #imshow(self.odf[:,:,odf_center[2]])
@@ -50,7 +53,7 @@ class make_image:
                 r1_range = r1_max*2 + 1
                 r2_range = r2_max*2 + 1
                 r3_range = r3_max*2 + 1
-                print 'size of ODF map', r1_range*n.ones(3)
+                print('size of ODF map', r1_range*n.ones(3))
                 odf_center = r1_max*n.ones(3)
                 self.odf= n.zeros((r1_range,r2_range,r3_range))
                 # Makes spheric ODF for debug purpuses
@@ -67,7 +70,7 @@ class make_image:
                 #show()
             elif self.graindata.param['odf_type'] == 2:
                 file = self.graindata.param['odf_file']
-                print 'Read ODF from file_ %s' %file
+                print('Read ODF from file_ %s' %file)
                 file = open(file,'r')
                 (r1_range, r2_range, r3_range) = file.readline()[9:].split()
                 r1_range = int(r1_range)
@@ -79,7 +82,7 @@ class make_image:
                 self.odf = oneD_odf[:elements].reshape(r1_range,r2_range,r3_range)
                 if self.graindata.param['odf_sub_sample'] > 1:
                     sub =self.graindata.param['odf_sub_sample']
-                    print 'subscale =',sub
+                    print('subscale =',sub)
                     r1_range_sub = r1_range * self.graindata.param['odf_sub_sample']
                     r2_range_sub = r2_range * self.graindata.param['odf_sub_sample']
                     r3_range_sub = r3_range * self.graindata.param['odf_sub_sample']
@@ -95,13 +98,13 @@ class make_image:
                     r2_range = r2_range_sub 
                     r3_range = r3_range_sub
                     odf_scale = odf_scale/sub
-                    print 'odf_scale', odf_scale
+                    print('odf_scale', odf_scale)
 
                 #[r1_range, r2_range, r3_range] = self.odf.shape
                 odf_center = [(r1_range)/2, r2_range/2, r3_range/2]
-                print odf_center
+                print(odf_center)
                 #self.odf[:,:,:] = 0.05
-                print self.odf.shape
+                print(self.odf.shape)
                 #from pylab import *
                 #imshow(self.odf[:,:,odf_center[2]])
                 #show()
@@ -135,7 +138,7 @@ class make_image:
     def make_image_array(self):
         from scipy import sparse
         #make stack of empty images as a dictionary of sparse matrices
-        print 'Build sparse image stack'
+        print('Build sparse image stack')
         stacksize = len(self.graindata.frameinfo)
         self.frames = {}
         for i in range(stacksize):
@@ -146,7 +149,7 @@ class make_image:
     def make_image(self,grainno=None,refl = None):
         from scipy import ndimage
         if grainno == None:
-            do_grains = range(self.graindata.param['no_grains'])
+            do_grains = list(range(self.graindata.param['no_grains']))
         else:
             do_grains = [grainno]
 
@@ -157,16 +160,16 @@ class make_image:
             B = self.graindata.grain[grainno].B
             SU = n.dot(self.graindata.S,self.graindata.grain[grainno].U)
             if refl == None:
-                do_refs = range(len(self.graindata.grain[grainno].refs))
+                do_refs = list(range(len(self.graindata.grain[grainno].refs)))
             else:
                 do_refs = [refl]
             # loop over reflections for each grain
 
             for nref in do_refs:
                 # exploit that the reflection list is sorted according to omega
-                print '\rDoing reflection %i of %i for grain %i of %i' %(nref+1,
+                print('\rDoing reflection %i of %i for grain %i of %i' %(nref+1,
                                                                          len(self.graindata.grain[grainno].refs),
-                                                                         grainno+1,self.graindata.param['no_grains']),
+                                                                         grainno+1,self.graindata.param['no_grains']), end=' ')
                 sys.stdout.flush()
                 #print 'Doing reflection: %i' %nref
                 if self.graindata.param['odf_type'] == 3:
@@ -196,7 +199,7 @@ class make_image:
                                 try:
                                     minpos = n.argmin(n.abs(Omega-self.graindata.grain[grainno].refs[nref,A_id['omega']]))
                                 except:
-                                    print Omega
+                                    print(Omega)
                                 if len(Omega) == 0:
                                     continue
                                 omega = Omega[minpos]
@@ -255,7 +258,7 @@ class make_image:
 
     def correct_image(self):
         no_frames = len(self.graindata.frameinfo)
-        print '\nGenerating ', no_frames, 'frames'
+        print('\nGenerating ', no_frames, 'frames')
         for frame_no in self.frames:
             t1 = time.clock()
 
@@ -285,7 +288,7 @@ class make_image:
                 self.write_edf(frame_no,frame)
         if '.tif' in self.graindata.param['output']:
                 self.write_tif(frame_no,frame)
-        print '\rDone frame %i took %8f s' %(frame_no+1,time.clock()-t1),
+        print('\rDone frame %i took %8f s' %(frame_no+1,time.clock()-t1), end=' ')
         sys.stdout.flush()
                 
     def write_edf(self,framenumber,frame):

@@ -1,10 +1,13 @@
+from __future__ import absolute_import
+from __future__ import print_function
 import numpy as n
 from xfab import tools
 from xfab import sg
 from xfab import detector
 from xfab.structure import int_intensity
-import variables,check_input,file_io
+from . import variables,check_input,file_io
 import sys
+
 #import logging
 #logging.basicConfig(level=logging.DEBUG,format='%(levelname)s %(message)s')
 
@@ -46,12 +49,12 @@ class find_refl:
         print('Generating reflections')
 
 
-        print 'Finished generating reflections\n'
+        print('Finished generating reflections\n')
     
     def run(self):
         spot_id = 0
         # Generate orientations of the grains and loop over all grains
-        print 'no of grains ',self.param['no_grains']
+        print('no of grains ',self.param['no_grains'])
         for grainno in range(self.param['no_grains']):
             A = []
             U = self.param['U_grains_%s' %(self.param['grain_list'][grainno])]
@@ -204,10 +207,10 @@ class find_refl:
                 A = n.zeros((0,len(A_id)))
             # save reflection info in grain container
             self.grain[grainno].refs = A 
-            print '\rDone %3i grain(s) of %3i' %(grainno+1,self.param['no_grains']),
+            print('\rDone %3i grain(s) of %3i' %(grainno+1,self.param['no_grains']), end=' ')
             sys.stdout.flush()
 
-        print '\n'
+        print('\n')
 
 
     def overlap(self):
@@ -245,7 +248,7 @@ class find_refl:
                             self.grain[int(A[j,A_id['grain_id']])].refs[A[j,A_id['ref_id']],
                                                                         A_id['overlaps']] += 1
                 j = j - 1
-        print 'Number of overlaps %i out of %i refl.' %(n.sum(nover),nrefl)
+        print('Number of overlaps %i out of %i refl.' %(n.sum(nover),nrefl))
         co = 0
         # How to find the info for reflection with spot_id
         #refl_with_spotid = A[(A[:,A_id['spot_id']]==spot_id),:]
@@ -253,8 +256,8 @@ class find_refl:
         for i in range(nrefl):
             if len(overlaps[i]) > 0:
                 co +=1
-                print i, overlaps[i]
-        print co
+                print(i, overlaps[i])
+        print(co)
 
     def save(self,grainno=None):
         """

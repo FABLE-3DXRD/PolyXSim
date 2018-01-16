@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import unittest
 from polyxsim import check_input
 from polyxsim import reflections
@@ -9,19 +10,21 @@ class test_gen_miller(unittest.TestCase):
         param['theta_min'] = 0 
         param['theta_max'] = 5
         param['wavelength'] = 0.2647
-        param['unit_cell'] = [8.5312,4.8321,10.125,90.00,92.031,90.00]
+        param['unit_cell_phase_0'] = [8.5312,4.8321,10.125,90.00,92.031,90.00]
         param['sgno'] = 4
-        hkl = reflections.gen_miller(param)
-        self.assertEquals(len(hkl),498)
+        param['sgname_phase_0'] = 'P21'
+        param['cell_choice_phase_0'] = 'standard' 
+        hkl = reflections.gen_miller(param,0)
+        self.assertEqual(len(hkl),498)
 
     def test_open_structure(self):
         param = {}
-        param['structure_file'] = 'oPPA.cif'
+        param['structure_phase_0'] = 'oPPA.cif'
 #        param['structure_datablock'] = 'oPPA'
-        structure = reflections.open_structure(param)
-        self.assertEquals(param['sgno'],4)
-        self.assertEquals([8.5312,4.8321,10.125,90.00,92.031,90.00],
-                          param['unit_cell'])
+        structure = reflections.open_structure(param,0)
+        self.assertEqual(param['sgno_phase_0'],4)
+        self.assertEqual([8.5312,4.8321,10.125,90.00,92.031,90.00],
+                          param['unit_cell_phase_0'])
         
 
     def test_calc_intensity(self):
@@ -29,11 +32,11 @@ class test_gen_miller(unittest.TestCase):
         myinput.read()
         myinput.check()
         myinput.initialize()
-        myinput.param['structure_file'] = 'oPPA.cif'
+        myinput.param['structure_phase_0'] = 'oPPA.cif'
         myinput.param['structure_datablock'] = 'oPPA'
 
-        xtal_structure = reflections.open_structure(myinput.param)
-        hkl = reflections.gen_miller(myinput.param)
+        xtal_structure = reflections.open_structure(myinput.param,0)
+        hkl = reflections.gen_miller(myinput.param,0)
         hkl = reflections.calc_intensity(hkl,xtal_structure)
 
     def test_add_intensity(self): 
@@ -41,14 +44,16 @@ class test_gen_miller(unittest.TestCase):
         param['theta_min'] = 0 
         param['theta_max'] = 3
         param['wavelength'] = 0.2647
-        param['unit_cell'] = [8.5312,4.8321,10.125,90.00,92.031,90.00]
-        param['sgno'] = 4
-        hkl = reflections.gen_miller(param)
+        param['unit_cell_phase_0'] = [8.5312,4.8321,10.125,90.00,92.031,90.00]
+        param['cell_choice_phase_0']='standard'
+        param['sgno_phase_0'] = 4
+        param['sgname_phase_0'] = 'p21'
+        hkl = reflections.gen_miller(param,0)
         hkl2 = reflections.add_intensity(hkl,param)
-        self.assertEquals(n.sum(hkl2[:,3]),len(hkl2)*2**15)
-        param['int'] = 2**14
+        self.assertEqual(n.sum(hkl2[:,3]),len(hkl2)*2**15)
+        param['structure_int'] = 2**14
         hkl2 = reflections.add_intensity(hkl,param)
-        self.assertEquals(n.sum(hkl2[:,3]),len(hkl2)*2**14)
+        self.assertEqual(n.sum(hkl2[:,3]),len(hkl2)*2**14)
 
 
 if __name__ == '__main__':

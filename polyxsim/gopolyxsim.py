@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 #This module has been made by Gaelle for the GUI. This is a copy of the script.
 # Modules to import 
+from __future__ import absolute_import
+from __future__ import print_function
 import sys,os
 from polyxsim import check_input
 from polyxsim import file_io
@@ -41,7 +43,7 @@ def run(options):
     except:
         options.print_input = None;
     if options.print_input:
-        print help_input.show_input()
+        print(help_input.show_input())
         sys.exit()
 
     # Check if filename is specified
@@ -50,7 +52,7 @@ def run(options):
     except:
         options.filename = None;
     if options.filename == None:
-        print "\nNo input file supplied [-i filename]\n"
+        print("\nNo input file supplied [-i filename]\n")
         #Gaelle comment : ? sys.exit() and add raise error instead
         sys.exit()
     #print 'options = ',options
@@ -62,10 +64,10 @@ def run(options):
     except:
         options.killfile = None;
     if options.killfile is not None and os.path.exists(options.killfile):
-        print "The purpose of the killfile option is to create that file"
-        print "only when you want PolyXsim to stop"
-        print "If the file already exists when you start PolyXsim, it is"
-        print "stopped immediately"
+        print("The purpose of the killfile option is to create that file")
+        print("only when you want PolyXsim to stop")
+        print("If the file already exists when you start PolyXsim, it is")
+        print("stopped immediately")
         raise ValueError("Your killfile "+options.killfile+" already exists")
     
     # Is the input file available?

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 
+from __future__ import print_function
 class frameinfo_cont:
     def __init__(self, frameno):
         self.no = frameno
@@ -76,7 +77,7 @@ if __name__=='__main__':
     grain = []
     grain.append(grain_cont())
     grain[0].refl_add()
-    print grain[0].refl[0].hkl
+    print(grain[0].refl[0].hkl)
 #     mycont = container()
 #     mycont.grainno = 2
 #     mycont.grain = []

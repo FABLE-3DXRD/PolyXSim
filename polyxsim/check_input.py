@@ -4,13 +4,16 @@
 # Checking input  
 #
 
-from string import split
+from __future__ import absolute_import
+from __future__ import print_function
+
 from copy import copy
 import sys, os 
-import variables
+from . import variables
 from xfab import tools,sg
 
 import numpy as n
+
 #import logging
 #logging.basicConfig(level=logging.DEBUG,format='%(levelname)s %(message)s')
 
@@ -105,7 +108,7 @@ class parse_input:
         try:
             f = open(self.filename,'r')
         except IOError:
-            raise IOError, 'No file named %s' %self.filename
+            raise IOError('No file named %s' %self.filename)
         
         self.input = f.readlines()
         f.close()
@@ -113,8 +116,8 @@ class parse_input:
         for lines in self.input:
             if lines.find('#') != 0:
                 if lines.find('#') > 0:
-                    lines = split(lines,'#')[0]
-                line = split(lines)
+                    lines = lines.split('#')[0]
+                line = lines.split()
                 if len(line) != 0:
                     key = line[0]
                     val = line[1:]
@@ -128,7 +131,7 @@ class parse_input:
                         valend = ']'
                         sepa = ','
                     
-                    if len(val) > 1:
+                    if len(val) > 1 or key == "output":
                         for i in val:
                             valtmp = valtmp + i + sepa
                         # remove last separator
@@ -260,17 +263,17 @@ class parse_input:
         for item in self.param:
             if '_phase_' in item:
                 if 'structure' in item:
-                    phase_list_structure.append(eval(split(item,'_phase_')[1]))
+                    phase_list_structure.append(eval(item.split('_phase_')[1]))
                 elif 'unit_cell' in item:
-                    phase_list_unit_cell.append(eval(split(item,'_phase_')[1]))
+                    phase_list_unit_cell.append(eval(item.split('_phase_')[1]))
                 elif 'sgno' in item:
-                    phase_list_sgno.append(eval(split(item,'_phase_')[1]))
+                    phase_list_sgno.append(eval(item.split('_phase_')[1]))
                 elif 'sgname' in item:
-                    phase_list_sgname.append(eval(split(item,'_phase_')[1]))
+                    phase_list_sgname.append(eval(item.split('_phase_')[1]))
                 elif 'gen_size' in item:
-                    phase_list_gen_size.append(eval(split(item,'_phase_')[1]))
+                    phase_list_gen_size.append(eval(item.split('_phase_')[1]))
                 elif 'gen_eps' in item:
-                    phase_list_gen_eps.append(eval(split(item,'_phase_')[1]))
+                    phase_list_gen_eps.append(eval(item.split('_phase_')[1]))
                     
 
         phase_list_structure.sort()
@@ -450,15 +453,15 @@ class parse_input:
         for item in self.param:
             if '_grains_' in item:
                 if 'U' in item:
-                    grain_list_U.append(eval(split(item,'_grains_')[1]))
+                    grain_list_U.append(eval(item.split('_grains_')[1]))
                 elif 'pos' in item:
-                    grain_list_pos.append(eval(split(item,'_grains_')[1]))
+                    grain_list_pos.append(eval(item.split('_grains_')[1]))
                 elif 'eps' in item:
-                    grain_list_eps.append(eval(split(item,'_grains_')[1]))
+                    grain_list_eps.append(eval(item.split('_grains_')[1]))
                 elif 'size' in item:
-                    grain_list_size.append(eval(split(item,'_grains_')[1]))
+                    grain_list_size.append(eval(item.split('_grains_')[1]))
                 elif 'phase' in item[:5]:
-                    grain_list_phase.append(eval(split(item,'_grains_')[1]))
+                    grain_list_phase.append(eval(item.split('_grains_')[1]))
                     self.param['no_grains_phase_%i' %self.param[item]] += 1
 
 #assert that the number of grains in all match 
@@ -593,7 +596,7 @@ class parse_input:
                         ' of phase_grains, check for multiple names'
                 self.param['grain_list'] = grain_list_phase
             else:
-                self.param['grain_list'] = range(no_grains)
+                self.param['grain_list'] = list(range(no_grains))
 
 # assert that all information needed to generate grains is present	
 #         assert len(grain_list_U) != 0 or self.param['gen_U'] != 0,\
@@ -769,13 +772,13 @@ class parse_input:
 
     def show_errors(self):
         if len(self.errors) > 0:
-            print 'List of errors and/or inconsistencies found in input: '
-            print '----------------------------------------------------- '
+            print('List of errors and/or inconsistencies found in input: ')
+            print('----------------------------------------------------- ')
             no = 0
             for i in self.errors:
                 no += 1
-                print 'Error %3i : ' %no, self.errors[i]
-            print '----------------------------------------------------- \n'
+                print('Error %3i : ' %no, self.errors[i])
+            print('----------------------------------------------------- \n')
             
 
 
@@ -801,7 +804,7 @@ class parse_input:
         modulus = n.abs(omega_end-omega_start)%omega_step
         if  modulus > 1e-9:
             if omega_step-modulus > 1e-9:
-                raise ValueError, 'The omega range does not match an integer number of omega steps' 
+                raise ValueError('The omega range does not match an integer number of omega steps') 
 
         # print omega_start,omega_end,omega_step, (n.abs(omega_end-omega_start)+1e-19)%omega_step
         omega_sign = self.param['omega_sign']
@@ -934,17 +937,17 @@ class parse_input:
         for item in self.param:
             if '_phase_' in item:
                 if 'structure' in item:
-                    phase_list_structure.append(eval(split(item,'_phase_')[1]))
+                    phase_list_structure.append(eval(item.split('_phase_')[1]))
                 elif 'unit_cell' in item:
-                    phase_list_unit_cell.append(eval(split(item,'_phase_')[1]))
+                    phase_list_unit_cell.append(eval(item.split('_phase_')[1]))
                 elif 'sgno' in item:
-                    phase_list_sgno.append(eval(split(item,'_phase_')[1]))
+                    phase_list_sgno.append(eval(item.split('_phase_')[1]))
                 elif 'sgname' in item:
-                    phase_list_sgname.append(eval(split(item,'_phase_')[1]))
+                    phase_list_sgname.append(eval(item.split('_phase_')[1]))
                 elif 'gen_size' in item:
-                    phase_list_gen_size.append(eval(split(item,'_phase_')[1]))
+                    phase_list_gen_size.append(eval(item.split('_phase_')[1]))
                 elif 'gen_eps' in item:
-                    phase_list_gen_eps.append(eval(split(item,'_phase_')[1]))
+                    phase_list_gen_eps.append(eval(item.split('_phase_')[1]))
                     
 
         phase_list_structure.sort()
@@ -1016,13 +1019,13 @@ if __name__=='__main__':
     try:
         filename = sys.argv[1] 
     except:
-        print 'Usage: check_input.py  <input.inp>'
+        print('Usage: check_input.py  <input.inp>')
         sys.exit()
 
     myinput = parse_input(input_file = filename)
     myinput.read()
     myinput.check() 
     if myinput.missing == True:
-        print 'MISSING ITEMS'
+        print('MISSING ITEMS')
     myinput.evaluate()
-    print myinput.param
+    print(myinput.param)
