@@ -294,13 +294,13 @@ class make_image:
     def write_edf(self,framenumber,frame):
         e=edfimage.edfimage()
         e.data=frame
-        e.dim2,e.dim1=frame.shape
+        edim2,edim1=frame.shape
         e.header = {}
         e.header['origin']='PolyXSim'
-        e.header['Dim_1']=e.dim1
-        e.header['Dim_2']=e.dim2
-        e.header['col_end']=e.dim1-1
-        e.header['row_end']=e.dim2-1
+        e.header['Dim_1']=edim1
+        e.header['Dim_2']=edim2
+        e.header['col_end']=edim1-1
+        e.header['row_end']=edim2-1
         e.header['DataType']='UnsignedShort'
         e.header['Image']=1
         e.header['ByteOrder']='Low'
