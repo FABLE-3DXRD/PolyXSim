@@ -6,7 +6,7 @@ import sys
 
 setup(
   name='PolyXSim',
-  version='1.1.0',
+  version='1.1.1',
   description='Simulation of diffraction images',
   license='GPL', 
   maintainer='Henning Osholm Soerensen and Jette Oddershede',
