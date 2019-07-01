@@ -30,7 +30,6 @@ class make_image:
         python translation Jette Oddershede, March 31, 2008
         """
         peakshape = self.graindata.param['peakshape']
-    
         if peakshape[0] == 0: # spike peak, 2x2 pixels
             peak_add = 1
             frame_add = 1
@@ -151,12 +150,14 @@ class make_image:
                                                                     self.graindata.param['dety_size'],
                                                                     self.graindata.param['detz_size'])
 
-                                y = round(dety_present)
-                                z = round(detz_present)
+                                y = int(round(dety_present))
+                                z = int(round(detz_present))
                                 try:
                                     frame[y+frame_add,z+frame_add] = frame[y+frame_add,z+frame_add] + fraction*intensity*filter_tth_eta[t,e]
                                 except:
+# FIXME                                    print("Unhandled exception in make_image.py")
                                     pass
+
 
 
 
@@ -166,6 +167,8 @@ class make_image:
                             for z in zrange:
                                 if y > 0 and y < framedimy and z > 0 and z < framedimz and abs(dety+frame_add-y) < 1 and abs(detz+frame_add-z) < 1:
 #                                   frame[y-1,z] = frame[y-1,z] + fraction*intensity*(1-abs(dety+frame_add-y))*(1-abs(detz+frame_add-z))
+                                    y = int(round(dety_present))
+                                    z = int(round(detz_present))
                                     frame[y,z] = frame[y,z] + fraction*intensity*(1-abs(dety+frame_add-y))*(1-abs(detz+frame_add-z))
 
             # 2D Gaussian on detector                   
