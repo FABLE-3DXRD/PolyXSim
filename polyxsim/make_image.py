@@ -3,6 +3,7 @@ from __future__ import print_function
 import sys,time
 from xfab import tools,detector
 from fabio import edfimage,tifimage
+import gzip # to write .edf.gz
 from . import variables,check_input
 from scipy import ndimage
 from scipy.stats import norm
@@ -201,6 +202,8 @@ class make_image:
             # Output frames 
             if '.edf' in self.graindata.param['output']:
                 self.write_edf(i,frame)
+            if '.edf.gz' in self.graindata.param['output']:
+                self.write_edf(i,frame,usegzip=True)
             if '.tif' in self.graindata.param['output']:
                 self.write_tif(i,frame)
             if '.tif16bit' in self.graindata.param['output']:
@@ -208,7 +211,7 @@ class make_image:
             print('\rDone frame %i took %8f s' %(i+1,time.clock()-t1), end=' ')
             sys.stdout.flush()
                 
-    def write_edf(self,framenumber,frame):
+    def write_edf(self,framenumber,frame,usegzip=False):
         e=edfimage.edfimage()
         e.data=frame
         edim2,edim1=frame.shape
@@ -227,7 +230,13 @@ class make_image:
         e.header['OmegaStep']=self.graindata.param['omega_step']
         e.header['grainfile']='%s/%s_%0.4dgrains.txt' \
             %(self.graindata.param['direc'],self.graindata.param['stem'],self.graindata.param['no_grains'])
-        e.write('%s%s' %(self.graindata.frameinfo[framenumber].name,'.edf'))
+        fname = '%s%s' %(self.graindata.frameinfo[framenumber].name,'.edf')
+        if usegzip:
+            fobj = gzip.GzipFile( fname + ".gz", "wb" )
+            e.write( fobj )
+            fobj.close()
+        else:
+            e.write(fname)
                 
     def write_tif(self,framenumber,frame):
         e=tifimage.tifimage()

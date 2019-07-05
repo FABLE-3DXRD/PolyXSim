@@ -95,7 +95,7 @@ class parse_input:
             'no_phases': 1,
             'intensity_const': 0
             }
-        self.output_types = ['.edf', 
+        self.output_types = ['.edf', '.edf.gz',
                              '.tif', 
                              '.ref',
                              '.par', 
@@ -786,11 +786,11 @@ class parse_input:
         # Frame generation
         if self.param['make_image'] != 0:
             if self.param['output'] == None:
-                self.param['output'] = '.edf'
-            if ('.edf' not in self.param['output']) and \
-                    ('.tif' not in self.param['output']) and \
-                    ('.tif16bit' not in self.param['output']):
-                self.param['output'].append('.edf')
+                self.param['output'] = ['.edf',]
+            else:
+                if not n.any( [ fmt in self.param['output'] for fmt in
+                                (".edf",".edf.gz",".tif",".tif16bit") ] ):
+                    self.param['output'].append('.edf')
      
         # Does output directory exist?
         if not os.path.exists(self.param['direc']):
