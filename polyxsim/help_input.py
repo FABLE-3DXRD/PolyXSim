@@ -452,7 +452,7 @@ File formats to output -
   There is a number of files which will be made by default. Whether one
   likes it or not. But the simulated reflections can be out put in 
   different file formats if requested. What can be chosen
-  1. '.edf' or '.tif' - presently the two supported diffraction image formats
+  1. '.edf' or '.tif' or '.edf.gz' - presently the supported diffraction image formats
   2. '.flt' - a peak file definitions on wiki:"imaged11 - file formats" format
   3. '.gve' - defined on the wiki:"imaged11 - file formats" g-vector file.
   4. '.ubi' - grain orientations as inv(U*B)

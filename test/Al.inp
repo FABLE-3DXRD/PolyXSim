@@ -3,8 +3,8 @@
 #direc '/home/osho/fable/simulation/PolyXSim/trunk/test/Al_ssch'
 direc 'Al'
 stem 'Al_ssch'
-make_image 0
-output  '.edf' '.flt' '.gve' '.par' '.ubi' 
+make_image 1
+output  '.edf.gz' '.flt' '.gve' '.par' '.ubi' 
 #Structural parameters
 #structure_phase_0 '/home/osho/fable/simulation/PolyXSim/trunk/test/Al.cif'
 structure_phase_0 'Al.cif'
