@@ -16,6 +16,16 @@ class test_input(unittest.TestCase):
         myinput.read()
         myinput.check()
         myinput.initialize()
+    def test_single_phase(self):
+        myinput = check_input.parse_input(input_file='simul_single_phase.inp')
+        myinput.read()
+        gen_eps_before_check = myinput.param['gen_eps'].copy()
+        myinput.check()
+        myinput.initialize()
+        gen_eps_before_after_check = myinput.param['gen_eps'].copy()
+        for gen_eps1,gen_eps2 in zip(gen_eps_before_check, gen_eps_before_after_check):
+            self.assertEqual(gen_eps1, gen_eps2)
+
 
 if __name__ == '__main__':
     unittest.main()

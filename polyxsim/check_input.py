@@ -385,9 +385,8 @@ class parse_input:
                 for phase in phase_list:
                     self.param['gen_size_phase_%i' %phase] = copy(self.param['gen_size'])
             else:
-                phase = 0 
-                self.param['gen_size_phase_%i' %phase] = copy(self.param['gen_size'])
-                
+                self.param['gen_size_phase_0'] = copy(self.param['gen_size'])
+
         if len(phase_list_gen_eps) != 0:
 #             assert len(phase_list_gen_eps) == no_phases, \
 #                 'Input number of structural phases does not agree with number\n' +\
@@ -409,12 +408,7 @@ class parse_input:
                 for phase in phase_list:
                     self.param['gen_eps_phase_%i' %phase] = copy(self.param['gen_eps'])
             else:
-                phase = 0 
-                # If strain is not provided and no generation of strains have be asked for
-                # "set" all eps to zero. 
-                if self.param['gen_eps'][0] == 0:
-                    self.param['gen_eps'] = [1, 0.0, 0.0, 0.0, 0.0]
-                self.param['gen_eps_phase_%i' %phase] = copy(self.param['gen_eps'])
+                self.param['gen_eps_phase_0'] = copy(self.param['gen_eps'])
         if self.param['gen_phase'][0] != 0:
 #             assert len(self.param['gen_phase'][1:]) == no_phases*2, 'Missing info for  -  gen_phase'
             if len(self.param['gen_phase'][1:]) != no_phases*2:
@@ -463,7 +457,6 @@ class parse_input:
                 elif 'phase' in item[:5]:
                     grain_list_phase.append(eval(item.split('_grains_')[1]))
                     self.param['no_grains_phase_%i' %self.param[item]] += 1
-
 #assert that the number of grains in all match 
 
         sum_of_grains = 0
@@ -488,6 +481,8 @@ class parse_input:
         grain_list_eps.sort()
         grain_list_size.sort()
         grain_list_phase.sort()
+
+
         if len(grain_list_U) != 0 and self.param['gen_U'] == 0:
 #             assert len(grain_list_U) == no_grains, \
 #                 'Input number of grains does not agree with number\n' +\
@@ -613,15 +608,30 @@ class parse_input:
         if len(grain_list_pos) == 0 and self.param['gen_pos'][0] == 0:
             self.errors['grain_list_gen_pos'] = \
                 'Information on position generation missing'
-# Not used anymore as zero strains are given if not strains are provide 
-# and no gen_eps's are given. Might be used to write warnings later.
-#        if len(grain_list_eps) == 0 and self.param['gen_eps'][0] == 0:
-#            self.errors['grain_list_gen_eps'] = \
-#                'Information on strain tensor generation missing'
+        if len(grain_list_eps) == 0 and self.param['gen_eps'][0] == 0:
+            self.errors['grain_list_gen_eps'] = \
+               'Information on strain tensor generation missing'
         if len(grain_list_size) == 0 and self.param['gen_size'][0] == 0:
             self.errors['grain_list_gen_size'] = \
                 'Information on grain size generation missing'
-			
+
+        # The user should make a decision, either things are generated randomly, or they are provided
+        # specifically. .inp files with generation toogled to "on" and specified grain properties provided
+        # at the same time should be rejected.
+        if len(grain_list_U) != 0 and self.param['gen_U'] == 1:
+            self.errors['grain_list_gen_U'] = \
+                'grain U were provided, but gen_U is also set to true.'
+        if len(grain_list_pos) != 0 and self.param['gen_pos'][0] == 1:
+            self.errors['grain_list_gen_pos'] = \
+                'grain positions were provided, but gen_pos is also set to true.'
+        if len(grain_list_eps) != 0 and self.param['gen_eps'][0] == 1:
+            self.errors['grain_list_gen_eps'] = \
+               'grain strains were provided, but gen_eps is also set to true.'
+        if len(grain_list_size) != 0 and self.param['gen_size'][0] == 1:
+            self.errors['grain_list_gen_size'] = \
+                'grain sizes were provided, but gen_size is also set to true.'
+
+                
 #If no structure file is given - unit_cel should be               
         if len(phase_list) == 0:
             # This is a monophase simulation probably using the "old" keywords
