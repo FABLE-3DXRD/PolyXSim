@@ -1,0 +1,58 @@
+### Instrumental
+beamflux 1e15
+wavelength  0.5092836 # in angstrom
+distance  135.00			# sample-detector distance (mm)
+dety_center  521.5				# beamcenter, y in pixel coordinatees
+detz_center  531.5				# beamcenter, z in pixel coordinatees
+y_size  0.0936   # Pixel size y (mm)
+z_size  0.0962   # Pixel size z (mm)
+dety_size  1024.0     # detector y size (pixels)
+detz_size  1024.0     # detector z size (pixels)
+tilt_x    0.0        # detector tilt counterclockwise around lab x axis in rad
+tilt_y    -0.1        # detector tilt counterclockwise around lab y axis in rad
+tilt_z    0.2       # detector tilt counterclockwise around lab z axis in rad
+omega_start  -90.0   # Minimum Omega in range of interest (in deg)
+omega_end  -50.0      # Maximum Omega in range of interest (in deg)
+omega_step  0.5      # Omega step size (in deg)
+omega_sign  1        # Sign of omega rotation
+beampol_factor  1    # Polarisation factor
+beampol_direct  0    # Polarisation direction
+#theta_min  0                # Minimum theta angle for reflection generation
+#theta_max  15               # Maximum theta angle for reflection generation
+o11   1              # Orientation matrix of detector
+o12   0              # [[o11,o12]
+o21   0              #  [o21,o22]]
+o22  -1              #
+
+### Grains
+no_grains  2
+
+gen_U 0        # generate grain orientations (1=on, 0=off)
+gen_pos 1 1     # generate grain positions (1=on, 0=off); (1=random, 0=(0,0,0)
+gen_eps 0 0 0 0 0 # generate strain tensors (1=on, 0=off); [mean (diag) spread (diag) mean (off-diag) spread (off-diag)]
+gen_size 1 0.05 0.01 0.25 # generate grain size (1=on, 0=off); [mean, min, max]
+sample_xyz 0.3 0.3 0.3  # sample size in mm
+
+U_grains_1 -0.888246 0.411253 -0.204671 -0.201101 -0.748709 -0.631659 -0.413011 -0.519909 0.747741
+U_grains_2 -0.158282 -0.986955 0.029458 -0.929214 0.158978 0.333597 -0.333929 0.025430 -0.942255
+
+eps_grains_1 -0.001294 4.4e-05 -0.00111 0.00259 -0.000228 -0.000491
+eps_grains_2 -0.001323 -4.9e-05 -0.001095 0.002575 -0.000318 -0.000453
+
+### Structural
+structure_file 'oPPA.cif'
+
+### Files
+direc  'simul'
+stem 'monoclinic'
+output '.flt' '.gve' '.ubi' '.par' '.edf'
+
+### Images
+make_image 0
+noise 1            # put on noise if different from 0, default no noise
+psf 1              # spread of Gaussian point spread function (detector)
+		   # corresponds roughly to the number of affected pixels on either side
+peakshape 1 2 0.5  # type, spread (in pixels from the central pixel), (spread in omega for type=1)
+		   # type=0 spike, type=1 2D Gaussian
+bg 20              # background counts
+spatial 'spatial1k.spline'
