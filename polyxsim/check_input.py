@@ -189,35 +189,35 @@ class parse_input:
                     if type(val) == type(1):
                         #assert val == 0, 'Wrong number of arguments for %s' %key
                         if val != 0: 
-                            self.errors[key] = 'Wrong number of arguments' 
+                            self.errors[key] = 'Wrong number of arguments for %s' %key 
                         else:
                             val = [0, 0]
                             self.param[key] = val
                     else:
                         #assert len(val) <= 3, 'Wrong number of arguments for %s' %key
                         if len(val) > 5: 
-                            self.errors[key] = 'Wrong number of arguments' 
+                            self.errors[key] = 'Wrong number of arguments for %s' %key 
                 elif key == 'sample_cyl' or key == 'gen_pos':
                     #assert len(val) == 2 , 'Wrong number of arguments for %s' %key
                     if len(val) != 2: 
-                        self.errors[key] = 'Wrong number of arguments' 
+                        self.errors[key] = 'Wrong number of arguments for %s' %key 
                 elif key == 'sample_xyz' or 'pos_grains' in key:
                     #assert len(val) == 3, 'Wrong number of arguments for %s' %key
                     if len(val) != 3: 
-                        self.errors[key] = 'Wrong number of arguments' 
+                        self.errors[key] = 'Wrong number of arguments for %s' %key 
                 elif 'gen_size' in key:
                     #assert len(val) == 4, 'Wrong number of arguments for %s' %key
                     if len(val) != 4: 
-                        self.errors[key] = 'Wrong number of arguments' 
+                        self.errors[key] = 'Wrong number of arguments for %s' %key 
                 elif 'gen_eps' in key:
                     if type(val) == type(1):
                         #assert val == 0, 'Wrong number of arguments for %s' %key
                         if val != 0: 
-                            self.errors[key] = 'Wrong number of arguments' 
+                            self.errors[key] = 'Wrong number of arguments for %s' %key 
                     else:
                         #assert len(val) == 5, 'Wrong number of arguments for %s' %key
                         if len(val) != 5: 
-                            self.errors[key] = 'Wrong number of arguments' 
+                            self.errors[key] = 'Wrong number of arguments for %s' %key 
                 elif key == 'gen_phase':
                     try: 
                         dummy = len(val)
@@ -226,23 +226,23 @@ class parse_input:
                         self.param[key] = val
                     #assert len(val) > 0, 'Wrong number of arguments for %s' %key
                     if len(val) < 1: 
-                        self.errors[key] = 'Wrong number of arguments' 
+                        self.errors[key] = 'Wrong number of arguments for %s' %key 
                 elif key == 'unit_cell' or 'eps_grains' in key:
                     #assert len(val) == 6, 'Wrong number of arguments for %s' %key
                     if len(val) != 6: 
-                        self.errors[key] = 'Wrong number of arguments' 
+                        self.errors[key] = 'Wrong number of arguments for %s' %key 
                 elif 'U_grains' in key:
                     if len(val) != 3:
                         #assert len(val) == 9, 'Wrong number of arguments for %s' %key
                         if len(val) != 9: 
-                            self.errors[key] = 'Wrong number of arguments' 
+                            self.errors[key] = 'Wrong number of arguments for %s' %key 
                         else:
                             self.param[key] = n.array(self.param[key])
                             self.param[key].shape = (3,3)
                     else:
                         #assert val.shape == (3,3), 'Wrong number of arguments for %s' %key
                         if  val.shape != (3,3): 
-                            self.errors[key] = 'Wrong number of arguments' 
+                            self.errors[key] = 'Wrong number of arguments for %s' %key 
                     # reshape U-matrices
             elif key == 'output':
                 for item in val:
