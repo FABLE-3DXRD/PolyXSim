@@ -65,7 +65,7 @@ class make_image:
     
         for i in no_frames:
             check_input.interrupt(self.killfile)
-            t1 = time.clock()
+            t1 = time.process_time() 
             nrefl = 0
             frame = n.zeros((framedimy,framedimz))
             omega = self.graindata.frameinfo[i].omega
@@ -208,7 +208,7 @@ class make_image:
                 self.write_tif(i,frame)
             if '.tif16bit' in self.graindata.param['output']:
                 self.write_tif16bit(i,frame)
-            print('\rDone frame %i took %8f s' %(i+1,time.clock()-t1), end=' ')
+            print('\rDone frame %i took %8f s' %(i+1,time.process_time() -t1), end=' ')
             sys.stdout.flush()
                 
     def write_edf(self,framenumber,frame,usegzip=False):
