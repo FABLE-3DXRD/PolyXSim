@@ -21,6 +21,23 @@ def interrupt(killfile):
     if killfile is not None and os.path.exists(killfile):
         raise KeyboardInterrupt
 
+import warnings
+def R2U( rot ):
+    """
+    R is an input Rotation matrix with finite precision
+    Try to locate the nearest orthonormal matrix and return it
+    """
+    # q is orthonormal. Ideally, r will be the identity matrix.
+    q, r = n.linalg.qr( n.asarray( rot ).astype( float ) )
+    # ... but usually signs are flipped. So here is the sign matrix.
+    s = n.diag( n.sign ( n.diag( r ) ) )
+    # q . s^1 . s .r == q.r, but s^1 == s, so:
+    U = q.dot( s )
+    if not n.allclose( U.astype(n.float32),
+                       rot.astype(n.float32) ):
+        warnings.warn(repr(rot) + '\n was rounded to \n' + repr(U))
+    return U
+
 
 class parse_input:
     def __init__(self,input_file = None):
@@ -239,6 +256,7 @@ class parse_input:
                         else:
                             self.param[key] = n.array(self.param[key])
                             self.param[key].shape = (3,3)
+                            self.param[key] = R2U( self.param[key] )
                     else:
                         #assert val.shape == (3,3), 'Wrong number of arguments for %s' %key
                         if  val.shape != (3,3): 
