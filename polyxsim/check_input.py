@@ -34,7 +34,7 @@ def R2U( rot ):
     # q . s^1 . s .r == q.r, but s^1 == s, so:
     U = q.dot( s )
     if not n.allclose( U.astype(n.float32),
-                       rot.astype(n.float32) ):
+                       rot.astype(n.float32), atol=1e-4 ):
         warnings.warn(repr(rot) + '\n was rounded to \n' + repr(U))
     return U
 
