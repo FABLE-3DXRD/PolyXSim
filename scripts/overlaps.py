@@ -49,11 +49,11 @@ class determine_overlap:
         nover=zeros((nrefl))
         print('Ready to compare all %i reflections' %nrefl)
         print('')
-        t1 = time.clock()
+        t1 = time.time()
         for i in range(1,nrefl):
 #            if i%1000 == 0:
 #                print 'Comparing reflection %i' %i
-            t2 = time.clock()-t1
+            t2 = time.time()-t1
             print('\rCompared %4.1f pct in %5.1f sec' %(100.*i/nrefl,t2), end=' ')                        
             sys.stdout.flush()
 

@@ -261,7 +261,7 @@ class make_image:
         no_frames = len(self.graindata.frameinfo)
         print('\nGenerating ', no_frames, 'frames')
         for frame_no in self.frames:
-            t1 = time.clock()
+            t1 = time.time()
 
             frame = self.frames[frame_no].toarray()
             if self.graindata.param['bg'] > 0:
@@ -293,7 +293,7 @@ class make_image:
             self.write_tif(i,frame)
         if '.tif16bit' in self.graindata.param['output']:
             self.write_tif16bit(i,frame)
-        print('\rDone frame %i took %8f s' %(frame_no+1,time.clock()-t1), end=' ')
+        print('\rDone frame %i took %8f s' %(frame_no+1,time.time()-t1), end=' ')
         sys.stdout.flush()
                 
     def write_edf(self,framenumber,frame,usegzip=False):
